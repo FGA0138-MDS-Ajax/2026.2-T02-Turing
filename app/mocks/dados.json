@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "endereco": "Av. Paulista, 1000",
+    "latitude": -23.5615,
+    "longitude": -46.6559
+  },
+  {
+    "id": 2,
+    "endereco": "Rua Augusta, 500",
+    "latitude": -23.5539,
+    "longitude": -46.6541
+  },
+  {
+    "id": 3,
+    "endereco": "Estação da Luz",
+    "latitude": -23.5344,
+    "longitude": -46.6358
+  },
+  {
+    "id": 4,
+    "endereco": "MASP",
+    "latitude": -23.5614,
+    "longitude": -46.6558
+  },
+  {
+    "id": 5,
+    "endereco": "Pátio do Colégio",
+    "latitude": -23.5475,
+    "longitude": -46.6339
+  },
+  {
+    "id": 6,
+    "endereco": "Mercado Municipal",
+    "latitude": -23.5418,
+    "longitude": -46.6292
+  },
+  {
+    "id": 7,
+    "endereco": "Ibirapuera",
+    "latitude": -23.5874,
+    "longitude": -46.6576
+  },
+  {
+    "id": 8,
+    "endereco": "Praça da Sé",
+    "latitude": -23.5503,
+    "longitude": -46.6339
+  },
+  {
+    "id": 9,
+    "endereco": "Allianz Parque",
+    "latitude": -23.5275,
+    "longitude": -46.6784
+  },
+  {
+    "id": 10,
+    "endereco": "USP (Portaria 1)",
+    "latitude": -23.5596,
+    "longitude": -46.7135
+  }
+]
