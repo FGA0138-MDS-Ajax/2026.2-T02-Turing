@@ -1,0 +1,12 @@
+.header{
+    width: 100%;
+    height: 5rem;
+    padding-left: 30px;
+    display: flex;
+    align-content: center;
+}
+
+.logo{
+    color: inherit;
+    text-decoration: none;
+}
