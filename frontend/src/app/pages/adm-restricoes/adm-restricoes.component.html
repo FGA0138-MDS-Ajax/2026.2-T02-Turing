@@ -1,0 +1,53 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<app-header [isAdm]="true">
+    <a href="/admUsuarios" draggable="false">
+        <button class="headerButton">Usuários</button>
+    </a>
+    <a href="/admAlertas" draggable="false">
+        <button class="headerButton">Alertas</button>
+    </a>
+    <button class="headerButton" disabled>Restrições</button>
+</app-header>
+
+<div class="main">
+    <div class="content">
+        <div class="title">
+            <div class="titleText">
+                <h1>Restrições</h1>
+                <p>Gerencie as restrições das rotas</p>
+            </div>
+            <div class="titleButton">
+                <button class="buttonCadastrar">
+                    <p class="buttonCadastrarText" (click)="criarRestricao()">
+                        Cadastrar nova restrição
+                    </p>
+                </button>
+            </div>
+        </div>
+        <div class="list">
+            <div class="listTitle">
+
+            </div>
+            <table cellspacing="0">
+                <thead class="listHeader">
+                    <tr>
+                        <th scope="col" class="listRest">Restrição</th>
+                        <th scope="col" class="listVal">Valor</th>
+                        <th scope="col" class="listAcao">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="listBody">
+                    <tr *ngFor="let restr of this.restrictions">
+                        <th class="listRest">{{restr.nome}}</th>
+                        <th class="listVal">{{restr.valor}}</th>
+                        <th class="listAcao">
+                            <p class="fa fa-pencil" (click)="editarRestricao(restr.id)"></p>
+                            <p class="fa fa-trash" (click)="deletarRestricao(restr.id)"></p>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { PainelAdmComponent } from './pages/painel-adm/painel-adm.component';
 import { HomeComponent } from './pages/home/home.component';
-import { PainelMotoristaComponent } from './pages/painel-motorista/painel-motorista.component'; //importando o componente motorista 
-
-
+import { PainelMotoristaComponent } from './pages/painel-motorista/painel-motorista.component';
+import { AdmUsuariosComponent } from './pages/adm-usuarios/adm-usuarios.component';
+import { AdmRestricoesComponent } from './pages/adm-restricoes/adm-restricoes.component';
+import { AdmAlertasComponent } from './pages/adm-alertas/adm-alertas.component';
 
 export const routes: Routes = [
     {
@@ -12,13 +12,22 @@ export const routes: Routes = [
         data: { breadcrumb: 'Home' }
     },
     {
-        path: 'painelAdm',
-        component: PainelAdmComponent,
-        data: { breadcrumb: 'Painel ADM' }
+        path: 'admUsuarios',
+        component: AdmUsuariosComponent,
+        data: { breadcrumb: 'Painel ADM - Usuários' }
     },
-
     {
-        path: 'painel-motorista', //add a rota do motorista
+        path: 'admAlertas',
+        component: AdmAlertasComponent,
+        data: { breadcrumb: 'Painel ADM - Alertas' }
+    },
+    {
+        path: 'admRestricoes',
+        component: AdmRestricoesComponent,
+        data: { breadcrumb: 'Painel ADM - Restrições' }
+    },
+    {
+        path: 'painel-motorista',
         component: PainelMotoristaComponent,
         data: { breadcrumb: 'Painel do Motorista' }
     },
@@ -26,5 +35,4 @@ export const routes: Routes = [
         path: '**',
         redirectTo: 'home'
     }
-
 ];

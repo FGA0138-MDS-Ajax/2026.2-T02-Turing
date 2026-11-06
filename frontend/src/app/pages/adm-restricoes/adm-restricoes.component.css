@@ -1,0 +1,109 @@
+.main{
+    height: 90vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+}
+
+.content{
+    height: 80vh;
+    width: 80vw;
+    margin-top: 1vh;
+}
+
+.title{
+    height: 10vh;
+    width: 80vw;
+    display: flex;
+}
+
+.titleText{
+    width: 60vw;
+}
+
+.titleButton{
+    display: flex;
+    width: 20vw;
+    align-items: end;
+    justify-content: end;
+}
+
+.buttonCadastrar{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 5vh;
+    width: 20vw;
+    border-radius: 2vh;
+    border: none;
+    background-color: blue;
+    color: white;
+    font-size: large;
+}
+
+.buttonCadastrar:hover{
+    transition: 0.2s;
+    background-color: rgb(0, 0, 128);
+    cursor: pointer;
+}
+
+.buttonCadastrar:active{
+    background-color: rgb(0, 0, 64);
+}
+
+.buttonCadastrarText::before{
+    content: "\FF0B";
+    margin-right: 0.1vw;
+}
+
+.list{
+    background-color: white;
+    border-radius: 1.5vh;
+    margin-top: 3vh;
+    height: 70vh;
+    width: 80vw;
+}
+
+.listTitle{
+    height: 10vh;
+    width: 80vw;
+}
+
+.listHeader{
+    background-color: rgb(239, 239, 239);
+    color: rgb(115, 115, 115);
+    height: 7vh;
+    width: 80vw;
+}
+
+th{
+    padding-inline: 1.5vw;
+    text-align: left;
+}
+
+.listRest{
+    width: 40vw;
+}
+
+.listVal{
+    width: 20vw;
+}
+
+.listAcao{
+    width: 20vw;
+    text-align: end;
+}
+
+.fa{
+    margin-left: 0.5vw;
+}
+
+.fa-trash{
+    font-size: x-large;
+    cursor: pointer;
+}
+
+.fa-pencil{
+    font-size: x-large;
+    cursor: pointer;
+}
