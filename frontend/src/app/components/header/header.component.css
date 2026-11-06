@@ -1,13 +1,67 @@
 .header{
     width: 100vw;
-    height: 8vh;
+    height: 10vh;
     min-height: 70px;
-    padding-left: 2vh;
     display: flex;
     align-items: center;
+    justify-content: center;
+}
+
+.headerSpace{
+    width: 90vw;
+    height: 8vh;
+    min-height: 70px;
+    border-radius: 5vh;
+    display: flex;
+    align-items: center;
+    background-color: white;
+}
+
+.logoSpace{
+    width: 20vw;
+    height: 8vh;
+    display: flex;
+    align-items: center;
+    justify-content: left;
 }
 
 .logo{
+    display: flex;
+    color: inherit;
+    margin-left: 3vw;
+    text-decoration: none;
+    user-select: none;
+    align-items: center;
+    justify-content: left;
+}
+
+.logoAdm{
+    display: flex;
     color: inherit;
     text-decoration: none;
+    user-select: none;
+    align-items: center;
+    justify-content: left;
+}
+
+.logoImg{
+    height: 6vh;
+    min-height: 50px;
+    padding-right: 0.5vw;
+}
+
+.elementSpace{
+    width: 50vw;
+    height: 8vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loginSpace{
+    width: 20vw;
+    height: 8vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

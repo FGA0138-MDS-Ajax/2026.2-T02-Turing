@@ -1,3 +1,18 @@
 <div class="header">
-    <h1><a class="logo" href="/">OpenRoute</a></h1>
+    <div class="headerSpace">
+        <div class="logoSpace">
+            <a class="logo" href="/" style="margin-left: 3vw;">
+                <img src="/Package.png" alt="" class="logoImg">
+                <h2>OpenRoute</h2>
+            </a>
+            <h3 *ngIf="this.isAdm" class="logoAdm" style="padding-left: 0.6vw;">adm</h3>
+        </div>
+        <div class="elementSpace">
+            <ng-content></ng-content>
+        </div>
+        <div class="loginSpace">
+            <button class="headerButton" disabled>Login</button>
+            <button class="headerButton" disabled>Cadastro</button>
+        </div>
+    </div>
 </div>

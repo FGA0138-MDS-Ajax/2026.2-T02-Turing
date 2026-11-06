@@ -2,4 +2,41 @@
 body{
     margin: 0;
     padding: 0;
+    background-color: aliceblue;
+}
+
+.headerButton{
+    user-select: none;
+    height: 5vh;
+    width: 9vw;
+    min-height: 50px;
+    min-width: 70px;
+    border-radius: 50px;
+    margin-left: max(0.5vh, 5px);
+    margin-right: max(0.5vh, 5px);
+    border: none;
+    font-size: medium;
+    color: white;
+    background: rgb(0, 128, 255);
+}
+
+.headerButton:hover{
+    transition: 0.2s;
+    cursor: pointer;
+    background-color: rgb(0, 64, 255);
+}
+
+.headerButton:active{
+    background-color: rgb(0, 0, 64);
+}
+
+.headerButton:disabled{
+    color: black;
+    background-color: rgb(214, 214, 214);
+}
+
+.headerButton:disabled:hover{
+    cursor: default;
+    color: black;
+    background-color: rgb(214, 214, 214);
 }
