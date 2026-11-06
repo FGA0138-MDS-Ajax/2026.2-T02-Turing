@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from typing import List
 from app.schemas.destino import Destino
 
+from app.core.matriz import gerar_matriz_distancias
+from app.core.otimizador import calcular_rota_otimizada
+
 router = APIRouter()
 
 @router.get("/health")
@@ -25,30 +28,42 @@ def calcular_rota(dados_recebidos: RotaRequest):
     # Print no terminal para o Dev 1 ver que os dados chegaram
     print(f"Recebi {len(dados_recebidos.destinos)} destinos para calcular.")
 
-    # 2. RETORNO FIXO (HARDCODED)
-    # Como ainda não temos o algoritmo do Dev 2, devolvemos os dados no formato do Contrato.
-    # Pegamos o ID do primeiro e do último destino enviado só para parecer real.
-    id_primeiro = dados_recebidos.destinos[0].id
-    id_ultimo = dados_recebidos.destinos[-1].id
+    # 2. CÁLCULO REAL DA ROTA (Substituindo o Mock)
+    destinos = dados_recebidos.destinos
+
+    # Garante que os destinos têm coordenadas (necessário para gerar a matriz)
+    for d in destinos:
+        if d.latitude is None or d.longitude is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"O destino {d.id} não possui coordenadas. Envie lat/lon para testar."
+            )
+
+    # Gera a matriz de distâncias (Função do Dev 1)
+    matriz = gerar_matriz_distancias(destinos)
     
+    # Chama o otimizador (Função do Dev 2)
+    resultado = calcular_rota_otimizada(matriz, velocidade_media_kmh=40)
+    
+    # Formata o retorno para o padrão do Contrato da API
+    rota_otimizada = []
+    for i, indice in enumerate(resultado["ordem_ids"]):
+        # Ignora o último índice se for o mesmo do início (retorno ao ponto de partida)
+        if i == len(resultado["ordem_ids"]) - 1 and indice == resultado["ordem_ids"][0]:
+            break
+            
+        d = destinos[indice]
+        rota_otimizada.append({
+            "ordem": i + 1,
+            "id_destino": d.id,
+            "endereco": d.endereco,
+            "latitude": d.latitude,
+            "longitude": d.longitude
+        })
+
     return {
-        "mensagem": "Rota calculada com sucesso (MOCK)",
-        "rota_otimizada": [
-            {
-                "ordem": 1,
-                "id_destino": id_primeiro,
-                "endereco": "Endereço Mockado 1",
-                "latitude": -23.5505,
-                "longitude": -46.6333
-            },
-            {
-                "ordem": 2,
-                "id_destino": id_ultimo,
-                "endereco": "Endereço Mockado 2",
-                "latitude": -23.5605,
-                "longitude": -46.6433
-            }
-        ],
-        "distancia_total_km": 15.5,
-        "tempo_estimado_min": 25
+        "mensagem": "Rota calculada com sucesso",
+        "rota_otimizada": rota_otimizada,
+        "distancia_total_km": resultado["distancia_total_km"],
+        "tempo_estimado_min": resultado["tempo_estimado_min"]
     }
