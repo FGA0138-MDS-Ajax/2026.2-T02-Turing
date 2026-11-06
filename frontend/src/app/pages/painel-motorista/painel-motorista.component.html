@@ -16,10 +16,13 @@
       <span [class.active]="abaAtiva === 'entregas'" (click)="selecionarAba('entregas')">Entregas</span>
     </nav>
 
-    <!-- menu de perfil do usuario -->
+    <!-- menu de perfil do utilizador com svg do bonequinho -->
     <div class="user-profile-container">
       <div class="avatar" (click)="toggleMenuPerfil()">
-        <span>MS</span>
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
       </div>
 
       <div class="dropdown-menu" *ngIf="menuPerfilAberto">
@@ -34,10 +37,11 @@
   <!-- conteudo principal q muda conforme a aba -->
   <main class="conteudo">
 
-    <!-- aba de endereços -->
+    <!-- aba de endereços com cep, rua, número e complemento -->
     <div *ngIf="abaAtiva === 'enderecos'" class="tab-content">
       <div class="section-header">
         <div>
+          <span class="sub-titulo">MINHA CONTA</span>
           <h1>Adicionar endereço</h1>
           <p class="descricao">Cadastre um endereço para agilizar suas rotas e organizar seus locais mais importantes.</p>
         </div>
@@ -75,7 +79,7 @@
       </div>
     </div>
 
-    <!-- aba de entregas vazia, pronta p/ receber os dados reais depois -->
+    <!-- aba de entregas vazia -->
     <div *ngIf="abaAtiva === 'entregas'" class="tab-content">
       <div class="section-header">
         <div>
