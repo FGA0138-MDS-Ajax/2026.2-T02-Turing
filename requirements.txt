@@ -4,3 +4,5 @@ uvicorn
 pydantic
 ortools
 pytest
+pymysql
+sqlalchemy
