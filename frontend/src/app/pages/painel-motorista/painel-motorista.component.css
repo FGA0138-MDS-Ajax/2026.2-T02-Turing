@@ -1,0 +1,408 @@
+/* importa a fonte inter do google fonts p/ padronizar a tipografia */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+/* define o fundo geral do painel com altura minima de tela cheia */
+.painel-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* ---------- NAVBAR ---------- */
+/* estiliza a barra superior dividindo o espaço entre logo, links e perfil */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  padding: 15px 40px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 20px;
+  color: #1e293b;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links span {
+  cursor: pointer;
+  color: #64748b;
+  font-weight: 500;
+  font-size: 15px;
+  padding-bottom: 20px;
+  margin-bottom: -20px;
+  position: relative;
+  transition: color 0.2s;
+}
+
+.nav-links span:hover {
+  color: #1e3a8a;
+}
+
+/* estiliza a aba q tá ativa com cor azul e uma linha embaixo */
+.nav-links span.active {
+  color: #2563eb;
+  font-weight: 600;
+  border-bottom: 3px solid #2563eb;
+}
+
+/* ---------- PERFIL / AVATAR ---------- */
+.user-profile-container {
+  position: relative;
+}
+
+/* bolinha preta com as iniciais do motorista q funciona como botao */
+.avatar {
+  background-color: #0f172a;
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* caixinha flutuante do menu dropdown q aparece ao clicar no avatar */
+.dropdown-menu {
+  position: absolute;
+  top: 50px;
+  right: 0;
+  min-width: 160px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 8px 0;
+  z-index: 10;
+}
+
+.dropdown-menu a {
+  display: block;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #334155;
+  text-decoration: none;
+}
+
+.dropdown-menu a:hover {
+  background: #f1f5f9;
+}
+
+.dropdown-menu hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 4px 0;
+}
+
+.dropdown-menu .logout {
+  color: #dc2626;
+}
+
+/* ---------- CONTEÚDO ---------- */
+/* centraliza o conteudo principal no meio da pagina com largura maxima */
+.conteudo {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.sub-titulo {
+  font-size: 11px;
+  font-weight: 700;
+  color: #2563eb;
+  letter-spacing: 1px;
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 6px 0 8px 0;
+}
+
+.descricao {
+  color: #64748b;
+  font-size: 14px;
+  margin: 0;
+}
+
+/* ---------- FORMULÁRIO ---------- */
+.card-formulario {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.card-formulario h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #334155;
+}
+
+.input-group input {
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ---------- BOTÃO ---------- */
+.acoes-footer {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-otimizar {
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-otimizar:hover {
+  background-color: #1e40af;
+}
+
+/* ---------- ESTILOS DA ABA DE ENTREGAS ---------- */
+.lista-entregas {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-entrega {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.entrega-header-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.entrega-header-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+  margin: 0;
+}
+
+.endereco-texto {
+  font-size: 14px;
+  color: #475569;
+  margin: 4px 0;
+}
+
+.detalhes-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0;
+}
+
+/* cores dinamicas p/ os badges de status da entrega */
+.badge-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+.badge-status.pendente {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.badge-status.em-trânsito {
+  background-color: #e0f2fe;
+  color: #0284c7;
+}
+
+.badge-status.concluída {
+  background-color: #dcfce7;
+  color: #16a34a;
+}
+
+.entrega-acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+
+.select-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.select-group select {
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.btn-ocorrencia {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-ocorrencia:hover {
+  background-color: #fee2e2;
+}
+
+/* ---------- MODAL DE OCORRÊNCIA ---------- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.modal-card h3 {
+  margin-top: 0;
+  color: #0f172a;
+  font-size: 18px;
+}
+
+.modal-card p {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 12px;
+}
+
+.modal-card textarea {
+  width: 100%;
+  height: 90px;
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  resize: none;
+  outline: none;
+  margin-bottom: 16px;
+}
+
+.modal-botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancelar {
+  background: #f1f5f9;
+  color: #475569;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-salvar {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}

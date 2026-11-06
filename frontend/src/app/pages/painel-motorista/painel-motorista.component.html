@@ -1,48 +1,94 @@
-<!-- Menu Superior / Navbar (como no seu layout) -->
-<nav class="navbar">
+<!-- container principal do painel -->
+<div class="painel-container">
   
-  <ul class="nav-links">
-    <li [class.active]="abaAtiva === 'feedback'" (click)="selecionarAba('feedback')">Feedback</li>
-    <li [class.active]="abaAtiva === 'perfil'" (click)="selecionarAba('perfil')">Perfil</li>
-    <li [class.active]="abaAtiva === 'notificacoes'" (click)="selecionarAba('notificacoes')">Notificações</li>
-    <li [class.active]="abaAtiva === 'enderecos'" (click)="selecionarAba('enderecos')">Endereços</li>
-  </ul>
-</nav>
+  <!-- barra superior de navegação -->
+  <header class="navbar">
+    <div class="logo-area">
+      <span class="logo-texto">OpenRoute</span>
+    </div>
 
-// a ideia de nao ter que mudar o endereçamento das pag
-<main class="conteudo-principal">
+    <!-- links de navegação entre as abas -->
+    <nav class="nav-links">
+      <span [class.active]="abaAtiva === 'feedback'" (click)="selecionarAba('feedback')">Feedback</span>
+      <span [class.active]="abaAtiva === 'perfil'" (click)="selecionarAba('perfil')">Perfil</span>
+      <span [class.active]="abaAtiva === 'notificacoes'" (click)="selecionarAba('notificacoes')">Notificações</span>
+      <span [class.active]="abaAtiva === 'enderecos'" (click)="selecionarAba('enderecos')">Endereços</span>
+      <span [class.active]="abaAtiva === 'entregas'" (click)="selecionarAba('entregas')">Entregas</span>
+    </nav>
 
-  @if (abaAtiva === 'feedback') {
-    <section>
-      <h2>Enviar Feedback</h2>
-    </section>
-  }
+    <!-- menu de perfil do usuario -->
+    <div class="user-profile-container">
+      <div class="avatar" (click)="toggleMenuPerfil()">
+        <span>MS</span>
+      </div>
 
-  @if (abaAtiva === 'perfil') {
-    <section>
-      <h2>Perfil do Motorista</h2>
-    </section>
-  }
+      <div class="dropdown-menu" *ngIf="menuPerfilAberto">
+        <a href="#" (click)="$event.preventDefault(); selecionarAba('perfil'); menuPerfilAberto = false">Meu Perfil</a>
+        <a href="#" (click)="$event.preventDefault(); abrirConfiguracoes()">Configurações</a>
+        <hr>
+        <a href="#" class="logout" (click)="$event.preventDefault(); sair()">Sair</a>
+      </div>
+    </div>
+  </header>
 
-  @if (abaAtiva === 'notificacoes') {
-    <section>
-      <h2>Suas Notificações</h2>
-    </section>
-  }
+  <!-- conteudo principal q muda conforme a aba -->
+  <main class="conteudo">
 
-  @if (abaAtiva === 'enderecos') {
-    <section>
-      <span>MINHA CONTA</span>
-      <h2>Adicionar endereço</h2>
-      
-      <form>
-        
-        <!-- Botão para navegar para a tela com o mapa/OSRM -->
-        <button type="button" routerLink="/rota-otimizada" class="btn-otimizar">
-          Otimizar Rota
-        </button>
-      </form>
-    </section>
-  }
+    <!-- aba de endereços -->
+    <div *ngIf="abaAtiva === 'enderecos'" class="tab-content">
+      <div class="section-header">
+        <div>
+          <h1>Adicionar endereço</h1>
+          <p class="descricao">Cadastre um endereço para agilizar suas rotas e organizar seus locais mais importantes.</p>
+        </div>
+      </div>
 
-</main>
+      <div class="card-formulario">
+        <h3>Dados do endereço</h3>
+        <p class="card-desc">Preencha os campos abaixo. Os itens com * são obrigatórios.</p>
+
+        <form class="form-grid">
+          <div class="input-group">
+            <label>CEP *</label>
+            <input type="text" placeholder="00000-000">
+          </div>
+          <div class="input-group">
+            <label>Rua *</label>
+            <input type="text" placeholder="Ex.: Avenida das Nações">
+          </div>
+
+          <div class="input-group">
+            <label>Número *</label>
+            <input type="text" placeholder="123">
+          </div>
+          <div class="input-group">
+            <label>Complemento</label>
+            <input type="text" placeholder="Apto, Bloco, etc.">
+          </div>
+        </form>
+
+        <div class="acoes-footer">
+          <button type="button" class="btn-otimizar" routerLink="/rota-otimizada">
+            Otimizar Rota
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- aba de entregas vazia, pronta p/ receber os dados reais depois -->
+    <div *ngIf="abaAtiva === 'entregas'" class="tab-content">
+      <div class="section-header">
+        <div>
+          <span class="sub-titulo">GESTÃO DE ROTAS</span>
+          <h1>Minhas Entregas</h1>
+          <p class="descricao">Acompanhe as entregas ativas, altere o status ou registre ocorrências.</p>
+        </div>
+      </div>
+
+      <div class="card-formulario">
+        <p class="card-desc">Nenhuma entrega cadastrada no momento.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
