@@ -1,0 +1,48 @@
+<!-- Menu Superior / Navbar (como no seu layout) -->
+<nav class="navbar">
+  
+  <ul class="nav-links">
+    <li [class.active]="abaAtiva === 'feedback'" (click)="selecionarAba('feedback')">Feedback</li>
+    <li [class.active]="abaAtiva === 'perfil'" (click)="selecionarAba('perfil')">Perfil</li>
+    <li [class.active]="abaAtiva === 'notificacoes'" (click)="selecionarAba('notificacoes')">Notificações</li>
+    <li [class.active]="abaAtiva === 'enderecos'" (click)="selecionarAba('enderecos')">Endereços</li>
+  </ul>
+</nav>
+
+// a ideia de nao ter que mudar o endereçamento das pag
+<main class="conteudo-principal">
+
+  @if (abaAtiva === 'feedback') {
+    <section>
+      <h2>Enviar Feedback</h2>
+    </section>
+  }
+
+  @if (abaAtiva === 'perfil') {
+    <section>
+      <h2>Perfil do Motorista</h2>
+    </section>
+  }
+
+  @if (abaAtiva === 'notificacoes') {
+    <section>
+      <h2>Suas Notificações</h2>
+    </section>
+  }
+
+  @if (abaAtiva === 'enderecos') {
+    <section>
+      <span>MINHA CONTA</span>
+      <h2>Adicionar endereço</h2>
+      
+      <form>
+        
+        <!-- Botão para navegar para a tela com o mapa/OSRM -->
+        <button type="button" routerLink="/rota-otimizada" class="btn-otimizar">
+          Otimizar Rota
+        </button>
+      </form>
+    </section>
+  }
+
+</main>
