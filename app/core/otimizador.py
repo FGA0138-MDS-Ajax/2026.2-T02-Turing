@@ -1,7 +1,7 @@
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
-def calcular_rota_otimizada(matriz_distancias, velocidade_media_kmh=40):
+def calcular_rota_otimizada(matriz_distancias, matriz_tempos=None, velocidade_media_kmh=40):
     """
     Recebe uma matriz NxN de distâncias (em km) e retorna a ordem otimizada dos IDs, a distância total (km) e o tempo estimado (min).
     """
@@ -10,21 +10,26 @@ def calcular_rota_otimizada(matriz_distancias, velocidade_media_kmh=40):
     if num_pontos < 2:
         raise ValueError("A matriz precisa ter pelo menos 2 pontos para calcular a rota.")
 
-    # O OR-Tools trabalha com inteiros, então convertemos km para metros
-    matriz_metros = [[int(dist * 1000) for dist in linha] for linha in matriz_distancias]
+    # Se tiver matriz de tempo, otimiza por tempo. Se não, por distância
+    if matriz_tempos:
+        matriz_custo = [[int(tempo) for tempo in linha] for linha in matriz_tempos]
+    else: 
+        matriz_custo = [[int(distancia * 1000) for distancia in linha] for linha in matriz_distancias]  
 
     # Configuração do problema (1 veículo, começando e terminando no ponto 0)
     manager = pywrapcp.RoutingIndexManager(num_pontos, 1, 0)
     routing = pywrapcp.RoutingModel(manager)
 
-    # Callback para o custo (distância) entre dois pontos
-    def distancia_callback(from_index, to_index):
+    # Callback para o custo entre dois pontos
+    def custo_callback(from_index, to_index):
         from_node = manager.IndexToNode(from_index)
         to_node = manager.IndexToNode(to_index)
-        return matriz_metros[from_node][to_node]
+        return matriz_custo[from_node][to_node]
 
-    transit_callback_index = routing.RegisterTransitCallback(distancia_callback)
+    # Registra o callback no roteador
+    transit_callback_index = routing.RegisterTransitCallback(custo_callback)
     routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
+    
 
     # Parâmetros de busca (limite de tempo de 5 segundos, conforme a métrica 4.1.1)
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
@@ -47,14 +52,21 @@ def calcular_rota_otimizada(matriz_distancias, velocidade_media_kmh=40):
         rota_ordem.append(node)
         previous_index = index
         index = solution.Value(routing.NextVar(index))
-        distancia_total_metros += routing.GetArcCostForVehicle(previous_index, index, 0)
+        
+        from_node = manager.IndexToNode(previous_index)
+        to_node = manager.IndexToNode(index)
+        distancia_total_metros += (matriz_distancias[from_node][to_node] * 1000)
 
     # Adiciona o ponto final (que é o mesmo do início no TSP)
     rota_ordem.append(manager.IndexToNode(index))
 
     distancia_total_km = distancia_total_metros / 1000.0
-    tempo_estimado_min = (distancia_total_km / velocidade_media_kmh) * 60
-
+    
+    if matriz_tempos:
+        tempo_estimado_min = sum(matriz_tempos[rota_ordem[i]][rota_ordem[i+1]] for i in range(len(rota_ordem)-1))
+    else:
+        tempo_estimado_min = (distancia_total_km / velocidade_media_kmh) * 60
+    
     return {
         "ordem_ids": rota_ordem,
         "distancia_total_km": round(distancia_total_km, 2),
