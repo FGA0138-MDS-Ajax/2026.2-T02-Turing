@@ -12,4 +12,7 @@ export class HeaderComponent {
   @Input()
   public isAdm: boolean = false;
 
+  @Input()
+  public isLogged: boolean = false;
+
 }
