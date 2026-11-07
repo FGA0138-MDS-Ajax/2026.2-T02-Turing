@@ -1,0 +1,244 @@
+<!-- container principal do painel do cliente -->
+<div class="painel-container">
+  
+  <!-- nav superior c/ logo, abas e perfil -->
+  <header class="navbar">
+    <div class="logo-area" style="cursor: pointer;" routerLink="/home">
+      <span class="logo-texto">OpenRoute</span>
+    </div>
+
+    <!-- links centrais p/ alternar abas -->
+    <nav class="nav-links">
+      <span [class.active]="abaAtiva === 'fazer-pedido'" (click)="selecionarAba('fazer-pedido')">Fazer Pedido</span>
+      <span [class.active]="abaAtiva === 'ver-pedidos'" (click)="selecionarAba('ver-pedidos')">Ver Pedidos</span>
+    </nav>
+
+    <!-- area direita c/ sino de notifs (badge + dropdown) e avatar do user -->
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      
+      <!-- container relativo p/ o dropdown de notificacoes -->
+      <div class="user-profile-container" style="position: relative;">
+        
+        <!-- icone do sino c/ badge contador de nao lidas -->
+        <div class="icone-sino" (click)="toggleNotificacoes()" style="cursor: pointer; position: relative; color: #64748b; display: flex; align-items: center;" title="Notificações">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <!-- badge vermelhinho c/ a quantidade -->
+          <span *ngIf="qtdNaoLidas > 0" style="position: absolute; top: -5px; right: -6px; background: #dc2626; color: white; font-size: 0.7rem; font-weight: 700; padding: 1px 5px; border-radius: 10px; border: 2px solid white;">
+            {{ qtdNaoLidas }}
+          </span>
+        </div>
+
+        <!-- menu flutuante de notificacoes q desce ao clicar -->
+        <div class="dropdown-menu" *ngIf="notificacoesAberto" style="width: 340px; right: 0; left: auto; padding: 0;">
+          
+          <!-- cabecalho do dropdown c/ titulo e botoes de filtro (todas / nao lidas) -->
+          <div style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 600; color: #0f172a; font-size: 0.95rem;">Notificações</span>
+              <span style="font-size: 0.8rem; color: #2563eb; cursor: pointer;" (click)="marcarTodasComoLidas()">Marcar lidas</span>
+            </div>
+            <!-- abas internas de filtro -->
+            <div style="display: flex; gap: 8px;">
+              <button type="button" (click)="mudarFiltroNotificacoes('todas')" [style.background]="filtroNotificacoes === 'todas' ? '#eff6ff' : 'transparent'" [style.color]="filtroNotificacoes === 'todas' ? '#2563eb' : '#64748b'" style="border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                Todas
+              </button>
+              <button type="button" (click)="mudarFiltroNotificacoes('nao-lidas')" [style.background]="filtroNotificacoes === 'nao-lidas' ? '#eff6ff' : 'transparent'" [style.color]="filtroNotificacoes === 'nao-lidas' ? '#2563eb' : '#64748b'" style="border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                Não lidas
+              </button>
+            </div>
+          </div>
+
+          <!-- lista de avisos filtrados c/ scroll -->
+          <div style="max-height: 260px; overflow-y: auto;">
+            <ng-container *ngIf="notificacoesFiltradas.length > 0; else semNotifs">
+              <div *ngFor="let notif of notificacoesFiltradas" style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;" [style.background]="notif.lida ? 'transparent' : '#f8fafc'">
+                <!-- icone indicador de nao lida -->
+                <span *ngIf="!notif.lida" style="width: 8px; height: 8px; background: #2563eb; border-radius: 50%; margin-top: 5px; flex-shrink: 0;"></span>
+                <div style="flex-grow: 1;">
+                  <p style="font-size: 0.85rem; color: #1e293b; font-weight: 500; margin: 0 0 4px 0;">{{ notif.titulo }}</p>
+                  <span style="font-size: 0.75rem; color: #64748b;">{{ notif.tempo }}</span>
+                </div>
+              </div>
+            </ng-container>
+            
+            <ng-template #semNotifs>
+              <p style="padding: 20px; text-align: center; color: #64748b; font-size: 0.85rem; margin: 0;">Nenhuma notificação encontrada.</p>
+            </ng-template>
+          </div>
+
+          <!-- rodape do dropdown -->
+          <div style="padding: 10px 16px; text-align: center; border-top: 1px solid #e2e8f0; background: #f8fafc;">
+            <span style="font-size: 0.85rem; color: #2563eb; font-weight: 500; cursor: pointer;" (click)="notificacoesAberto = false">Mostrar todos</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- dropdown do perfil do user -->
+      <div class="user-profile-container" style="position: relative;">
+        <div class="avatar-dropdown-trigger" (click)="toggleMenuPerfil()" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+          <div class="avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+
+        <!-- menu suspenso qnd clica no avatar -->
+        <div class="dropdown-menu" *ngIf="menuPerfilAberto">
+          <a href="#" (click)="$event.preventDefault(); selecionarAba('perfil'); menuPerfilAberto = false">Meu Perfil</a>
+          <a href="#" (click)="$event.preventDefault(); abrirConfiguracoes()">Configurações</a>
+          <hr>
+          <a href="#" class="logout" (click)="$event.preventDefault(); sair()">Sair</a>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- conteudo q muda de acordo c/ a aba ativa -->
+  <main class="conteudo">
+
+    <!-- 1. aba p/ solicitar novo pedido -->
+    <div *ngIf="abaAtiva === 'fazer-pedido'" class="tab-content">
+      <div class="section-header">
+        <span class="sub-titulo">NOVA SOLICITAÇÃO</span>
+        <h1>Fazer Pedido</h1>
+        <p class="descricao">Preencha os dados do pacote e os detalhes do endereço.</p>
+      </div>
+
+      <!-- form c/ campos de cep e num -->
+      <div class="card-formulario">
+        <form (ngSubmit)="enviarPedido()">
+          
+          <!-- desc do pacote -->
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem;">Descrição do Pedido</label>
+            <input type="text" [(ngModel)]="novoPedido.descricao" name="descricao" placeholder="Ex: Caixa de documentos" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <!-- campo cep -->
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem;">CEP de Destino</label>
+            <input type="text" [(ngModel)]="novoPedido.cep" name="cep" placeholder="Ex: 72115-000" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <!-- campo num -->
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #334155; margin-bottom: 0.5rem;">Número / Lote</label>
+            <input type="number" [(ngModel)]="novoPedido.numero" name="numero" placeholder="Ex: 12" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <!-- envio do form -->
+          <button type="submit" class="btn-otimizar" style="cursor: pointer;">Confirmar e Solicitar Pedido</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- 2. aba p/ listar e ver histórico de pedidos -->
+    <div *ngIf="abaAtiva === 'ver-pedidos'" class="tab-content">
+      <div class="section-header">
+        <span class="sub-titulo">HISTÓRICO E ACOMPANHAMENTO</span>
+        <h1>Ver Pedidos</h1>
+        <p class="descricao">Acompanhe o andamento dos seus pedidos solicitados.</p>
+      </div>
+
+      <!-- tabela c/ a listagem dos pedidos -->
+      <div class="card-formulario">
+        <ng-container *ngIf="listaPedidos.length > 0; else semPedidos">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid #e2e8f0; text-align: left;">
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">ID</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Descrição</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Status Atual</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem; text-align: right;">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- loop p/ desenhar as linhas da tabela -->
+              <tr *ngFor="let pedido of listaPedidos" style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.75rem; color: #64748b; font-size: 0.9rem;">#{{ pedido.id }}</td>
+                <td style="padding: 0.75rem; color: #334155; font-size: 0.9rem;">{{ pedido.descricao }}</td>
+                <td style="padding: 0.75rem; font-weight: 600; color: #0f172a; font-size: 0.9rem;">{{ pedido.status }}</td>
+                <td style="padding: 0.75rem; text-align: right;">
+                  <button type="button" (click)="verDetalhesPedido(pedido)" style="background: #0f172a; color: white; border: none; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.8rem; cursor: pointer;">
+                    Detalhes
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+
+        <!-- mensagem se n houver pedidos -->
+        <ng-template #semPedidos>
+          <p class="card-desc">Você ainda não realizou nenhum pedido.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- 3. sub-tela p/ gerenciar detalhes do pedido -->
+    <div *ngIf="abaAtiva === 'detalhes-pedido'" class="tab-content">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span class="sub-titulo">GERENCIAMENTO DO PEDIDO #{{ pedidoSelecionado?.id }}</span>
+          <h1>Detalhes do Pedido</h1>
+          <p class="descricao">{{ pedidoSelecionado?.descricao }} - CEP: {{ pedidoSelecionado?.cep }}, Nº {{ pedidoSelecionado?.numero }}</p>
+        </div>
+        <button type="button" (click)="selecionarAba('ver-pedidos')" style="background: transparent; border: 1px solid #cbd5e1; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer;">
+          Voltar para Lista
+        </button>
+      </div>
+
+      <!-- cards de acoes do pedido (status, rastreio e cancelamento) -->
+      <div class="card-formulario" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- status do pedido -->
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <h3 style="font-size: 0.95rem; color: #0f172a; margin-bottom: 0.5rem;">Status</h3>
+          <p style="color: #475569; font-size: 0.9rem;">O status atual do seu pedido é: <strong style="color: #0f172a;">{{ pedidoSelecionado?.status }}</strong></p>
+        </div>
+
+        <!-- rastreamento do pedido -->
+        <div style="background: #f8fafc; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <h3 style="font-size: 0.95rem; color: #0f172a; margin-bottom: 0.5rem;">Rastreamento em Tempo Real</h3>
+          <p style="color: #475569; font-size: 0.9rem; margin-bottom: 0.75rem;">Acompanhe a rota e a localização estimada do entregador.</p>
+          <button type="button" (click)="rastrearPedido(pedidoSelecionado)" style="background: #2563eb; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+            Abrir Mapa de Rastreio
+          </button>
+        </div>
+
+        <!-- zona de cancelamento do pedido -->
+        <div style="background: #fef2f2; padding: 1rem; border-radius: 8px; border: 1px solid #fecaca;">
+          <h3 style="font-size: 0.95rem; color: #991b1b; margin-bottom: 0.5rem;">Zona de Perigo / Cancelamento</h3>
+          <p style="color: #b91c1c; font-size: 0.9rem; margin-bottom: 0.75rem;">Se necessário, você pode cancelar este pedido antes que ele seja recolhido.</p>
+          <button type="button" (click)="cancelarPedido(pedidoSelecionado)" style="background: #dc2626; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer;">
+            Cancelar Pedido
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 4. aba de perfil do user -->
+    <div *ngIf="abaAtiva === 'perfil'" class="tab-content">
+      <div class="section-header">
+        <span class="sub-titulo">MINHA CONTA</span>
+        <h1>Meu Perfil</h1>
+        <p class="descricao">Visualize e edite as informações da sua conta de cliente.</p>
+      </div>
+      <div class="card-formulario">
+        <p class="card-desc">Informações do cliente carregadas com sucesso.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
