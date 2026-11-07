@@ -10,7 +10,7 @@
         <div class="elementSpace">
             <ng-content></ng-content>
         </div>
-        <div class="loginSpace">
+        <div class="loginSpace" *ngIf="!this.isLogged">
             <button class="headerButton" disabled>Login</button>
             <button class="headerButton" disabled>Cadastro</button>
         </div>

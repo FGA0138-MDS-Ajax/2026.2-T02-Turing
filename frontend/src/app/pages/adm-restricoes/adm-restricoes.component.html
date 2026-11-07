@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-<app-header [isAdm]="true">
+<app-header [isAdm]="true" [isLogged]="true">
     <a href="/admUsuarios" draggable="false">
         <button class="headerButton">Usuários</button>
     </a>
@@ -11,43 +11,196 @@
 </app-header>
 
 <div class="main">
-    <div class="content">
+    <div *ngIf="abaAtiva === 'Listar'" class="listContent">
         <div class="title">
             <div class="titleText">
-                <h1>Restrições</h1>
-                <p>Gerencie as restrições das rotas</p>
+                <div>
+                    <p>Gestão de restrições</p>
+                    <h1>Restrições</h1>
+                    <p>Limites de variação dos valores das rotas</p>
+                </div>
             </div>
             <div class="titleButton">
-                <button class="buttonCadastrar">
-                    <p class="buttonCadastrarText" (click)="criarRestricao()">
+                <button class="buttonAvancar" (click)="abrirCadastro()">
+                    <p class="buttonCadastrarText">
                         Cadastrar nova restrição
                     </p>
                 </button>
             </div>
         </div>
-        <div class="list">
-            <div class="listTitle">
-
-            </div>
-            <table cellspacing="0">
+        <div class="contentBox">
+            <table *ngIf="this.restricoes.length > 0" cellspacing="0">
                 <thead class="listHeader">
                     <tr>
-                        <th scope="col" class="listRest">Restrição</th>
-                        <th scope="col" class="listVal">Valor</th>
+                        <th scope="col" class="listRest">Id da rota</th>
+                        <th scope="col" class="listVal">Data de criação</th>
                         <th scope="col" class="listAcao">Ações</th>
                     </tr>
                 </thead>
                 <tbody class="listBody">
-                    <tr *ngFor="let restr of this.restrictions">
-                        <th class="listRest">{{restr.nome}}</th>
-                        <th class="listVal">{{restr.valor}}</th>
+                    <tr *ngFor="let restr of this.restricoes">
+                        <th class="listRest">{{restr.id}}</th>
+                        <th class="listVal">{{restr.criada_em}}</th>
                         <th class="listAcao">
-                            <p class="fa fa-pencil" (click)="editarRestricao(restr.id)"></p>
-                            <p class="fa fa-trash" (click)="deletarRestricao(restr.id)"></p>
+                            <p class="fa fa-eye" (click)="abrirDetalhes(restr.id)"></p>
+                            <p class="fa fa-pencil" (click)="abrirEdicao(restr.id)"></p>
                         </th>
                     </tr>
                 </tbody>
             </table>
+            <div *ngIf="this.restricoes.length === 0" class="noRestrictions">
+                <p>Nenhuma restrição cadastrada</p>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="abaAtiva === 'Cadastrar'" class="listContent">
+        <div class="title">
+            <div class="titleText">
+                <div>
+                    <p>Gestão de restrições</p>
+                    <h1>Cadastre uma restrição</h1>
+                    <p>Crie uma nova restrição</p>
+                </div>
+            </div>
+            <div class="titleButton">
+                <button class="buttonVoltar" (click)="abrirLista()">Voltar</button>
+            </div>
+        </div>
+        <div class="contentBox">
+            <form (ngSubmit)="cadastrarRestricao()">
+                <div class="editorRota">
+                    <label for="selectRota"><b>Rota</b></label>
+                    <select [(ngModel)]="novaRestricaoRotaId" name="idDaRota" id="selectRota">
+                        <option *ngFor="let rota of this.rotas" value="{{rota.id}}">{{rota.nome}}</option>
+                    </select>
+                </div>
+                <div class="editorJanelaInicio">
+                    <label for="tempoInicio"><b>JanelaInicio</b></label>
+                    <input type="time" [(ngModel)]="novaRestricaoJanelaInicio" name="janelaInicio" id="tempoInicio">
+                </div>
+                <div class="editorJanelaFim">
+                    <label for="tempoFim"><b>JanelaFim</b></label>
+                    <input type="time" [(ngModel)]="novaRestricaoJanelaFim" name="janelaFim" id="tempoFim">
+                </div>
+                <div class="editorCapacidade">
+                    <label for="numberCapacidade"><b>CapacidadeMaxima</b></label>
+                    <input type="number" [(ngModel)]="novaRestricaoCapacidadeMaxima" name="capacidadeMaxima" id="numberCapacidade">
+                </div>
+                <div class="editorUnidade">
+                    <label for="textUnidade"><b>UnidadeCapacidade</b></label>
+                    <input type="text" [(ngModel)]="novaRestricaoUnidadeCapacidade" name="unidadeCapacidade" id="textUnidade">
+                </div>
+                <div class="editorObservacoes">
+                    <label for="textObservacoes"><b>Observacoes</b></label>
+                    <input type="text" [(ngModel)]="novaRestricaoObservacoes" name="observacoes" id="textObservacoes">
+                </div>
+
+                <div class="editorButton">
+                    <button type="submit" class="buttonAvancar">Cadastrar Rota</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div *ngIf="abaAtiva === 'Detalhar'" class="listContent">
+        <div class="title">
+            <div class="titleText">
+                <div>
+                    <p>Gestão de restrições</p>
+                    <h1>Detalhes da restrição</h1>
+                    <p>Observe os detalhes da restrição</p>
+                </div>
+            </div>
+            <div class="titleButton">
+                <button class="buttonVoltar" (click)="abrirLista()">Voltar</button>
+            </div>
+        </div>
+        <div class="contentBox">
+            <div class="detalheBox">
+                <div class="detalheId">
+                    <h2>Restrição {{restricaoDetalhada.id}}</h2>
+                </div>
+                <div class="detalheCadastramento">
+                    <b>Cadastramento:</b>
+                    <p>{{restricaoDetalhada.criada_em}}</p>
+                </div>
+                <div class="detalheAtualizacao">
+                    <b>Última atualização:</b>
+                    <p>{{restricaoDetalhada.atualizada_em}}</p>
+                </div>
+                <div class="detalheRota">
+                    <b>Rota:</b>
+                    <p>{{restricaoDetalhada.rota_id}}</p>
+                </div>
+                <div class="detalheJanelaDeTempo">
+                    <b>Janela de tempo:</b>
+                    <div class="detalheJanelaInicio">
+                        <b>Início:</b>
+                        <p>{{(restricaoDetalhada.janela_inicio != undefined ? restricaoDetalhada.janela_inicio : '----')}}</p>
+                    </div>
+                    <div class="detalheJanelaFim">
+                        <b>Fim:</b>
+                        <p>{{(restricaoDetalhada.janela_fim != undefined ? restricaoDetalhada.janela_fim : '----')}}</p>
+                    </div>
+                </div>
+                <div class="detalheCapacidade">
+                    <b>Capacidade máxima:</b>
+                    <p>{{(restricaoDetalhada.capacidade_maxima != undefined ? (restricaoDetalhada.capacidade_maxima + ' ' + restricaoDetalhada.unidade_capacidade) : '----')}}</p>
+                </div>
+                <div class="detalheObservacoes">
+                    <b>Observações:</b>
+                    <div class="detalheObservacoesTexto">
+                        <p>{{(restricaoDetalhada.observacoes != undefined ? restricaoDetalhada.observacoes : '----')}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div *ngIf="abaAtiva === 'Editar'" class="listContent">
+        <div class="title">
+            <div class="titleText">
+                <div>
+                    <p>Gestão de restrições</p>
+                    <h1>Edite a restrição</h1>
+                    <p>Faça as alterações desejadas na restrição</p>
+                </div>
+            </div>
+            <div class="titleButton">
+                <button class="buttonVoltar" (click)="abrirLista()">Voltar</button>
+            </div>
+        </div>
+        <div class="contentBox">
+            <div class="formEditor">
+                <form (ngSubmit)="editarRestricao()">
+                    <div>
+                        <div class="editorJanelaInicio">
+                            <label for="tempoInicio"><b>JanelaInicio</b></label>
+                            <input type="time" [(ngModel)]="restricaoEditada.janela_inicio" name="janelaInicio" id="tempoInicio">
+                        </div>
+                        <div class="editorJanelaFim">
+                            <label for="tempoFim"><b>JanelaFim</b></label>
+                            <input type="time" [(ngModel)]="restricaoEditada.janela_fim" name="janelaFim" id="tempoFim">
+                        </div>
+                        <div class="editorCapacidade">
+                            <label for="numberCapacidade"><b>CapacidadeMaxima</b></label>
+                            <input type="number" [(ngModel)]="restricaoEditada.capacidade_maxima" name="capacidadeMaxima" id="numberCapacidade">
+                        </div>
+                        <div class="editorUnidade">
+                            <label for="textUnidade"><b>UnidadeCapacidade</b></label>
+                            <input type="text" [(ngModel)]="restricaoEditada.unidade_capacidade" name="unidadeCapacidade" id="textUnidade">
+                        </div>
+                        <div class="editorObservacoes">
+                            <label for="textObservacoes"><b>Observacoes</b></label>
+                            <input type="text" [(ngModel)]="restricaoEditada.observacoes" name="observacoes" id="textObservacoes">
+                        </div>
+                    </div>
+                    <div class="editorButton">
+                        <button class="buttonAvancar" type="submit">Confirmar</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
