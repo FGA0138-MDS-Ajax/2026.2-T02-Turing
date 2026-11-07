@@ -58,6 +58,7 @@ def test_otimizacao_prioriza_tempo_sobre_distancia():
     assert resultado["distancia_total_km"] == 33.0
 
 
+ feature/benchmark-dev2
 def test_benchmark_desempenho_20_destinos():
     """
     Testa a métrica C06.3: Calcular 20 destinos em até 5 segundos.
@@ -89,4 +90,48 @@ def test_benchmark_desempenho_20_destinos():
     assert tempo_total <= 5.0, f"O cálculo demorou {tempo_total:.2f}s, o limite é 5s."
     
     # Verifica se a rota foi gerada corretamente
+
+def test_restricao_de_capacidade():
+    # Matriz simples
+    matriz = [
+        [0.0, 5.0, 10.0],
+        [5.0, 0.0, 6.0],
+        [10.0, 6.0, 0.0]
+    ]
+    
+    # Demanda: ponto 0 é depósito (0), ponto 1 (5kg), ponto 2 (5kg)
+    demandas = [0, 5, 5]
+    # Capacidade do veículo: 10kg
+    capacidades = [10]
+    
+    # A rota deve conseguir visitar os dois pontos (5+5 = 10kg)
+    resultado = calcular_rota_otimizada(matriz, demandas=demandas, capacidades=capacidades)
+    
+    # Verifica se o algoritmo achou uma rota (qualquer uma que atenda)
+    assert len(resultado["ordem_ids"]) > 0
+    assert resultado["distancia_total_km"] > 0
+
+def test_restricao_de_janela_tempo():
+    # Matriz de distância e tempo
+    matriz_dist = [
+        [0.0, 5.0, 10.0],
+        [5.0, 0.0, 6.0],
+        [10.0, 6.0, 0.0]
+    ]
+    matriz_tempo = [
+        [0, 5, 10],
+        [5, 0, 6],
+        [10, 6, 0]
+    ]
+    
+    # Janelas de tempo: 
+    # Depósito: (0, 100) - sem restrição
+    # Ponto 1: (0, 5) - tem que chegar antes do minuto 5
+    # Ponto 2: (10, 15) - tem que chegar entre 10 e 15
+    janelas = [(0, 100), (0, 5), (10, 15)]
+    
+    resultado = calcular_rota_otimizada(matriz_dist, matriz_tempos=matriz_tempo, janelas_tempo=janelas)
+    
+    # O algoritmo deve ser obrigado a ir no ponto 1 primeiro (por causa do tempo)
+ main
     assert len(resultado["ordem_ids"]) > 0
