@@ -1,27 +1,79 @@
 <!-- container principal do painel -->
 <div class="painel-container">
-  
+ 
   <!-- barra superior de navegação -->
   <header class="navbar">
     <div class="logo-area" style="cursor: pointer;" routerLink="/">
       <span class="logo-texto">OpenRoute</span>
     </div>
 
-    <!-- links de navegação entre as abas (sem o perfil e sem notificacoes de texto) -->
+    <!-- links de navegação entre as abas -->
     <nav class="nav-links">
-      <span [class.active]="abaAtiva === 'feedback'" (click)="selecionarAba('feedback')">Feedback</span>
       <span [class.active]="abaAtiva === 'entregas'" (click)="selecionarAba('entregas')">Entregas</span>
     </nav>
 
-    <!-- area direita com o sino de notificacoes e o perfil com setinha -->
+    <!-- area direita c/ sino de notifs (badge + dropdown) e perfil -->
     <div style="display: flex; align-items: center; gap: 1rem;">
       
-      <!-- icone de sino para notificacoes -->
-      <div class="icone-sino" (click)="selecionarAba('notificacoes')" style="cursor: pointer; position: relative; color: #64748b; display: flex; align-items: center;" title="Notificações">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-        </svg>
+      <!-- container relativo p/ o dropdown de notificacoes -->
+      <div class="user-profile-container" style="position: relative;">
+        
+        <!-- icone do sino c/ badge contador de nao lidas -->
+        <div class="icone-sino" (click)="toggleNotificacoes()" style="cursor: pointer; position: relative; color: #64748b; display: flex; align-items: center;" title="Notificações">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <!-- badge vermelhinho c/ a quantidade -->
+          <span *ngIf="qtdNaoLidas > 0" style="position: absolute; top: -5px; right: -6px; background: #dc2626; color: white; font-size: 0.7rem; font-weight: 700; padding: 1px 5px; border-radius: 10px; border: 2px solid white;">
+            {{ qtdNaoLidas }}
+          </span>
+        </div>
+
+        <!-- menu flutuante de notificacoes q desce ao clicar -->
+        <div class="dropdown-menu" *ngIf="notificacoesAberto" style="width: 340px; right: 0; left: auto; padding: 0;">
+          
+          <!-- cabecalho do dropdown c/ titulo e botoes de filtro (todas / nao lidas) -->
+          <div style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 600; color: #0f172a; font-size: 0.95rem;">Notificações</span>
+              <span style="font-size: 0.8rem; color: #2563eb; cursor: pointer;" (click)="marcarTodasComoLidas()">Marcar lidas</span>
+            </div>
+            <!-- abas internas de filtro -->
+            <div style="display: flex; gap: 8px;">
+              <button type="button" (click)="mudarFiltroNotificacoes('todas')" [style.background]="filtroNotificacoes === 'todas' ? '#eff6ff' : 'transparent'" [style.color]="filtroNotificacoes === 'todas' ? '#2563eb' : '#64748b'" style="border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                Todas
+              </button>
+              <button type="button" (click)="mudarFiltroNotificacoes('nao-lidas')" [style.background]="filtroNotificacoes === 'nao-lidas' ? '#eff6ff' : 'transparent'" [style.color]="filtroNotificacoes === 'nao-lidas' ? '#2563eb' : '#64748b'" style="border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
+                Não lidas
+              </button>
+            </div>
+          </div>
+
+          <!-- lista de avisos filtrados c/ scroll -->
+          <div style="max-height: 260px; overflow-y: auto;">
+            <ng-container *ngIf="notificacoesFiltradas.length > 0; else semNotifs">
+              <div *ngFor="let notif of notificacoesFiltradas" style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;" [style.background]="notif.lida ? 'transparent' : '#f8fafc'">
+                <!-- icone indicador de nao lida -->
+                <span *ngIf="!notif.lida" style="width: 8px; height: 8px; background: #2563eb; border-radius: 50%; margin-top: 5px; flex-shrink: 0;"></span>
+                <div style="flex-grow: 1;">
+                  <p style="font-size: 0.85rem; color: #1e293b; font-weight: 500; margin: 0 0 4px 0;">{{ notif.titulo }}</p>
+                  <span style="font-size: 0.75rem; color: #64748b;">{{ notif.tempo }}</span>
+                </div>
+              </div>
+            </ng-container>
+            
+            <ng-template #semNotifs>
+              <p style="padding: 20px; text-align: center; color: #64748b; font-size: 0.85rem; margin: 0;">Nenhuma notificação encontrada.</p>
+            </ng-template>
+          </div>
+
+          <!-- rodape do dropdown -->
+          <div style="padding: 10px 16px; text-align: center; border-top: 1px solid #e2e8f0; background: #f8fafc;">
+            <span style="font-size: 0.85rem; color: #2563eb; font-weight: 500; cursor: pointer;" (click)="notificacoesAberto = false">Fechar</span>
+          </div>
+
+        </div>
       </div>
 
       <!-- menu de perfil do utilizador com avatar e setinha indicativa -->
@@ -98,18 +150,6 @@
         <ng-template #semEntregas>
           <p class="card-desc">Nenhuma entrega cadastrada no momento.</p>
         </ng-template>
-      </div>
-    </div>
-
-    <!-- aba de notificacoes -->
-    <div *ngIf="abaAtiva === 'notificacoes'" class="tab-content">
-      <div class="section-header">
-        <span class="sub-titulo">ATUALIZAÇÕES</span>
-        <h1>Notificações</h1>
-        <p class="descricao">Acompanhe os avisos e atualizações recentes do sistema.</p>
-      </div>
-      <div class="card-formulario">
-        <p class="card-desc">Nenhuma notificação nova no momento.</p>
       </div>
     </div>
 

@@ -12,12 +12,25 @@ import { RotaService } from '../../services/rota.service';
   styleUrls: ['./painel-motorista.component.css']
 })
 export class PainelMotoristaComponent implements OnInit {
+  // define qual aba ta ativa na tela
   abaAtiva: string = 'entregas';
+  // controla se o menu do perfil tá aberto ou fechado
   menuPerfilAberto: boolean = false;
+  // controla se o dropdown de notificacoes tá aberto ou fechado
+  notificacoesAberto: boolean = false;
+
+  // filtro atual das notifs ('todas' ou 'nao-lidas')
+  filtroNotificacoes: string = 'todas';
+
+  // lista de notificacoes do motorista c/ status de leitura
+  listaNotificacoes = [
+    { id: 1, titulo: 'Nova rota de entrega atribuída', tempo: 'Há 10 minutos', lida: false },
+    { id: 2, titulo: 'Atualização no sistema de mapas', tempo: 'Há 1 hora', lida: false }
+  ];
 
   // lista de entregas vindas do backend
   listaEntregas: any[] = [];
-  
+ 
   // armazena os IDs dos pedidos selecionados pelas checkboxes
   pedidosSelecionados: number[] = [];
 
@@ -37,12 +50,46 @@ export class PainelMotoristaComponent implements OnInit {
     });
   }
 
-  selecionarAba(aba: string) {
-    this.abaAtiva = aba;
+  // retorna apenas a quant de notifs nao lidas p/ o badge
+  get qtdNaoLidas(): number {
+    return this.listaNotificacoes.filter(n => !n.lida).length;
   }
 
+  // retorna a lista filtrada conforme a aba selecionada no dropdown
+  get notificacoesFiltradas() {
+    if (this.filtroNotificacoes === 'nao-lidas') {
+      return this.listaNotificacoes.filter(n => !n.lida);
+    }
+    return this.listaNotificacoes;
+  }
+
+  // altera o filtro do dropdown de notifs
+  mudarFiltroNotificacoes(filtro: string) {
+    this.filtroNotificacoes = filtro;
+  }
+
+  // marca todas as notifs como lidas
+  marcarTodasComoLidas() {
+    this.listaNotificacoes.forEach(n => n.lida = true);
+  }
+
+  // muda a aba atual e fecha todos os menus abertos
+  selecionarAba(aba: string) {
+    this.abaAtiva = aba;
+    this.menuPerfilAberto = false;
+    this.notificacoesAberto = false;
+  }
+
+  // abre ou fecha o dropdown do perfil
   toggleMenuPerfil() {
     this.menuPerfilAberto = !this.menuPerfilAberto;
+    this.notificacoesAberto = false; // fecha as notifs se abrir o perfil
+  }
+
+  // abre ou fecha o menu de notificacoes
+  toggleNotificacoes() {
+    this.notificacoesAberto = !this.notificacoesAberto;
+    this.menuPerfilAberto = false; // fecha o perfil se abrir as notifs
   }
 
   // toggle selecao: marca ou desmarca o pedido na lista
