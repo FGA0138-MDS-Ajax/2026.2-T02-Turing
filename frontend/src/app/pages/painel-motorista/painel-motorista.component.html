@@ -3,94 +3,125 @@
   
   <!-- barra superior de navegação -->
   <header class="navbar">
-    <div class="logo-area">
+    <div class="logo-area" style="cursor: pointer;" routerLink="/">
       <span class="logo-texto">OpenRoute</span>
     </div>
 
-    <!-- links de navegação entre as abas -->
+    <!-- links de navegação entre as abas (sem o perfil e sem notificacoes de texto) -->
     <nav class="nav-links">
       <span [class.active]="abaAtiva === 'feedback'" (click)="selecionarAba('feedback')">Feedback</span>
-      <span [class.active]="abaAtiva === 'perfil'" (click)="selecionarAba('perfil')">Perfil</span>
-      <span [class.active]="abaAtiva === 'notificacoes'" (click)="selecionarAba('notificacoes')">Notificações</span>
-      <span [class.active]="abaAtiva === 'enderecos'" (click)="selecionarAba('enderecos')">Endereços</span>
       <span [class.active]="abaAtiva === 'entregas'" (click)="selecionarAba('entregas')">Entregas</span>
     </nav>
 
-    <!-- menu de perfil do utilizador com svg do bonequinho -->
-    <div class="user-profile-container">
-      <div class="avatar" (click)="toggleMenuPerfil()">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-          <circle cx="12" cy="7" r="4"></circle>
+    <!-- area direita com o sino de notificacoes e o perfil com setinha -->
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      
+      <!-- icone de sino para notificacoes -->
+      <div class="icone-sino" (click)="selecionarAba('notificacoes')" style="cursor: pointer; position: relative; color: #64748b; display: flex; align-items: center;" title="Notificações">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
         </svg>
       </div>
 
-      <div class="dropdown-menu" *ngIf="menuPerfilAberto">
-        <a href="#" (click)="$event.preventDefault(); selecionarAba('perfil'); menuPerfilAberto = false">Meu Perfil</a>
-        <a href="#" (click)="$event.preventDefault(); abrirConfiguracoes()">Configurações</a>
-        <hr>
-        <a href="#" class="logout" (click)="$event.preventDefault(); sair()">Sair</a>
+      <!-- menu de perfil do utilizador com avatar e setinha indicativa -->
+      <div class="user-profile-container" style="position: relative;">
+        <div class="avatar-dropdown-trigger" (click)="toggleMenuPerfil()" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+          <div class="avatar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <!-- setinha para baixo indicativa -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+
+        <div class="dropdown-menu" *ngIf="menuPerfilAberto">
+          <a href="#" (click)="$event.preventDefault(); selecionarAba('perfil'); menuPerfilAberto = false">Meu Perfil</a>
+          <a href="#" (click)="$event.preventDefault(); abrirConfiguracoes()">Configurações</a>
+          <hr>
+          <a href="#" class="logout" (click)="$event.preventDefault(); sair()">Sair</a>
+        </div>
       </div>
+
     </div>
   </header>
 
   <!-- conteudo principal q muda conforme a aba -->
   <main class="conteudo">
 
-    <!-- aba de endereços com cep, rua, número e complemento -->
-    <div *ngIf="abaAtiva === 'enderecos'" class="tab-content">
-      <div class="section-header">
-        <div>
-          <span class="sub-titulo">MINHA CONTA</span>
-          <h1>Adicionar endereço</h1>
-          <p class="descricao">Cadastre um endereço para agilizar suas rotas e organizar seus locais mais importantes.</p>
-        </div>
-      </div>
-
-      <div class="card-formulario">
-        <h3>Dados do endereço</h3>
-        <p class="card-desc">Preencha os campos abaixo. Os itens com * são obrigatórios.</p>
-
-        <form class="form-grid">
-          <div class="input-group">
-            <label>CEP *</label>
-            <input type="text" placeholder="00000-000">
-          </div>
-          <div class="input-group">
-            <label>Rua *</label>
-            <input type="text" placeholder="Ex.: Avenida das Nações">
-          </div>
-
-          <div class="input-group">
-            <label>Número *</label>
-            <input type="text" placeholder="123">
-          </div>
-          <div class="input-group">
-            <label>Complemento</label>
-            <input type="text" placeholder="Apto, Bloco, etc.">
-          </div>
-        </form>
-
-        <div class="acoes-footer">
-          <button type="button" class="btn-otimizar" routerLink="/rota-otimizada">
-            Otimizar Rota
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- aba de entregas vazia -->
+    <!-- aba de entregas com selecao de multiplos destinos -->
     <div *ngIf="abaAtiva === 'entregas'" class="tab-content">
-      <div class="section-header">
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <span class="sub-titulo">GESTÃO DE ROTAS</span>
           <h1>Minhas Entregas</h1>
-          <p class="descricao">Acompanhe as entregas ativas, altere o status ou registre ocorrências.</p>
+          <p class="descricao">Selecione múltiplos pedidos para calcular e otimizar a rota de entrega.</p>
         </div>
+        <!-- botao para disparar a otimizacao com base nos selecionados -->
+        <button type="button" class="btn-otimizar" (click)="otimizarRotaSelecionada($event)">
+          Otimizar Rota Selecionada
+        </button>
       </div>
 
       <div class="card-formulario">
-        <p class="card-desc">Nenhuma entrega cadastrada no momento.</p>
+        <ng-container *ngIf="listaEntregas.length > 0; else semEntregas">
+          <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 1px solid #e2e8f0; text-align: left;">
+                <th style="padding: 0.75rem; width: 40px;">Sel.</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">ID</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Descrição</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Endereço</th>
+                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let entrega of listaEntregas" style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 0.75rem; text-align: center;">
+                  <input type="checkbox" (change)="toggleSelecaoPedido(entrega.id)" style="cursor: pointer;">
+                </td>
+                <td style="padding: 0.75rem; color: #64748b; font-size: 0.9rem;">{{ entrega.id }}</td>
+                <td style="padding: 0.75rem; color: #334155; font-size: 0.9rem;">{{ entrega.descricao }}</td>
+                <td style="padding: 0.75rem; color: #0f172a; font-weight: 500; font-size: 0.9rem;">{{ entrega.endereco }}</td>
+                <td style="padding: 0.75rem; color: #64748b; font-size: 0.9rem;">
+                  <span style="font-weight: 600; color: #0f172a;">{{ entrega.status }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </ng-container>
+
+        <ng-template #semEntregas>
+          <p class="card-desc">Nenhuma entrega cadastrada no momento.</p>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- aba de notificacoes -->
+    <div *ngIf="abaAtiva === 'notificacoes'" class="tab-content">
+      <div class="section-header">
+        <span class="sub-titulo">ATUALIZAÇÕES</span>
+        <h1>Notificações</h1>
+        <p class="descricao">Acompanhe os avisos e atualizações recentes do sistema.</p>
+      </div>
+      <div class="card-formulario">
+        <p class="card-desc">Nenhuma notificação nova no momento.</p>
+      </div>
+    </div>
+
+    <!-- aba de perfil (caso o utilizador clique em Meu Perfil no menu) -->
+    <div *ngIf="abaAtiva === 'perfil'" class="tab-content">
+      <div class="section-header">
+        <span class="sub-titulo">MINHA CONTA</span>
+        <h1>Meu Perfil</h1>
+        <p class="descricao">Visualize e edite as informações da sua conta de motorista.</p>
+      </div>
+      <div class="card-formulario">
+        <p class="card-desc">Informações do perfil carregadas com sucesso.</p>
       </div>
     </div>
 
