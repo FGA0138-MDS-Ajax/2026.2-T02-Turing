@@ -1,5 +1,9 @@
 import pytest 
+import time
+import random
+import pytest
 from app.core.otimizador import calcular_rota_otimizada
+
 
 def test_calculo_rota_com_matriz_conhecida():
      # Matriz de distâncias em km (4 pontos)
@@ -54,6 +58,39 @@ def test_otimizacao_prioriza_tempo_sobre_distancia():
     assert resultado["distancia_total_km"] == 33.0
 
 
+ feature/benchmark-dev2
+def test_benchmark_desempenho_20_destinos():
+    """
+    Testa a métrica C06.3: Calcular 20 destinos em até 5 segundos.
+    """
+    import random
+    
+    # Gera uma matriz 20x20 com distâncias aleatórias entre 1 e 50 km
+    num_pontos = 20
+    matriz = [[0.0 for _ in range(num_pontos)] for _ in range(num_pontos)]
+    
+    for i in range(num_pontos):
+        for j in range(num_pontos):
+            if i != j:
+                matriz[i][j] = float(random.randint(1, 50))
+                
+    # Inicia o cronômetro
+    tempo_inicio = time.time()
+    
+    # Roda o otimizador
+    resultado = calcular_rota_otimizada(matriz, velocidade_media_kmh=40)
+    
+    # Para o cronômetro
+    tempo_fim = time.time()
+    tempo_total = tempo_fim - tempo_inicio
+    
+    print(f"\n[Benchmark] Tempo para 20 destinos: {tempo_total:.4f} segundos")
+    
+    # A métrica exige <= 5 segundos
+    assert tempo_total <= 5.0, f"O cálculo demorou {tempo_total:.2f}s, o limite é 5s."
+    
+    # Verifica se a rota foi gerada corretamente
+
 def test_restricao_de_capacidade():
     # Matriz simples
     matriz = [
@@ -96,4 +133,5 @@ def test_restricao_de_janela_tempo():
     resultado = calcular_rota_otimizada(matriz_dist, matriz_tempos=matriz_tempo, janelas_tempo=janelas)
     
     # O algoritmo deve ser obrigado a ir no ponto 1 primeiro (por causa do tempo)
+ main
     assert len(resultado["ordem_ids"]) > 0
