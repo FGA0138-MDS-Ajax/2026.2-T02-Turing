@@ -1,7 +1,7 @@
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
 
-def calcular_rota_otimizada(matriz_distancias, matriz_tempos=None, velocidade_media_kmh=40):
+def calcular_rota_otimizada(matriz_distancias, matriz_tempos=None, velocidade_media_kmh=40, demandas=None, capacidades=None, janelas_tempo=None):
     """
     Recebe uma matriz NxN de distâncias (em km) e retorna a ordem otimizada dos IDs, a distância total (km) e o tempo estimado (min).
     """
@@ -29,7 +29,39 @@ def calcular_rota_otimizada(matriz_distancias, matriz_tempos=None, velocidade_me
     # Registra o callback no roteador
     transit_callback_index = routing.RegisterTransitCallback(custo_callback)
     routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
-    
+
+    # --- Restrição de Capacidade (Peso) ---
+    if demandas and capacidades:
+        def demanda_callback(from_index):
+            from_node = manager.IndexToNode(from_index)
+            return demandas[from_node]
+
+        demanda_callback_index = routing.RegisterUnaryTransitCallback(demanda_callback)
+        routing.AddDimensionWithVehicleCapacity(
+            demanda_callback_index,
+            0,  # slack
+            capacidades,  # capacidades dos veículos
+            True,  # começar com capacidade zero
+            'Capacity'
+        )
+
+    # --- Restrição de Janela de Tempo (Horários) ---
+    if janelas_tempo:
+        tempo_callback_index = routing.RegisterTransitCallback(custo_callback) # Reutiliza o custo
+        routing.AddDimension(
+            tempo_callback_index,
+            30,  # tempo de espera permitido
+            1440,  # tempo máximo total (24h)
+            False,
+            'Time'
+        )
+        time_dimension = routing.GetDimensionOrDie('Time')
+        
+        for location_idx, (inicio, fim) in enumerate(janelas_tempo):
+            if location_idx == 0:  # Depósito (ponto 0) não tem janela restrita
+                continue
+            index = manager.NodeToIndex(location_idx)
+            time_dimension.CumulVar(index).SetRange(inicio, fim)
 
     # Parâmetros de busca (limite de tempo de 5 segundos, conforme a métrica 4.1.1)
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
@@ -40,7 +72,7 @@ def calcular_rota_otimizada(matriz_distancias, matriz_tempos=None, velocidade_me
     solution = routing.SolveWithParameters(search_parameters)
 
     if not solution:
-        raise RuntimeError("Não foi possível encontrar uma solução para a rota.")
+        raise RuntimeError("Não foi possível encontrar uma solução que atenda a todas as restrições.")
 
     # Extrai a rota e calcula os totais
     index = routing.Start(0)
