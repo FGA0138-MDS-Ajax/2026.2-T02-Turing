@@ -1,23 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import rotas # Importando o arquivo de rotas que criamos
+from app.db.session import engine
+from app.api import rotas, destinos, rotas_crud 
 
-# Inicializa a aplicação FastAPI
-app = FastAPI(
-    title="API de Otimização de Rotas",
-    description="Backend para cálculo de rotas (MVP)",
-    version="1.0.0"
-)
+app = FastAPI(title="API de Otimização de Rotas")
 
-# Configuração de CORS (MUITO IMPORTANTE!)
-# Isso permite que o Frontend (em outra porta) consiga acessar essa API.
+@app.on_event("startup")
+def startup():
+    try:
+        with engine.connect() as connection:
+            print("✅ Conectado ao banco de dados MySQL com sucesso!")
+    except Exception as e:
+        print(f"❌ Erro ao conectar ao banco: {e}")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Em produção, trocar o "*" pelo endereço do frontend
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Acopla as rotas criadas no outro arquivo à aplicação principal
 app.include_router(rotas.router)
+app.include_router(destinos.router)
+app.include_router(rotas_crud.router)

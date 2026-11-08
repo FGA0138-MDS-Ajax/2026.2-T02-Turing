@@ -6,3 +6,5 @@ ortools
 pytest
 pymysql
 sqlalchemy
+python-dotenv
+alembic
