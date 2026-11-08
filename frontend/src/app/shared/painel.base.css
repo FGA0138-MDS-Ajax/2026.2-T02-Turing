@@ -1,0 +1,300 @@
+/* estilos compartilhados pelo painel do cliente e do motorista (se o painel do adm nao for mt diferente da ora add isso aqui nele tb)
+   cada componente inclui este arquivo no styleUrls, antes do css próprio (ou seja, cliente e o mot tem link da url disso aqui) */
+
+:host {
+  --tinta: #0f172a;
+  --texto: #334155;
+  --texto-suave: #64748b;
+  --linha: #e2e8f0;
+  --fundo: #f6f7f9;
+  --superficie: #ffffff;
+  --acao: #2563eb;
+  --acao-escura: #1d4ed8;
+  --perigo: #b91c1c;
+  --rota: #0f766e;
+
+  display: block;
+  min-height: 100vh;
+  background: var(--fundo);
+  color: var(--tinta);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+/* estrutura da página */
+.conteudo {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 3rem;
+}
+
+.cabecalho-pagina {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.6rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.descricao {
+  margin: 0;
+  max-width: 60ch;
+  color: var(--texto-suave);
+  font-size: 0.95rem;
+}
+
+.cartao {
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  padding: 1.5rem;
+}
+
+.cartao + .cartao {
+  margin-top: 1.25rem;
+}
+
+/* botões */
+.botao {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.botao-primario {
+  background: var(--tinta);
+  color: #ffffff;
+}
+
+.botao-primario:hover:not(:disabled) {
+  background: #1e293b;
+}
+
+.botao-secundario {
+  background: var(--superficie);
+  color: var(--tinta);
+  border-color: #cbd5e1;
+}
+
+.botao-secundario:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.botao-link {
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--acao-escura);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.botao:disabled,
+.botao-link:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.botao:focus-visible,
+.botao-link:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--acao);
+  outline-offset: 2px;
+}
+
+/* formulários */
+.grade-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.25rem;
+}
+
+.ocupa-tudo {
+  grid-column: 1 / -1;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.campo label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+input:not([type='checkbox']),
+select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: var(--superficie);
+  color: var(--tinta);
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.campo-erro input {
+  border-color: var(--perigo);
+}
+
+.erro-campo {
+  font-size: 0.8rem;
+  color: var(--perigo);
+}
+
+.ajuda {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+}
+
+input[type='checkbox'] {
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+}
+
+/* avisos */
+.aviso {
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1.25rem;
+}
+
+.aviso-erro {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #991b1b;
+}
+
+.aviso-sucesso {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+/* tabelas */
+.tabela-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th {
+  padding: 0.7rem 0.75rem;
+  border-bottom: 1px solid var(--linha);
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* selo de status (sempre acompanhado do texto, nunca só cor) */
+.status {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pendente { background: #f1f5f9; color: #475569; }
+.status-planejado { background: #e0e7ff; color: #3730a3; }
+.status-saiu-para-entrega { background: #dbeafe; color: #1e40af; }
+.status-em-andamento { background: #fef3c7; color: #92400e; }
+.status-entregue { background: #dcfce7; color: #166534; }
+.status-falhou { background: #fee2e2; color: #991b1b; }
+.status-cancelado { background: #e2e8f0; color: #475569; }
+
+/* estados vazios e de carregamento */
+.vazio {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: var(--texto-suave);
+}
+
+.vazio p {
+  margin: 0 0 1rem;
+}
+
+.carregando {
+  margin: 0;
+  padding: 1rem 0;
+  color: var(--texto-suave);
+}
+
+/* texto só para leitor de tela */
+.sr-somente {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 640px) {
+  .conteudo {
+    padding: 1.25rem 1rem 2rem;
+  }
+
+  .cartao {
+    padding: 1.1rem;
+  }
+
+  .grade-campos {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .botao {
+    transition: background-color 0.15s ease;
+  }
+}

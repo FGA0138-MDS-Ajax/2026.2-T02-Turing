@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core'; // add OnInit p/ carregar os pedidos ao abrir a tela
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { RotaService } from '../../services/rota.service'; // service q fala c/ o back
 
 @Component({
   selector: 'app-painel-cliente',
@@ -10,7 +11,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './painel-cliente.component.html',
   styleUrl: './painel-cliente.component.css'
 })
-export class PainelClienteComponent {
+export class PainelClienteComponent implements OnInit {
   // define qual aba ta ativa na tela
   abaAtiva: string = 'ver-pedidos';
   // controla se o menu do perfil tá aberto ou fechado
@@ -28,20 +29,53 @@ export class PainelClienteComponent {
   ];
 
   // obj do form p/ recolher cep e num sep
+  // numero agora é texto p/ aceitar casos como "12-B" (no banco é varchar)
   novoPedido = {
     descricao: '',
     cep: '',
-    numero: null
+    numero: ''
   };
  
-  // lista mockada de pedidos p/ testar a tabela
-  listaPedidos = [
-    { id: 101, descricao: 'Pacote de Livros', cep: '70833-010', numero: 20, status: 'Em trânsito' },
-    { id: 102, descricao: 'Documentos Assinados', cep: '70355-510', numero: 15, status: 'Aguardando Coleta' }
-  ];
+  // lista de pedidos vinda do back (antes era mockada)
+  listaPedidos: any[] = [];
 
   // guarda o pedido clicado p/ mostrar na tela de det
   pedidoSelecionado: any = null;
+
+  // trava o botao de enviar enquanto o back responde, p/ n clicar 2x
+  enviando: boolean = false;
+
+  // traduz o status do banco p/ um texto amigavel na tela
+  private rotulosStatus: { [chave: string]: string } = {
+    PENDENTE: 'Pendente',
+    PLANEJADO: 'Planejado',
+    SAIU_PARA_ENTREGA: 'Saiu para entrega',
+    EM_ANDAMENTO: 'Em andamento',
+    ENTREGUE: 'Entregue',
+    FALHOU: 'Falhou',
+    CANCELADO: 'Cancelado'
+  };
+
+  // injeta o service p/ poder chamar a api
+  constructor(private rotaService: RotaService) {}
+
+  // roda ao abrir a tela e já busca os pedidos
+  ngOnInit(): void {
+    this.carregarPedidos();
+  }
+
+  // devolve o texto amigavel do status (usar no html no lugar de pedido.status)
+  rotuloStatus(status: string): string {
+    return this.rotulosStatus[status] || status;
+  }
+
+  // carregar pedidos: busca os pedidos do cliente no back
+  carregarPedidos() {
+    this.rotaService.obterPedidos().subscribe({
+      next: (pedidos) => (this.listaPedidos = pedidos),
+      error: (erro) => console.error('erro ao buscar pedidos:', erro)
+    });
+  }
 
   // retorna apenas a quant de notifs nao lidas p/ o badge
   get qtdNaoLidas(): number {
@@ -87,30 +121,34 @@ export class PainelClienteComponent {
 
   // formata os dados e envia o pedido p/ api
   enviarPedido() {
-    const pedidoParaApi = {
-      descricao: this.novoPedido.descricao,
-      endereco: {
-        cep: this.novoPedido.cep,
-        numero: Number(this.novoPedido.numero),
-        latitude: -15.7942, // lat padrão p/ o back n recusar
-        longitude: -47.8822 // long padrão p/ o back n recusar
-      }
-    };
+    // valida se os campos estao preenchidos antes de enviar
+    if (!this.novoPedido.descricao || !this.novoPedido.cep || !this.novoPedido.numero) {
+      alert('preencha descrição, cep e número.');
+      return;
+    }
 
-    console.log('enviando p/ api:', pedidoParaApi);
-
-    // add o novo pedido na lista visual
-    this.listaPedidos.push({
-      id: Math.floor(Math.random() * 900) + 100,
+    // manda só descricao, cep e numero (o back descobre as coordenadas)
+    const pedido = {
       descricao: this.novoPedido.descricao,
       cep: this.novoPedido.cep,
-      numero: Number(this.novoPedido.numero),
-      status: 'Aguardando Coleta'
+      numero: String(this.novoPedido.numero)
+    };
+
+    this.enviando = true;
+    this.rotaService.criarPedido(pedido).subscribe({
+      next: () => {
+        this.enviando = false;
+        // limpa o form, recarrega a lista do back e volta p/ aba de listagem
+        this.novoPedido = { descricao: '', cep: '', numero: '' };
+        this.carregarPedidos();
+        this.selecionarAba('ver-pedidos');
+      },
+      error: (erro) => {
+        this.enviando = false;
+        // mostra o motivo q o back mandou (ex: endereço n encontrado)
+        alert(erro.error?.detail || 'erro ao enviar o pedido.');
+      }
     });
-    
-    // limpa o form e volta p/ aba de listagem
-    this.novoPedido = { descricao: '', cep: '', numero: null };
-    this.selecionarAba('ver-pedidos');
   }
 
   // pega o pedido clicado e abre a tela de det
@@ -125,6 +163,7 @@ export class PainelClienteComponent {
   }
 
   // cancela o pedido selecionado removendo-o da lista
+  // (ainda só local: o back n tem endpoint de cancelamento)
   cancelarPedido(pedido: any) {
     if (confirm(`Certeza que deseja cancelar o pedido #${pedido.id}?`)) {
       this.listaPedidos = this.listaPedidos.filter(p => p.id !== pedido.id);
