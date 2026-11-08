@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
 from typing import List
-from app.schemas.destino import Destino
+from app.schemas.destino import DestinoResponse as Destino
 from app.core.matriz import gerar_matriz_distancias
 from app.core.otimizador import calcular_rota_otimizada
 
@@ -43,7 +43,7 @@ def calcular_rota(dados_recebidos: RotaRequest):
         rota_otimizada.append({
             "ordem": i + 1,
             "id_destino": d.id,
-            "endereco": d.endereco,
+            "endereco": f"{d.logradouro}, {d.numero}",
             "latitude": d.latitude,
             "longitude": d.longitude
         })
