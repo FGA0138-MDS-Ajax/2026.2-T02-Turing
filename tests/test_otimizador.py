@@ -58,7 +58,6 @@ def test_otimizacao_prioriza_tempo_sobre_distancia():
     assert resultado["distancia_total_km"] == 33.0
 
 
- feature/benchmark-dev2
 def test_benchmark_desempenho_20_destinos():
     """
     Testa a métrica C06.3: Calcular 20 destinos em até 5 segundos.
@@ -133,5 +132,4 @@ def test_restricao_de_janela_tempo():
     resultado = calcular_rota_otimizada(matriz_dist, matriz_tempos=matriz_tempo, janelas_tempo=janelas)
     
     # O algoritmo deve ser obrigado a ir no ponto 1 primeiro (por causa do tempo)
- main
     assert len(resultado["ordem_ids"]) > 0
