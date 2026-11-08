@@ -97,6 +97,15 @@ h2 {
   background: #f1f5f9;
 }
 
+.botao-cancelar {
+  background: var(--perigo);
+  color: var(--superficie);
+}
+
+.botao-cancelar:hover:not(:disabled) {
+  background: #991c1c;
+}
+
 .botao-link {
   font: inherit;
   font-size: 0.875rem;
