@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdmUsuariosComponent } from './adm-usuarios.component';
+import { AdmRestricoesComponent } from './painel-adm.component';
 
-describe('AdmUsuariosComponent', () => {
-  let component: AdmUsuariosComponent;
-  let fixture: ComponentFixture<AdmUsuariosComponent>;
+describe('AdmRestricoesComponent', () => {
+  let component: AdmRestricoesComponent;
+  let fixture: ComponentFixture<AdmRestricoesComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AdmUsuariosComponent]
+      imports: [AdmRestricoesComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AdmUsuariosComponent);
+    fixture = TestBed.createComponent(AdmRestricoesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

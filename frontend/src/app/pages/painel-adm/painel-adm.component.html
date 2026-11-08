@@ -1,0 +1,247 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaDestaque"
+  rotaLogo="/home"
+  (abaSelecionada)="selecionarAba($event)"
+></app-navbar>
+
+<main class="conteudo">
+
+    <div
+        *ngIf="mensagem"
+        class="aviso"
+        [ngClass]="mensagem.tipo === 'erro' ? 'aviso-erro' : 'aviso-sucesso'"
+        [attr.role]="mensagem.tipo === 'erro' ? 'alert' : 'status'"
+    >
+        {{ mensagem.texto }}
+    </div>
+
+    <section *ngIf="abaAtiva === 'listar-restricao'">
+
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Restrições</h1>
+                <p class="descricao">Limites de variação dos valores das rotas</p>
+            </div>
+            <div>
+                <button type="button" class="botao botao-secundario botao-atualizar" (click)="atualizarListaRestricoes()" [disabled]="carregando">
+                    {{ carregando ? 'Carregando' : 'Atualizar lista'}}
+                </button>
+                <button type="button" class="botao botao-primario" (click)="selecionarAba('cadastrar-restricao')" [disabled]="carregando">
+                    Cadastrar restrição
+                </button>
+            </div>
+        </div>
+        <div class="cartao">
+            <div class="tabela-wrap">
+                <table *ngIf="this.restricoes.length > 0 && !erroLista" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome da rota</th>
+                            <th scope="col">Data de criação</th>
+                            <th scope="col"><span class="sr-somente">Ações</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let restr of this.restricoes">
+                            <th>{{restr.nome_rota || ''}}</th>
+                            <th>{{restr.criada_em}}</th>
+                            <th>
+                                <div class="coluna-acao">
+                                    <p class="fa fa-eye" (click)="abrirDetalhes(restr)"></p>
+                                    <p class="fa fa-pencil" (click)="abrirEdicao(restr)"></p>
+                                </div>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+                <p *ngIf="carregando && !this.restricoes.length" class="carregando">
+                    Carregando restrições
+                </p>
+                <div *ngIf="this.restricoes.length === 0 && !erroLista">
+                    <p>Nenhuma restrição cadastrada</p>
+                </div>
+                <div *ngIf="erroLista" class="aviso aviso-erro" role="alert">
+                    {{ erroLista }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section *ngIf="abaAtiva === 'cadastrar-restricao'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Cadastre uma restrição</h1>
+                <p class="descricao">Crie uma nova restrição</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="abrirLista()">
+                Voltar
+            </button>
+        </div>
+        <form class="cartao" (ngSubmit)="cadastrarRestricao()">
+            <div class="grade-campos">
+                <div class="campo ocupa-tudo">
+                    <label for="selectRota"><b>Rota</b></label>
+                    <select [(ngModel)]="restricaoNovaRotaId" name="idDaRota" id="selectRota" required>
+                        <option *ngFor="let rota of this.rotas" value="{{rota.id}}">{{rota.nome}}</option>
+                    </select>
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="tempoInicio"><b>JanelaInicio</b></label>
+                    <input type="time" step="1" [(ngModel)]="restricaoNova.janela_inicio" name="janelaInicio" id="tempoInicio">
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="tempoFim"><b>JanelaFim</b></label>
+                    <input type="time" step="1" [(ngModel)]="restricaoNova.janela_fim" name="janelaFim" id="tempoFim">
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="numberCapacidade"><b>CapacidadeMaxima</b></label>
+                    <input type="number" [(ngModel)]="restricaoNova.capacidade_maxima" name="capacidadeMaxima" id="numberCapacidade">
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="textUnidade"><b>UnidadeCapacidade</b></label>
+                    <input type="text" [(ngModel)]="restricaoNova.unidade_capacidade" name="unidadeCapacidade" id="textUnidade">
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="textObservacoes"><b>Observacoes</b></label>
+                    <input type="text" [(ngModel)]="restricaoNova.observacoes" name="observacoes" id="textObservacoes">
+                </div>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="botao botao-primario" [disabled]="cadastrando">Cadastrar Rota</button>
+            </div>
+        </form>
+    </section>
+
+    <section *ngIf="abaAtiva === 'detalhar-restricao'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Detalhes</h1>
+                <p class="descricao">Detalhes da restrição {{restricaoDetalhada.id}}</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="abrirLista()">
+                Voltar
+            </button>
+        </div>
+        <div class="cartao">
+            <dl class="detalhes">
+                <div>
+                    <dt>Rota:</dt>
+                    <dd>{{restricaoDetalhada.nome_rota}}</dd>
+                </div>
+                <div></div>
+                <div>
+                    <dt>Cadastramento:</dt>
+                    <dd>{{restricaoDetalhada.criada_em}}</dd>
+                </div>
+                <div>
+                    <dt>Última atualização:</dt>
+                    <dd>{{restricaoDetalhada.atualizada_em}}</dd>
+                </div>
+                <div>
+                    <dt>Janela de tempo:</dt>
+                    <dd>
+                        <dl class="detalhes detalhesInterno">
+                            <div>
+                                <dt>Início:</dt>
+                                <dd>{{(restricaoDetalhada.janela_inicio != undefined ? restricaoDetalhada.janela_inicio : '----')}}</dd>
+                            </div>
+                            <div>
+                                <dt>Fim:</dt>
+                                <dd>{{(restricaoDetalhada.janela_fim != undefined ? restricaoDetalhada.janela_fim : '----')}}</dd>
+                            </div>
+                        </dl>
+                    </dd>
+                </div>
+                <div>
+                    <dt>Capacidade máxima:</dt>
+                    <dd>{{(restricaoDetalhada.capacidade_maxima != undefined ? (restricaoDetalhada.capacidade_maxima + ' ' + restricaoDetalhada.unidade_capacidade) : '----')}}</dd>
+                </div>
+            </dl>
+            <dl class="detalhesObservacao">
+                <div>
+                    <dt>Observações:</dt>
+                    <dd>{{(restricaoDetalhada.observacoes != undefined ? restricaoDetalhada.observacoes : '----')}}</dd>
+                </div>
+            </dl>
+            <!-- <div>
+                <div class="detalheCadastramento">
+                    <b>Cadastramento:</b>
+                    <p>{{restricaoDetalhada.criada_em}}</p>
+                </div>
+                <div class="detalheAtualizacao">
+                    <b>Última atualização:</b>
+                    <p>{{restricaoDetalhada.atualizada_em}}</p>
+                </div>
+                <div class="detalheRota">
+                    <b>Rota:</b>
+                    <p>{{restricaoDetalhada.nome_rota}}</p>
+                </div>
+                <div class="detalheJanelaDeTempo">
+                    <b>Janela de tempo:</b>
+                    <div class="detalheJanelaInicio">
+                        <b>Início:</b>
+                        <p>{{(restricaoDetalhada.janela_inicio != undefined ? restricaoDetalhada.janela_inicio : '----')}}</p>
+                    </div>
+                    <div class="detalheJanelaFim">
+                        <b>Fim:</b>
+                        <p>{{(restricaoDetalhada.janela_fim != undefined ? restricaoDetalhada.janela_fim : '----')}}</p>
+                    </div>
+                </div>
+                <div class="detalheCapacidade">
+                    <b>Capacidade máxima:</b>
+                    <p>{{(restricaoDetalhada.capacidade_maxima != undefined ? (restricaoDetalhada.capacidade_maxima + ' ' + restricaoDetalhada.unidade_capacidade) : '----')}}</p>
+                </div>
+                <div class="detalheObservacoes">
+                    <b>Observações:</b>
+                    <div class="detalheObservacoesTexto">
+                        <p>{{(restricaoDetalhada.observacoes != undefined ? restricaoDetalhada.observacoes : '----')}}</p>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+    </section>
+
+    <section *ngIf="abaAtiva === 'editar-restricao'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Edite a restrição</h1>
+                <p class="descricao">Faça as alterações desejadas na restrição</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="abrirLista()">
+                Voltar
+            </button>
+        </div>
+        <form class="cartao" (ngSubmit)="editarRestricao()">
+            <div class="grade-campos">
+                <div class="campo ocupa-tudo">
+                    <label for="tempoInicio"><b>JanelaInicio</b></label>
+                    <input type="time" step="1" [(ngModel)]="restricaoEditada.janela_inicio" name="janelaInicio" id="tempoInicio">
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="tempoFim"><b>JanelaFim</b></label>
+                    <input type="time" step="1" [(ngModel)]="restricaoEditada.janela_fim" name="janelaFim" id="tempoFim">
+                </div>
+                <div class="campo">
+                    <label for="numberCapacidade"><b>CapacidadeMaxima</b></label>
+                    <input type="number" [(ngModel)]="restricaoEditada.capacidade_maxima" name="capacidadeMaxima" id="numberCapacidade">
+                </div>
+                <div class="campo">
+                    <label for="textUnidade"><b>UnidadeCapacidade</b></label>
+                    <input type="text" [(ngModel)]="restricaoEditada.unidade_capacidade" name="unidadeCapacidade" id="textUnidade">
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="textObservacoes"><b>Observacoes</b></label>
+                    <input type="text" [(ngModel)]="restricaoEditada.observacoes" name="observacoes" id="textObservacoes">
+                </div>
+            </div>
+            <div class="acoes-form">
+                <button class="botao botao-cancelar" type="button" [disabled]="this.editando" (click)="excluirRestricao()">Excluir restrição</button>
+                <button class="botao botao-primario" type="submit" [disabled]="this.editando">Confirmar edição</button>
+            </div>
+        </form>
+    </section>
+</main>
