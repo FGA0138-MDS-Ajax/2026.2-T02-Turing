@@ -1,186 +1,255 @@
-import { Component, OnInit } from '@angular/core'; // add OnInit p/ carregar os pedidos ao abrir a tela
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { RotaService } from '../../services/rota.service'; // service q fala c/ o back
+import { RotaService } from '../../services/rota.service';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
+import { mensagemDeErro } from '../../shared/erro.util';
+import {
+  NovoPedido,
+  Pedido,
+  ROTULOS_STATUS,
+  classeStatus,
+  rotuloStatus,
+  textoEndereco,
+  textoJanela
+} from '../../models/pedido.model';
+
+type Aba = 'fazer-pedido' | 'ver-pedidos' | 'detalhes-pedido';
+
+interface Mensagem {
+  tipo: 'erro' | 'sucesso';
+  texto: string;
+}
+
+// campos do formulário de novo pedido
+interface FormPedido {
+  descricao: string;
+  cep: string;
+  numero: string;
+  dataEntrega: string;
+  janelaInicio: string;
+  janelaFim: string;
+}
+
+type ErrosForm = Partial<Record<keyof FormPedido, string>>;
+
+// data de hoje no fuso do usuário, no formato yyyy-mm-dd (nsei fazer o contrario)
+function dataLocalISO(): string {
+  const agora = new Date();
+  const mes = String(agora.getMonth() + 1).padStart(2, '0');
+  const dia = String(agora.getDate()).padStart(2, '0');
+  return `${agora.getFullYear()}-${mes}-${dia}`;
+}
 
 @Component({
   selector: 'app-painel-cliente',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, FormsModule, NavbarComponent],
   templateUrl: './painel-cliente.component.html',
-  styleUrl: './painel-cliente.component.css'
+  styleUrls: ['../../shared/painel-base.css', './painel-cliente.component.css']
 })
 export class PainelClienteComponent implements OnInit {
-  // define qual aba ta ativa na tela
-  abaAtiva: string = 'ver-pedidos';
-  // controla se o menu do perfil tá aberto ou fechado
-  menuPerfilAberto: boolean = false;
-  // controla se o dropdown de notificacoes tá aberto ou fechado
-  notificacoesAberto: boolean = false;
-
-  // filtro atual das notifs ('todas' ou 'nao-lidas')
-  filtroNotificacoes: string = 'todas';
-
-  // lista de notificacoes c/ status de leitura
-  listaNotificacoes = [
-    { id: 1, titulo: 'Pedido #101 saiu para entrega', tempo: 'Há 15 minutos', lida: false },
-    { id: 2, titulo: 'Pedido #102 confirmado com sucesso', tempo: 'Há 2 horas', lida: false }
+  // abas da navbar
+  readonly abas = [
+    { id: 'fazer-pedido', rotulo: 'Fazer pedido' },
+    { id: 'ver-pedidos', rotulo: 'Meus pedidos' }
   ];
 
-  // obj do form p/ recolher cep e num sep
-  // numero agora é texto p/ aceitar casos como "12-B" (no banco é varchar)
-  novoPedido = {
-    descricao: '',
-    cep: '',
-    numero: ''
-  };
- 
-  // lista de pedidos vinda do back (antes era mockada)
-  listaPedidos: any[] = [];
+  // opções do filtro de status
+  readonly opcoesStatus = Object.entries(ROTULOS_STATUS).map(([valor, rotulo]) => ({
+    valor,
+    rotulo
+  }));
 
-  // guarda o pedido clicado p/ mostrar na tela de det
-  pedidoSelecionado: any = null;
+  // helpers usados direto no html
+  readonly rotulo = rotuloStatus;
+  readonly classe = classeStatus;
+  readonly textoEndereco = textoEndereco;
+  readonly textoJanela = textoJanela;
 
-  // trava o botao de enviar enquanto o back responde, p/ n clicar 2x
-  enviando: boolean = false;
+  readonly hoje = dataLocalISO();
 
-  // traduz o status do banco p/ um texto amigavel na tela
-  private rotulosStatus: { [chave: string]: string } = {
-    PENDENTE: 'Pendente',
-    PLANEJADO: 'Planejado',
-    SAIU_PARA_ENTREGA: 'Saiu para entrega',
-    EM_ANDAMENTO: 'Em andamento',
-    ENTREGUE: 'Entregue',
-    FALHOU: 'Falhou',
-    CANCELADO: 'Cancelado'
-  };
+  abaAtiva: Aba = 'ver-pedidos';
 
-  // injeta o service p/ poder chamar a api
+  // lista de pedidos vinda do back
+  listaPedidos: Pedido[] = [];
+  carregando = false;
+  erroLista = '';
+
+  // pedido aberto na tela de detalhes
+  pedidoSelecionado: Pedido | null = null;
+
+  // filtros da lista
+  filtroTexto = '';
+  filtroStatus = '';
+
+  // formulário de novo pedido
+  form: FormPedido = this.formVazio();
+  errosForm: ErrosForm = {};
+  tentouEnviar = false;
+  enviando = false;
+
+  // aviso exibido no topo da página (sucesso ou erro de envio)
+  mensagem: Mensagem | null = null;
+
   constructor(private rotaService: RotaService) {}
 
-  // roda ao abrir a tela e já busca os pedidos
   ngOnInit(): void {
     this.carregarPedidos();
   }
 
-  // devolve o texto amigavel do status (usar no html no lugar de pedido.status)
-  rotuloStatus(status: string): string {
-    return this.rotulosStatus[status] || status;
+  // na navbar, os detalhes contam como parte de "Meus pedidos"
+  get abaDestaque(): string {
+    return this.abaAtiva === 'detalhes-pedido' ? 'ver-pedidos' : this.abaAtiva;
   }
 
-  // carregar pedidos: busca os pedidos do cliente no back
-  carregarPedidos() {
-    this.rotaService.obterPedidos().subscribe({
-      next: (pedidos) => (this.listaPedidos = pedidos),
-      error: (erro) => console.error('erro ao buscar pedidos:', erro)
+  // lista com os filtros de texto e status aplicados
+  get pedidosFiltrados(): Pedido[] {
+    const termo = this.filtroTexto.trim().toLowerCase();
+
+    return this.listaPedidos.filter((pedido) => {
+      if (this.filtroStatus && pedido.status !== this.filtroStatus) {
+        return false;
+      }
+      if (!termo) {
+        return true;
+      }
+      return [String(pedido.id), pedido.descricao ?? '', pedido.cep ?? ''].some((texto) =>
+        texto.toLowerCase().includes(termo)
+      );
     });
   }
 
-  // retorna apenas a quant de notifs nao lidas p/ o badge
-  get qtdNaoLidas(): number {
-    return this.listaNotificacoes.filter(n => !n.lida).length;
+  trackPorId(_indice: number, pedido: Pedido): number {
+    return pedido.id;
   }
 
-  // retorna a lista filtrada conforme a aba selecionada no dropdown
-  get notificacoesFiltradas() {
-    if (this.filtroNotificacoes === 'nao-lidas') {
-      return this.listaNotificacoes.filter(n => !n.lida);
+  // busca os pedidos no back
+  carregarPedidos(): void {
+    this.carregando = true;
+    this.erroLista = '';
+
+    this.rotaService.obterPedidos().subscribe({
+      next: (pedidos) => {
+        this.listaPedidos = pedidos;
+        this.carregando = false;
+      },
+      error: (erro) => {
+        this.carregando = false;
+        this.erroLista = mensagemDeErro(erro, 'Não foi possível carregar os pedidos.');
+      }
+    });
+  }
+
+  // troca de aba (vem da navbar ou dos botões da tela)
+  selecionarAba(aba: string): void {
+    this.abaAtiva = aba as Aba;
+    this.mensagem = null;
+  }
+
+  verDetalhes(pedido: Pedido): void {
+    this.pedidoSelecionado = pedido;
+    this.selecionarAba('detalhes-pedido');
+  }
+
+  // o cep é digitado só com números e ganha o hífen sozinho (72115000 -> 72115-000)
+  aoDigitarCep(valor: string): void {
+    const digitos = (valor ?? '').replace(/\D/g, '').slice(0, 8);
+    this.form.cep = digitos.length > 5 ? `${digitos.slice(0, 5)}-${digitos.slice(5)}` : digitos;
+    this.revalidar();
+  }
+
+  // depois da primeira tentativa de envio, os erros somem conforme o usuário corrige
+  revalidar(): void {
+    if (this.tentouEnviar) {
+      this.validar();
     }
-    return this.listaNotificacoes;
   }
 
-  // altera o filtro do dropdown de notifs
-  mudarFiltroNotificacoes(filtro: string) {
-    this.filtroNotificacoes = filtro;
+  // valida o formulário e guarda a mensagem de cada campo com problema
+  private validar(): boolean {
+    const f = this.form;
+    const erros: ErrosForm = {};
+
+    if (!f.descricao.trim()) {
+      erros.descricao = 'Descreva o que será entregue.';
+    }
+    if (!/^\d{5}-\d{3}$/.test(f.cep)) {
+      erros.cep = 'Informe o CEP com 8 dígitos, por exemplo 72115-000.';
+    }
+    if (!f.numero.trim()) {
+      erros.numero = 'Informe o número ou o lote.';
+    }
+    if (!f.dataEntrega) {
+      erros.dataEntrega = 'Escolha a data de entrega.';
+    } else if (f.dataEntrega < this.hoje) {
+      erros.dataEntrega = 'A data de entrega não pode estar no passado.';
+    }
+    if (f.janelaInicio && f.janelaFim && f.janelaFim < f.janelaInicio) {
+      erros.janelaFim = 'O horário final deve ser depois do inicial.';
+    }
+
+    this.errosForm = erros;
+    return Object.keys(erros).length === 0;
   }
 
-  // marca todas as notifs como lidas
-  marcarTodasComoLidas() {
-    this.listaNotificacoes.forEach(n => n.lida = true);
-  }
+  // valida e envia o pedido para a api (o back descobre as coordenadas)
+  enviarPedido(): void {
+    this.tentouEnviar = true;
+    this.mensagem = null;
 
-  // muda a aba atual e fecha todos os menus abertos
-  selecionarAba(aba: string) {
-    this.abaAtiva = aba;
-    this.menuPerfilAberto = false;
-    this.notificacoesAberto = false;
-  }
-
-  // abre ou fecha o dropdown do perfil
-  toggleMenuPerfil() {
-    this.menuPerfilAberto = !this.menuPerfilAberto;
-    this.notificacoesAberto = false;
-  }
-
-  // abre ou fecha o menu de notificacoes
-  toggleNotificacoes() {
-    this.notificacoesAberto = !this.notificacoesAberto;
-    this.menuPerfilAberto = false;
-  }
-
-  // formata os dados e envia o pedido p/ api
-  enviarPedido() {
-    // valida se os campos estao preenchidos antes de enviar
-    if (!this.novoPedido.descricao || !this.novoPedido.cep || !this.novoPedido.numero) {
-      alert('preencha descrição, cep e número.');
+    if (!this.validar() || this.enviando) {
       return;
     }
 
-    // manda só descricao, cep e numero (o back descobre as coordenadas)
-    const pedido = {
-      descricao: this.novoPedido.descricao,
-      cep: this.novoPedido.cep,
-      numero: String(this.novoPedido.numero)
+    const pedido: NovoPedido = {
+      descricao: this.form.descricao.trim(),
+      cep: this.form.cep,
+      numero: this.form.numero.trim(),
+      data_entrega: this.form.dataEntrega
     };
+    if (this.form.janelaInicio) {
+      pedido.janela_entrega_inicio = this.form.janelaInicio;
+    }
+    if (this.form.janelaFim) {
+      pedido.janela_entrega_fim = this.form.janelaFim;
+    }
 
     this.enviando = true;
     this.rotaService.criarPedido(pedido).subscribe({
       next: () => {
         this.enviando = false;
-        // limpa o form, recarrega a lista do back e volta p/ aba de listagem
-        this.novoPedido = { descricao: '', cep: '', numero: '' };
+        this.form = this.formVazio();
+        this.errosForm = {};
+        this.tentouEnviar = false;
         this.carregarPedidos();
-        this.selecionarAba('ver-pedidos');
+        this.abaAtiva = 'ver-pedidos';
+        this.mensagem = {
+          tipo: 'sucesso',
+          texto: 'Pedido solicitado. Ele aparece na lista com o status Pendente.'
+        };
       },
       error: (erro) => {
         this.enviando = false;
-        // mostra o motivo q o back mandou (ex: endereço n encontrado)
-        alert(erro.error?.detail || 'erro ao enviar o pedido.');
+        this.mensagem = {
+          tipo: 'erro',
+          texto: mensagemDeErro(
+            erro,
+            'Não foi possível enviar o pedido. Confira os dados e tente de novo.'
+          )
+        };
       }
     });
   }
 
-  // pega o pedido clicado e abre a tela de det
-  verDetalhesPedido(pedido: any) {
-    this.pedidoSelecionado = pedido;
-    this.abaAtiva = 'detalhes-pedido';
-  }
-
-  // simula a abertura do mapa de rastreio
-  rastrearPedido(pedido: any) {
-    alert(`abrindo rastreio p/ o pedido #${pedido.id}`);
-  }
-
-  // cancela o pedido selecionado removendo-o da lista
-  // (ainda só local: o back n tem endpoint de cancelamento)
-  cancelarPedido(pedido: any) {
-    if (confirm(`Certeza que deseja cancelar o pedido #${pedido.id}?`)) {
-      this.listaPedidos = this.listaPedidos.filter(p => p.id !== pedido.id);
-      alert('Pedido cancelado com sucesso.');
-      this.selecionarAba('ver-pedidos');
-    }
-  }
-
-  // abre as configs da conta
-  abrirConfiguracoes() {
-    alert('abrindo configs...');
-    this.menuPerfilAberto = false;
-  }
-
-  // faz o logout da conta
-  sair() {
-    alert('saindo da conta...');
-    this.menuPerfilAberto = false;
+  private formVazio(): FormPedido {
+    return {
+      descricao: '',
+      cep: '',
+      numero: '',
+      dataEntrega: '',
+      janelaInicio: '',
+      janelaFim: ''
+    };
   }
 }

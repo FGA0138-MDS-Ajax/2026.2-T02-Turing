@@ -1,27 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API_URL } from '../config/api.config';
+import { DestinoRota, NovoPedido, Pedido, RespostaRota } from '../models/pedido.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RotaService {
-  private apiUrl = 'http://localhost:8000';
+  private readonly apiUrl = API_URL;
 
   constructor(private http: HttpClient) {}
 
-  // calc rota: envia os destinos p/ otimizacao
-  calcularRota(destinos: any[]): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/calcular-rota`, { destinos });
+  // calcula a rota: o primeiro destino da lista vira o ponto de partida e de volta (regra do otimizador)
+  calcularRota(destinos: DestinoRota[]): Observable<RespostaRota> {
+    return this.http.post<RespostaRota>(`${this.apiUrl}/calcular-rota`, { destinos });
   }
 
-  // obeter pedidos: busca a lista de pedidos salvos no banco p/ o motorista ver nas entregas
-  obterPedidos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/pedidos`);
+  // busca os pedidos salvos no banco
+  obterPedidos(): Observable<Pedido[]> {
+    return this.http.get<Pedido[]>(`${this.apiUrl}/pedidos`);
   }
 
-  // criar pedido: usado pelo cliente p/ registar um novo pedido
-  criarPedido(dadosPedido: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/pedidos`, dadosPedido);
+  // registra um novo pedido
+  criarPedido(dadosPedido: NovoPedido): Observable<Pedido> {
+    return this.http.post<Pedido>(`${this.apiUrl}/pedidos`, dadosPedido);
   }
 }

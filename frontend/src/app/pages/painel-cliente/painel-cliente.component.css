@@ -1,178 +1,65 @@
-/* container principal */
-.painel-container {
-  min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  color: #0f172a;
-}
+/* só o que é específico do painel do cliente; o resto está em shared/painel-base.css */
 
-/* barra superior de navegação (navbar) */
-.navbar {
+.acoes-form {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 2rem;
-  background-color: #ffffff;
-  border-bottom: 1px solid #e2e8f0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  justify-content: flex-end;
+  margin-top: 1.5rem;
 }
 
-.logo-texto {
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-}
-
-/* links centrais */
-.nav-links {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.nav-links span {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #64748b;
-  cursor: pointer;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.nav-links span:hover {
-  color: #0f172a;
-  background-color: #f1f5f9;
-}
-
-.nav-links span.active {
-  color: #0f172a;
-  font-weight: 600;
-  background-color: #e2e8f0;
-}
-
-/* perfil e dropdown */
-.user-profile-container {
-  position: relative;
-}
-
-.avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background-color: #f1f5f9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #64748b;
-  border: 1px solid #cbd5e1;
-  transition: background-color 0.2s;
-}
-
-.avatar-dropdown-trigger:hover .avatar {
-  background-color: #e2e8f0;
-  color: #0f172a;
-}
-
-.dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: 120%;
-  width: 160px;
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
+/* grupo do horário de recebimento */
+.janela {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid var(--linha);
   border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 0.5rem 0;
-  z-index: 50;
 }
 
-.dropdown-menu a {
-  display: block;
-  padding: 0.5rem 1rem;
+.janela legend {
+  padding: 0 0.4rem;
   font-size: 0.85rem;
-  color: #334155;
-  text-decoration: none;
-  transition: background-color 0.15s;
+  font-weight: 600;
+  color: var(--texto);
 }
 
-.dropdown-menu a:hover {
-  background-color: #f1f5f9;
-  color: #0f172a;
+.janela .ajuda {
+  margin: 0.75rem 0 0;
 }
 
-.dropdown-menu hr {
-  margin: 0.4rem 0;
-  border: 0;
-  border-top: 1px solid #e2e8f0;
+/* busca + filtro de status */
+.filtros {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
-.dropdown-menu a.logout {
-  color: #ef4444;
+.coluna-acao {
+  text-align: right;
 }
 
-.dropdown-menu a.logout:hover {
-  background-color: #fef2f2;
-}
-
-/* conteudo principal */
-.conteudo {
-  max-width: 1000px;
-  margin: 2rem auto;
-  padding: 0 1.5rem;
-}
-
-.section-header {
-  margin-bottom: 1.5rem;
-}
-
-.sub-titulo {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-.section-header h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0.25rem 0 0.5rem 0;
-}
-
-.descricao {
-  font-size: 0.9rem;
-  color: #64748b;
+/* tela de detalhes */
+.detalhes {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem 2rem;
   margin: 0;
 }
 
-/* card de formulario e tabelas */
-.card-formulario {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+.detalhes dt {
+  margin-bottom: 0.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-suave);
 }
 
-.card-desc {
-  color: #64748b;
-  font-size: 0.9rem;
+.detalhes dd {
   margin: 0;
+  color: var(--tinta);
 }
 
-.btn-otimizar {
-  background-color: #0f172a;
-  color: #ffffff;
-  border: none;
-  padding: 0.65rem 1.25rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
-
-.btn-otimizar:hover {
-  background-color: #1e293b;
+@media (max-width: 640px) {
+  .filtros,
+  .detalhes {
+    grid-template-columns: 1fr;
+  }
 }
