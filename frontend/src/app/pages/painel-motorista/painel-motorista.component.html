@@ -1,169 +1,173 @@
-<!-- container principal do painel -->
-<div class="painel-container">
- 
-  <!-- barra superior de navegação -->
-  <header class="navbar">
-    <div class="logo-area" style="cursor: pointer;" routerLink="/">
-      <span class="logo-texto">OpenRoute</span>
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaAtiva"
+  rotaLogo="/"
+  (abaSelecionada)="abaAtiva = $event"
+></app-navbar>
+
+<main class="conteudo">
+
+  <div class="cabecalho-pagina">
+    <div>
+      <h1>Minhas entregas</h1>
+      <p class="descricao">
+        Marque as entregas que quer fazer juntas e calcule a ordem mais curta para percorrê-las.
+      </p>
+    </div>
+    <button type="button" class="botao botao-secundario" (click)="carregarPedidos()" [disabled]="carregando">
+      {{ carregando ? 'Atualizando…' : 'Atualizar lista' }}
+    </button>
+  </div>
+
+  <!-- escolha do ponto de partida e botão de calcular -->
+  <section class="cartao" aria-labelledby="titulo-calculo">
+    <h2 id="titulo-calculo">Calcular rota</h2>
+
+    <div class="linha-calculo">
+      <div class="campo">
+        <label for="partida">Ponto de partida e de volta</label>
+        <select
+          id="partida"
+          [ngModel]="pontoPartidaId"
+          (ngModelChange)="pontoPartidaId = $event"
+          [disabled]="pedidosSelecionados.length < 2"
+        >
+          <option *ngIf="!pedidosSelecionados.length" [ngValue]="null">Marque as entregas na tabela</option>
+          <option *ngFor="let pedido of pedidosSelecionados" [ngValue]="pedido.id">
+            Pedido {{ pedido.id }}: {{ textoEndereco(pedido) }}
+          </option>
+        </select>
+        <span class="ajuda">
+          {{ selecionados.size }} {{ selecionados.size === 1 ? 'entrega marcada' : 'entregas marcadas' }}.
+          A rota começa e termina no ponto escolhido. Marque pelo menos 2 entregas.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="botao botao-primario"
+        (click)="calcularRota()"
+        [disabled]="pedidosSelecionados.length < 2 || calculando"
+      >
+        {{ calculando ? 'Calculando…' : 'Calcular rota otimizada' }}
+      </button>
     </div>
 
-    <!-- links de navegação entre as abas -->
-    <nav class="nav-links">
-      <span [class.active]="abaAtiva === 'entregas'" (click)="selecionarAba('entregas')">Entregas</span>
-    </nav>
+    <div *ngIf="erroRota" class="aviso aviso-erro aviso-calculo" role="alert">{{ erroRota }}</div>
+  </section>
 
-    <!-- area direita c/ sino de notifs (badge + dropdown) e perfil -->
-    <div style="display: flex; align-items: center; gap: 1rem;">
-      
-      <!-- container relativo p/ o dropdown de notificacoes -->
-      <div class="user-profile-container" style="position: relative;">
-        
-        <!-- icone do sino c/ badge contador de nao lidas -->
-        <div class="icone-sino" (click)="toggleNotificacoes()" style="cursor: pointer; position: relative; color: #64748b; display: flex; align-items: center;" title="Notificações">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-          <!-- badge vermelhinho c/ a quantidade -->
-          <span *ngIf="qtdNaoLidas > 0" style="position: absolute; top: -5px; right: -6px; background: #dc2626; color: white; font-size: 0.7rem; font-weight: 700; padding: 1px 5px; border-radius: 10px; border: 2px solid white;">
-            {{ qtdNaoLidas }}
+  <!-- resultado: resumo, ordem das paradas e mapa -->
+  <section
+    #blocoResultado
+    *ngIf="resultado"
+    class="cartao"
+    tabindex="-1"
+    aria-labelledby="titulo-resultado"
+  >
+    <h2 id="titulo-resultado">Rota otimizada</h2>
+
+    <dl class="resumo">
+      <div>
+        <dt>Distância total</dt>
+        <dd>{{ formatarKm(resultado.distancia_total_km) }}</dd>
+      </div>
+      <div>
+        <dt>Tempo estimado</dt>
+        <dd>{{ formatarDuracao(resultado.tempo_estimado_min) }}</dd>
+      </div>
+      <div>
+        <dt>Paradas</dt>
+        <dd>{{ resultado.rota_otimizada.length }}</dd>
+      </div>
+    </dl>
+
+    <div class="resultado-corpo">
+      <ol class="paradas">
+        <li *ngFor="let parada of resultado.rota_otimizada">
+          <span class="numero" aria-hidden="true">{{ parada.ordem }}</span>
+          <span class="parada-texto">
+            <span class="sr-somente">Parada {{ parada.ordem }}: </span>{{ parada.endereco }}
+            <small *ngIf="parada.ordem === 1">Partida e retorno</small>
           </span>
-        </div>
+        </li>
+      </ol>
 
-        <!-- menu flutuante de notificacoes q desce ao clicar -->
-        <div class="dropdown-menu" *ngIf="notificacoesAberto" style="width: 340px; right: 0; left: auto; padding: 0;">
-          
-          <!-- cabecalho do dropdown c/ titulo e botoes de filtro (todas / nao lidas) -->
-          <div style="padding: 12px 16px; border-bottom: 1px solid #e2e8f0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-              <span style="font-weight: 600; color: #0f172a; font-size: 0.95rem;">Notificações</span>
-              <span style="font-size: 0.8rem; color: #2563eb; cursor: pointer;" (click)="marcarTodasComoLidas()">Marcar lidas</span>
-            </div>
-            <!-- abas internas de filtro -->
-            <div style="display: flex; gap: 8px;">
-              <button type="button" (click)="mudarFiltroNotificacoes('todas')" [style.background]="filtroNotificacoes === 'todas' ? '#eff6ff' : 'transparent'" [style.color]="filtroNotificacoes === 'todas' ? '#2563eb' : '#64748b'" style="border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
-                Todas
-              </button>
-              <button type="button" (click)="mudarFiltroNotificacoes('nao-lidas')" [style.background]="filtroNotificacoes === 'nao-lidas' ? '#eff6ff' : 'transparent'" [style.color]="filtroNotificacoes === 'nao-lidas' ? '#2563eb' : '#64748b'" style="border: none; padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600; cursor: pointer;">
-                Não lidas
-              </button>
-            </div>
-          </div>
-
-          <!-- lista de avisos filtrados c/ scroll -->
-          <div style="max-height: 260px; overflow-y: auto;">
-            <ng-container *ngIf="notificacoesFiltradas.length > 0; else semNotifs">
-              <div *ngFor="let notif of notificacoesFiltradas" style="padding: 12px 16px; border-bottom: 1px solid #f1f5f9; cursor: pointer; display: flex; align-items: flex-start; gap: 8px;" [style.background]="notif.lida ? 'transparent' : '#f8fafc'">
-                <!-- icone indicador de nao lida -->
-                <span *ngIf="!notif.lida" style="width: 8px; height: 8px; background: #2563eb; border-radius: 50%; margin-top: 5px; flex-shrink: 0;"></span>
-                <div style="flex-grow: 1;">
-                  <p style="font-size: 0.85rem; color: #1e293b; font-weight: 500; margin: 0 0 4px 0;">{{ notif.titulo }}</p>
-                  <span style="font-size: 0.75rem; color: #64748b;">{{ notif.tempo }}</span>
-                </div>
-              </div>
-            </ng-container>
-            
-            <ng-template #semNotifs>
-              <p style="padding: 20px; text-align: center; color: #64748b; font-size: 0.85rem; margin: 0;">Nenhuma notificação encontrada.</p>
-            </ng-template>
-          </div>
-
-          <!-- rodape do dropdown -->
-          <div style="padding: 10px 16px; text-align: center; border-top: 1px solid #e2e8f0; background: #f8fafc;">
-            <span style="font-size: 0.85rem; color: #2563eb; font-weight: 500; cursor: pointer;" (click)="notificacoesAberto = false">Fechar</span>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- menu de perfil do utilizador com avatar e setinha indicativa -->
-      <div class="user-profile-container" style="position: relative;">
-        <div class="avatar-dropdown-trigger" (click)="toggleMenuPerfil()" style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-          <div class="avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-          <!-- setinha para baixo indicativa -->
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </div>
-
-        <div class="dropdown-menu" *ngIf="menuPerfilAberto">
-          <a href="#" (click)="$event.preventDefault(); selecionarAba('perfil'); menuPerfilAberto = false">Meu Perfil</a>
-          <a href="#" (click)="$event.preventDefault(); abrirConfiguracoes()">Configurações</a>
-          <hr>
-          <a href="#" class="logout" (click)="$event.preventDefault(); sair()">Sair</a>
-        </div>
-      </div>
-
-    </div>
-  </header>
-
-  <!-- conteudo principal q muda conforme a aba -->
-  <main class="conteudo">
-
-    <!-- aba de entregas com selecao de multiplos destinos -->
-    <div *ngIf="abaAtiva === 'entregas'" class="tab-content">
-      <div class="section-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <span class="sub-titulo">GESTÃO DE ROTAS</span>
-          <h1>Minhas Entregas</h1>
-          <p class="descricao">Selecione múltiplos pedidos para calcular e otimizar a rota de entrega.</p>
-        </div>
-        <!-- botao para disparar a otimizacao com base nos selecionados -->
-        <button type="button" class="btn-otimizar" (click)="otimizarRotaSelecionada($event)">
-          Otimizar Rota Selecionada
-        </button>
-      </div>
-
-      <div class="card-formulario">
-        <ng-container *ngIf="listaEntregas.length > 0; else semEntregas">
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="border-bottom: 1px solid #e2e8f0; text-align: left;">
-                <th style="padding: 0.75rem; width: 40px;">Sel.</th>
-                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">ID</th>
-                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Descrição</th>
-                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Endereço</th>
-                <th style="padding: 0.75rem; color: #334155; font-size: 0.85rem;">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let entrega of listaEntregas" style="border-bottom: 1px solid #f1f5f9;">
-                <td style="padding: 0.75rem; text-align: center;">
-                  <input type="checkbox" (change)="toggleSelecaoPedido(entrega.id)" style="cursor: pointer;">
-                </td>
-                <td style="padding: 0.75rem; color: #64748b; font-size: 0.9rem;">{{ entrega.id }}</td>
-                <td style="padding: 0.75rem; color: #334155; font-size: 0.9rem;">{{ entrega.descricao }}</td>
-                <td style="padding: 0.75rem; color: #0f172a; font-weight: 500; font-size: 0.9rem;">{{ entrega.endereco }}</td>
-                <td style="padding: 0.75rem; color: #64748b; font-size: 0.9rem;">
-                  <span style="font-weight: 600; color: #0f172a;">{{ entrega.status }}</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </ng-container>
-
-        <ng-template #semEntregas>
-          <p class="card-desc">Nenhuma entrega cadastrada no momento.</p>
-        </ng-template>
-      </div>
+      <app-mapa-rota [paradas]="resultado.rota_otimizada"></app-mapa-rota>
     </div>
 
-    <!-- aba de perfil (caso o utilizador clique em Meu Perfil no menu) -->
-    <div *ngIf="abaAtiva === 'perfil'" class="tab-content">
-      <div class="section-header">
-        <span class="sub-titulo">MINHA CONTA</span>
-        <h1>Meu Perfil</h1>
-        <p class="descricao">Visualize e edite as informações da sua conta de motorista.</p>
-      </div>
-      <div class="card-formulario">
-        <p class="card-desc">Informações do perfil carregadas com sucesso.</p>
-      </div>
+    <p class="nota">
+      A linha liga as paradas em linha reta, e o trecho tracejado é a volta ao ponto de partida.
+      O tempo estimado considera velocidade média de 40 km/h.
+    </p>
+  </section>
+
+  <!-- tabela de entregas -->
+  <section *ngIf="abaAtiva === 'entregas'" class="cartao" aria-labelledby="titulo-entregas">
+    <h2 id="titulo-entregas">Entregas</h2>
+
+    <div *ngIf="erroLista" class="aviso aviso-erro" role="alert">
+      {{ erroLista }}
+      <button type="button" class="botao-link" (click)="carregarPedidos()">Tentar novamente</button>
     </div>
 
-  </main>
-</div>
+    <p *ngIf="carregando && !listaEntregas.length" class="carregando">Carregando entregas…</p>
+
+    <ng-container *ngIf="!erroLista && !(carregando && !listaEntregas.length)">
+      <div class="tabela-wrap" *ngIf="listaEntregas.length; else semEntregas">
+        <table>
+          <caption class="sr-somente">Entregas disponíveis para montar a rota</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="coluna-check">
+                <input
+                  type="checkbox"
+                  [checked]="todasSelecionadas"
+                  [disabled]="!entregasSelecionaveis.length"
+                  (change)="alternarTodas()"
+                  aria-label="Marcar todas as entregas disponíveis"
+                >
+              </th>
+              <th scope="col">Pedido</th>
+              <th scope="col">Descrição</th>
+              <th scope="col">Endereço</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let entrega of listaEntregas; trackBy: trackPorId"
+              [class.linha-bloqueada]="!podeSelecionar(entrega)"
+            >
+              <td class="coluna-check">
+                <input
+                  type="checkbox"
+                  [checked]="selecionados.has(entrega.id)"
+                  [disabled]="!podeSelecionar(entrega)"
+                  (change)="alternarSelecao(entrega)"
+                  [attr.aria-label]="'Marcar o pedido ' + entrega.id"
+                >
+              </td>
+              <td>#{{ entrega.id }}</td>
+              <td>{{ entrega.descricao || 'Sem descrição' }}</td>
+              <td>
+                {{ textoEndereco(entrega) }}
+                <small class="obs" *ngIf="!podeSelecionar(entrega)">{{ motivoBloqueio(entrega) }}</small>
+              </td>
+              <td><span class="status" [ngClass]="classe(entrega.status)">{{ rotulo(entrega.status) }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #semEntregas>
+        <div class="vazio">
+          <p>Nenhuma entrega cadastrada no momento.</p>
+          <button type="button" class="botao botao-secundario" (click)="carregarPedidos()">
+            Atualizar lista
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+  </section>
+
+</main>

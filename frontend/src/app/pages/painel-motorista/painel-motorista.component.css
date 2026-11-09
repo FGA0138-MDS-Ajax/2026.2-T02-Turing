@@ -1,168 +1,139 @@
-.painel-container {
-  min-height: 100vh;
-  background-color: #f8fafc;
-  font-family: inherit;
+/* só o que é específico do painel do motorista, o resto está em shared/painel-base.css */
+
+/* escolha do ponto de partida + botão de calcular */
+.linha-calculo {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 1rem 1.25rem;
 }
 
-.navbar {
+.linha-calculo .botao {
+  margin-top: 1.5rem;
+}
+
+.aviso-calculo {
+  margin: 1rem 0 0;
+}
+
+/* resultado da rota */
+.resumo {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ffffff;
-  padding: 0 2rem;
-  height: 70px;
-  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1rem 2.5rem;
+  margin: 0 0 1.25rem;
 }
 
-.logo-texto {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #0f172a;
+.resumo dt {
+  margin-bottom: 0.15rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-suave);
 }
 
-.nav-links span {
-  margin: 0 1rem;
-  cursor: pointer;
-  color: #64748b;
-  font-weight: 500;
-  transition: color 0.2s;
+.resumo dd {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
-.nav-links span.active, .nav-links span:hover {
-  color: #0f172a;
+.resultado-corpo {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) 1fr;
+  gap: 1.25rem;
+  align-items: start;
 }
 
-.user-profile-container {
-  position: relative;
+/* lista das paradas, na ordem de visita */
+.paradas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 400px;
+  overflow-y: auto;
 }
 
-.avatar {
-  background-color: #e2e8f0;
-  color: #64748b;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
+.paradas li {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.avatar:hover {
-  background-color: #cbd5e1;
-}
-
-.dropdown-menu {
-  position: absolute;
-  right: 0;
-  top: 50px;
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  width: 160px;
-  display: flex;
-  flex-direction: column;
-  padding: 0.5rem 0;
-  z-index: 10;
-}
-
-.dropdown-menu a {
-  padding: 0.5rem 1rem;
-  color: #334155;
-  text-decoration: none;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f1f5f9;
   font-size: 0.9rem;
 }
 
-.dropdown-menu a:hover {
-  background-color: #f1f5f9;
+.paradas li:last-child {
+  border-bottom: 0;
 }
 
-.dropdown-menu hr {
-  border: none;
-  border-top: 1px solid #e2e8f0;
-  margin: 0.25rem 0;
-}
-
-.dropdown-menu a.logout {
-  color: #ef4444;
-}
-
-.conteudo {
-  padding: 2rem;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.section-header h1 {
-  font-size: 1.5rem;
-  color: #0f172a;
-  margin-top: 0.25rem;
-}
-
-.sub-titulo {
-  font-size: 0.75rem;
-  font-weight: bold;
-  color: #64748b;
-  letter-spacing: 0.05em;
-}
-
-.descricao, .card-desc {
-  color: #64748b;
-  font-size: 0.95rem;
-  margin-bottom: 1.5rem;
-}
-
-.card-formulario {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  border: 1px solid #e2e8f0;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
-.input-group {
+.numero {
+  flex: 0 0 auto;
+  width: 1.75rem;
+  height: 1.75rem;
   display: flex;
-  flex-direction: column;
-}
-
-.input-group label {
-  font-size: 0.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--rota);
+  color: #ffffff;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #334155;
-  margin-bottom: 0.35rem;
 }
 
-.input-group input {
-  padding: 0.75rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  font-size: 0.95rem;
+.paradas li:first-child .numero {
+  background: var(--tinta);
 }
 
-.acoes-footer {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: flex-end;
+.parada-texto small {
+  display: block;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
 }
 
-.btn-otimizar {
-  background-color: #0f172a;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
+.nota {
+  margin: 1rem 0 0;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
 }
 
-.btn-otimizar:hover {
-  background-color: #1e293b;
+#titulo-resultado:focus,
+section:focus {
+  outline: none;
+}
+
+/* tabela de entregas */
+.coluna-check {
+  width: 2.5rem;
+  text-align: center;
+}
+
+.linha-bloqueada td {
+  color: var(--texto-suave);
+}
+
+.obs {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--texto-suave);
+}
+
+@media (max-width: 800px) {
+  .resultado-corpo {
+    grid-template-columns: 1fr;
+  }
+
+  .paradas {
+    max-height: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .linha-calculo {
+    grid-template-columns: 1fr;
+  }
+
+  .linha-calculo .botao {
+    margin-top: 0;
+  }
 }
