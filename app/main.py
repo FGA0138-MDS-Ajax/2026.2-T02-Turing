@@ -9,6 +9,10 @@ from app.api.validacao import ErroDeValidacao
 from app.api.rotas import rotas_bp
 from app.api.destinos import destinos_bp
 from app.api.rotas_crud import rotas_crud_bp
+from app.api.autenticacao import auth_bp
+from app.api.usuarios import usuarios_bp
+from app.api.pedidos import pedidos_bp
+from app.models import usuario as _usuario_models
 
 logging.basicConfig(level=logging.INFO)
 
@@ -19,6 +23,9 @@ CORS(app)                       # antes da entrega: CORS(app, origins=["http://<
 app.register_blueprint(rotas_bp)
 app.register_blueprint(destinos_bp)
 app.register_blueprint(rotas_crud_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(usuarios_bp)
+app.register_blueprint(pedidos_bp)
 
 
 @app.errorhandler(ErroDeValidacao)

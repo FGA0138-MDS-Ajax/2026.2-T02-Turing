@@ -2,20 +2,30 @@ import logging
 from typing import List
 
 from flask import Blueprint, jsonify, abort
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.api.validacao import LerCorpo
-from app.schemas.destino import DestinoResponse as Destino
+from app.api.autenticacao import exigir_usuario_operacional
+from app.core.otimizador import calcular_rota_otimizada
 from app.core.matriz import gerar_matriz_distancias
-from app.core.heuristica import VizinhoMaisProximo
-from app.integracoes.osrm import OtimizarOrdemOsrm, ObterGeometriaOsrm, ErroOsrm
+from app.integracoes.osrm import ObterMatrizOsrm, ObterGeometriaOsrm, ErroOsrm
 
 logger = logging.getLogger(__name__)
 rotas_bp = Blueprint("rotas", __name__)
 
 
+class PontoRota(BaseModel):
+    id: int
+    latitude: float = Field(ge=-90, le=90)
+    longitude: float = Field(ge=-180, le=180)
+    endereco: str = ""
+    janela_inicio_min: float | None = Field(default=None, ge=0)
+    janela_fim_min: float | None = Field(default=None, ge=0)
+
+
 class RotaRequest(BaseModel):
-    destinos: List[Destino]
+    destinos: List[PontoRota]
+    velocidade_media_kmh: float = Field(default=40, gt=0)
 
 
 @rotas_bp.get("/health")
@@ -25,68 +35,58 @@ def verificar_saude():
 
 @rotas_bp.post("/calcular-rota")
 def calcular_rota():
-    dadosRecebidos = LerCorpo(RotaRequest)
-    destinos = dadosRecebidos.destinos
-
+    exigir_usuario_operacional()
+    dados = LerCorpo(RotaRequest)
+    destinos = dados.destinos
     if len(destinos) < 2:
         abort(400, description="É necessário enviar pelo menos 2 destinos para calcular uma rota.")
-
-    for d in destinos:
-        if d.latitude is None or d.longitude is None:
-            abort(400, description=f"O destino {d.id} não possui coordenadas.")
+    if len({d.id for d in destinos}) != len(destinos):
+        abort(400, description="A lista contém IDs de destinos duplicados.")
 
     coordenadas = [(d.latitude, d.longitude) for d in destinos]
-
-    # 1) Matriz por vias reais (OSRM); se falhar, registra e usa linha reta.
-    #    TODO (C07.3): tentar o TomTom antes da linha reta.
-    provedorCalculo = "osrm"
-    matrizDuracoesMin = None
+    provedor = "osrm"
+    matriz_tempos = None
     try:
-        matriz, matrizDuracoesMin = ObterMatrizOsrm(coordenadas)
+        matriz, matriz_tempos = ObterMatrizOsrm(coordenadas)
     except ErroOsrm as erro:
-        logger.error("OSRM indisponível, usando distância em linha reta: %s", erro)
+        logger.warning("OSRM indisponível; usando distância geográfica aproximada: %s", erro)
         matriz = gerar_matriz_distancias(destinos)
-        provedorCalculo = "haversine"
+        provedor = "haversine_aproximado"
 
-    # 2) Ordem otimizada (OR-Tools)
-    resultado = calcular_rota_otimizada(matriz, velocidade_media_kmh=40)
-    ordem = resultado["ordem_ids"]
-
-    tempoEstimadoMin = resultado["tempo_estimado_min"]
-    if matrizDuracoesMin is not None:
-        tempoEstimadoMin = round(
-            sum(matrizDuracoesMin[ordem[i]][ordem[i + 1]] for i in range(len(ordem) - 1)), 2
-        )
-
-    # 3) Geometria para o mapa; se falhar, linha reta entre as paradas
-    coordenadasNaOrdem = [coordenadas[indice] for indice in ordem]
+    janelas = None
+    if any(d.janela_inicio_min is not None or d.janela_fim_min is not None for d in destinos):
+        janelas = []
+        for indice, destino in enumerate(destinos):
+            if indice == 0:
+                janelas.append((0, 10**9))
+                continue
+            if destino.janela_inicio_min is None or destino.janela_fim_min is None:
+                abort(400, description="Informe início e fim para todas as janelas de tempo, em minutos desde a partida.")
+            janelas.append((destino.janela_inicio_min, destino.janela_fim_min))
     try:
-        geometria = ObterGeometriaOsrm(coordenadasNaOrdem)
-    except ErroOsrm as erro:
-        logger.error("Geometria OSRM indisponível, usando linha reta: %s", erro)
-        geometria = {
-            "type": "LineString",
-            "coordinates": [[lon, lat] for lat, lon in coordenadasNaOrdem],
-        }
-
-    rotaOtimizada = []
-    for i, indice in enumerate(ordem):
-        if i == len(ordem) - 1 and indice == ordem[0]:
-            break
+        resultado = calcular_rota_otimizada(
+            matriz, velocidade_media_kmh=dados.velocidade_media_kmh,
+            matriz_tempos=matriz_tempos, janelas_tempo=janelas
+        )
+    except ValueError as erro:
+        abort(422, description=str(erro))
+    ordem = resultado["ordem_ids"]
+    paradas = []
+    for posicao, indice in enumerate(ordem[:-1], start=1):
         d = destinos[indice]
-        rotaOtimizada.append({
-            "ordem": i + 1,
-            "id_destino": d.id,
-            "endereco": f"{d.logradouro}, {d.numero}",
-            "latitude": d.latitude,
-            "longitude": d.longitude,
-        })
+        paradas.append({"ordem": posicao, "id_pedido": d.id, "endereco": d.endereco,
+                        "latitude": d.latitude, "longitude": d.longitude})
 
-    return jsonify({
-        "mensagem": "Rota calculada com sucesso",
-        "rota_otimizada": rotaOtimizada,
-        "distancia_total_km": round(distanciaTotalKm, 2),
-        "tempo_estimado_min": round(tempoEstimadoMin, 2),
-        "geometria": geometria,
-        "provedor_calculo": provedorCalculo,
-    })
+    coords_ordem = [coordenadas[i] for i in ordem]
+    try:
+        geometria = ObterGeometriaOsrm(coords_ordem) if provedor == "osrm" else {
+            "type": "LineString", "coordinates": [[lon, lat] for lat, lon in coords_ordem]
+        }
+    except ErroOsrm as erro:
+        logger.warning("Não foi possível obter geometria viária: %s", erro)
+        geometria = {"type": "LineString", "coordinates": [[lon, lat] for lat, lon in coords_ordem]}
+
+    return jsonify({"mensagem": "Rota calculada com sucesso", "rota_otimizada": paradas,
+                    "distancia_total_km": resultado["distancia_total_km"],
+                    "tempo_estimado_min": resultado["tempo_estimado_min"],
+                    "geometria": geometria, "provedor_calculo": provedor})
