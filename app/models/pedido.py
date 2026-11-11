@@ -4,6 +4,7 @@ from app.models.base import Base
 import enum
 
 class StatusPedido(enum.Enum):
+    # Importante rever essa seçao e tudo que depende dela. Nao esta no escopo avaliar se o pedido esta pendente ou entregue.
     PENDENTE = "PENDENTE"
     PLANEJADO = "PLANEJADO"
     ENTREGUE = "ENTREGUE"
