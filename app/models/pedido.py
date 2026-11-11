@@ -3,13 +3,6 @@ from sqlalchemy.sql import func
 from app.models.base import Base
 import enum
 
-class StatusPedido(enum.Enum):
-    # Importante rever essa seçao e tudo que depende dela. Nao esta no escopo avaliar se o pedido esta pendente ou entregue.
-    PENDENTE = "PENDENTE"
-    PLANEJADO = "PLANEJADO"
-    ENTREGUE = "ENTREGUE"
-    CANCELADO = "CANCELADO"
-
 class PedidoModel(Base):
     __tablename__ = "pedidos"
 
@@ -21,7 +14,6 @@ class PedidoModel(Base):
     data_entrega = Column(Date, nullable=False)
     janela_entrega_inicio = Column(Time, nullable=True)
     janela_entrega_fim = Column(Time, nullable=True)
-    status = Column(Enum(StatusPedido), nullable=False, default=StatusPedido.PENDENTE)
     
     criado_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizado_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
