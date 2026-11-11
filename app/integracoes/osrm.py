@@ -1,7 +1,7 @@
 """Cálculo de rotas via OSRM (previsto na arquitetura, seção 2.3).
 
 Timeout de 5 s conforme a Tabela 1. Em caso de falha, levanta ErroOsrm para que
-quem chama aplique o fallback (TomTom, previsto em C07.3).
+quem chama aplique o fallback (TomTom, previsto em C07.2).
 """
 import requests
 
