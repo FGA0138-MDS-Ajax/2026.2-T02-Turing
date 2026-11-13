@@ -5,9 +5,9 @@ from flask import Blueprint, jsonify, abort
 from pydantic import BaseModel, Field
 
 from app.api.validacao import LerCorpo
-from app.api.autenticacao import exigir_usuario_operacional
-from app.core.otimizador import calcular_rota_otimizada
-from app.core.matriz import gerar_matriz_distancias
+from app.api.autenticacao import ExigirUsuarioOperacional
+from app.core.otimizador import CalcularRotaOtimizada
+from app.core.matriz import GerarMatrizDistancias
 from app.integracoes.osrm import ObterMatrizOsrm, ObterGeometriaOsrm, ErroOsrm
 
 logger = logging.getLogger(__name__)
@@ -29,13 +29,13 @@ class RotaRequest(BaseModel):
 
 
 @rotas_bp.get("/health")
-def verificar_saude():
+def VerificarSaude():
     return jsonify({"status": "ok", "mensagem": "A API está rodando perfeitamente!"})
 
 
 @rotas_bp.post("/calcular-rota")
-def calcular_rota():
-    exigir_usuario_operacional()
+def CalcularRota():
+    ExigirUsuarioOperacional()
     dados = LerCorpo(RotaRequest)
     destinos = dados.destinos
     if len(destinos) < 2:
@@ -45,12 +45,12 @@ def calcular_rota():
 
     coordenadas = [(d.latitude, d.longitude) for d in destinos]
     provedor = "osrm"
-    matriz_tempos = None
+    matrizTempos = None
     try:
-        matriz, matriz_tempos = ObterMatrizOsrm(coordenadas)
+        matriz, matrizTempos = ObterMatrizOsrm(coordenadas)
     except ErroOsrm as erro:
         logger.warning("OSRM indisponível; usando distância geográfica aproximada: %s", erro)
-        matriz = gerar_matriz_distancias(destinos)
+        matriz = GerarMatrizDistancias(destinos)
         provedor = "haversine_aproximado"
 
     janelas = None
@@ -64,9 +64,9 @@ def calcular_rota():
                 abort(400, description="Informe início e fim para todas as janelas de tempo, em minutos desde a partida.")
             janelas.append((destino.janela_inicio_min, destino.janela_fim_min))
     try:
-        resultado = calcular_rota_otimizada(
-            matriz, velocidade_media_kmh=dados.velocidade_media_kmh,
-            matriz_tempos=matriz_tempos, janelas_tempo=janelas
+        resultado = CalcularRotaOtimizada(
+            matriz, velocidadeMediaKmh=dados.velocidade_media_kmh,
+            matrizTempos=matrizTempos, janelasTempo=janelas
         )
     except ValueError as erro:
         abort(422, description=str(erro))
@@ -77,14 +77,14 @@ def calcular_rota():
         paradas.append({"ordem": posicao, "id_pedido": d.id, "endereco": d.endereco,
                         "latitude": d.latitude, "longitude": d.longitude})
 
-    coords_ordem = [coordenadas[i] for i in ordem]
+    coordsOrdem = [coordenadas[i] for i in ordem]
     try:
-        geometria = ObterGeometriaOsrm(coords_ordem) if provedor == "osrm" else {
-            "type": "LineString", "coordinates": [[lon, lat] for lat, lon in coords_ordem]
+        geometria = ObterGeometriaOsrm(coordsOrdem) if provedor == "osrm" else {
+            "type": "LineString", "coordinates": [[lon, lat] for lat, lon in coordsOrdem]
         }
     except ErroOsrm as erro:
         logger.warning("Não foi possível obter geometria viária: %s", erro)
-        geometria = {"type": "LineString", "coordinates": [[lon, lat] for lat, lon in coords_ordem]}
+        geometria = {"type": "LineString", "coordinates": [[lon, lat] for lat, lon in coordsOrdem]}
 
     return jsonify({"mensagem": "Rota calculada com sucesso", "rota_otimizada": paradas,
                     "distancia_total_km": resultado["distancia_total_km"],

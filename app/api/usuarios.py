@@ -4,29 +4,29 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 from app.models.usuario import SessaoModel
 from app.api.validacao import LerCorpo
-from app.api.autenticacao import exigir_adm
-from app.db.session import get_db
+from app.api.autenticacao import ExigirAdm
+from app.db.session import GetDb
 from app.models.usuario import UsuarioModel, PerfilModel
 from app.schemas.usuario import UsuarioCreate
 
 usuarios_bp = Blueprint("usuarios", __name__, url_prefix="/usuarios")
 
-def _serializar(usuario):
+def _Serializar(usuario):
     return {"id": usuario.id, "nome": usuario.nome, "email": usuario.email,
             "telefone": usuario.telefone, "ativo": usuario.ativo,
             "perfil": usuario.perfil.codigo, "criado_em": usuario.criado_em.isoformat() if usuario.criado_em else None}
 
 @usuarios_bp.get("")
 @usuarios_bp.get("/")
-def listar_usuarios():
-    exigir_adm(); db = get_db()
+def ListarUsuarios():
+    ExigirAdm(); db = GetDb()
     usuarios = db.query(UsuarioModel).join(PerfilModel).order_by(UsuarioModel.nome).all()
-    return jsonify([_serializar(u) for u in usuarios])
+    return jsonify([_Serializar(u) for u in usuarios])
 
 @usuarios_bp.post("")
 @usuarios_bp.post("/")
-def cadastrar_usuario():
-    exigir_adm(); dados = LerCorpo(UsuarioCreate); db = get_db()
+def CadastrarUsuario():
+    ExigirAdm(); dados = LerCorpo(UsuarioCreate); db = GetDb()
     perfil = db.query(PerfilModel).filter(PerfilModel.codigo == "USUARIO").first()
     if not perfil:
         abort(500, description="Perfil USUARIO não cadastrado. Execute database.sql.")
@@ -37,17 +37,17 @@ def cadastrar_usuario():
         db.commit(); db.refresh(novo)
     except IntegrityError:
         db.rollback(); abort(409, description="Já existe uma conta com esse e-mail.")
-    return jsonify(_serializar(novo)), 201
+    return jsonify(_Serializar(novo)), 201
 
-@usuarios_bp.get("/<int:usuario_id>")
-def obter_usuario(usuario_id):
-    exigir_adm(); db = get_db(); usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuario_id).first()
+@usuarios_bp.get("/<int:usuarioId>")
+def ObterUsuario(usuarioId):
+    ExigirAdm(); db = GetDb(); usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuarioId).first()
     if not usuario: abort(404, description="Usuário não encontrado.")
-    return jsonify(_serializar(usuario))
+    return jsonify(_Serializar(usuario))
 
-@usuarios_bp.delete("/<int:usuario_id>")
-def remover_usuario(usuario_id):
-    adm = exigir_adm(); db = get_db(); usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuario_id).first()
+@usuarios_bp.delete("/<int:usuarioId>")
+def RemoverUsuario(usuarioId):
+    adm = ExigirAdm(); db = GetDb(); usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuarioId).first()
     if not usuario: abort(404, description="Usuário não encontrado.")
     if usuario.id == adm.id: abort(400, description="O ADM não pode remover a própria conta.")
     if usuario.perfil.codigo == "ADM": abort(403, description="A remoção de contas ADM não é permitida por esta operação.")

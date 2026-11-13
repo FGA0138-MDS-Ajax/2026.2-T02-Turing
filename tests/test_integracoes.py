@@ -7,9 +7,9 @@ import app.integracoes.osrm as osrm
 nominatim.INTERVALO_MINIMO_SEGUNDOS = 0  # sem espera nos testes
 
 
-def FazerResposta(json_data=None, erroHttp=False):
+def FazerResposta(jsonData=None, erroHttp=False):
     r = MagicMock()
-    r.json.return_value = json_data
+    r.json.return_value = jsonData
     if erroHttp:
         r.raise_for_status.side_effect = requests.HTTPError("500")
     return r

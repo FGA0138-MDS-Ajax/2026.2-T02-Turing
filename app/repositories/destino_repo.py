@@ -6,34 +6,34 @@ from app.services.geocodificacao import AplicarGeocodificacao
 CAMPOS_DE_ENDERECO = {"logradouro", "numero", "cidade", "estado", "cep"}
 
 
-def criar_destino(db: Session, destino: DestinoCreate):
-    db_destino = DestinoModel(**destino.model_dump())
-    AplicarGeocodificacao(db_destino)
-    db.add(db_destino)
+def CriarDestino(db: Session, destino: DestinoCreate):
+    dbDestino = DestinoModel(**destino.model_dump())
+    AplicarGeocodificacao(dbDestino)
+    db.add(dbDestino)
     db.commit()
-    db.refresh(db_destino)
-    return db_destino
+    db.refresh(dbDestino)
+    return dbDestino
 
-def listar_destinos(db: Session):
+def ListarDestinos(db: Session):
     return db.query(DestinoModel).all()
 
-def atualizar_destino(db: Session, destino_id: int, dados_novos: DestinoUpdate):
-    db_destino = db.query(DestinoModel).filter(DestinoModel.id == destino_id).first()
-    if not db_destino:
+def AtualizarDestino(db: Session, destinoId: int, dadosNovos: DestinoUpdate):
+    dbDestino = db.query(DestinoModel).filter(DestinoModel.id == destinoId).first()
+    if not dbDestino:
         return None
-    dados_atualizados = dados_novos.model_dump(exclude_unset=True)
-    for chave, valor in dados_atualizados.items():
-        setattr(db_destino, chave, valor)
-    if CAMPOS_DE_ENDERECO & dados_atualizados.keys():
-        AplicarGeocodificacao(db_destino)  # endereço mudou: revalida
+    dadosAtualizados = dadosNovos.model_dump(exclude_unset=True)
+    for chave, valor in dadosAtualizados.items():
+        setattr(dbDestino, chave, valor)
+    if CAMPOS_DE_ENDERECO & dadosAtualizados.keys():
+        AplicarGeocodificacao(dbDestino)  # endereço mudou: revalida
     db.commit()
-    db.refresh(db_destino)
-    return db_destino
+    db.refresh(dbDestino)
+    return dbDestino
 
-def deletar_destino(db: Session, destino_id: int):
-    db_destino = db.query(DestinoModel).filter(DestinoModel.id == destino_id).first()
-    if db_destino:
-        db.delete(db_destino)
+def DeletarDestino(db: Session, destinoId: int):
+    dbDestino = db.query(DestinoModel).filter(DestinoModel.id == destinoId).first()
+    if dbDestino:
+        db.delete(dbDestino)
         db.commit()
         return True
     return False

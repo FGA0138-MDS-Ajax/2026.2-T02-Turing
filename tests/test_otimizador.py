@@ -2,7 +2,7 @@ import pytest
 import time
 import random
 import pytest
-from app.core.otimizador import calcular_rota_otimizada
+from app.core.otimizador import CalcularRotaOtimizada
 
 
 def test_calculo_rota_com_matriz_conhecida():
@@ -14,7 +14,7 @@ def test_calculo_rota_com_matriz_conhecida():
         [10.0, 6.0, 0.0, 7.0],
         [15.0, 12.0, 7.0, 0.0]
     ]
-    resultado = calcular_rota_otimizada(matriz, velocidade_media_kmh=40)
+    resultado = CalcularRotaOtimizada(matriz, velocidadeMediaKmh=40)
 
     # Verifica se a ordem retornada é a esperada
     assert resultado ["ordem_ids"] == [0, 1, 2, 3, 0]
@@ -26,15 +26,15 @@ def test_calculo_rota_com_matriz_conhecida():
     assert resultado["tempo_estimado_min"] == 49.5
 
 def test_matriz_menor_que_dois_pontos_gera_erro():
-    matriz_invalida = [[0.0]]
+    matrizInvalida = [[0.0]]
     
     with pytest.raises(ValueError, match="A matriz precisa ter pelo menos 2 pontos para calcular a rota."):
-        calcular_rota_otimizada(matriz_invalida)
+        CalcularRotaOtimizada(matrizInvalida)
 
 
 def test_otimizacao_prioriza_tempo_sobre_distancia():
     # Matriz de distância: a rota 0->1->2->3->0 dá 33 km
-    matriz_dist = [
+    matrizDist = [
         [0.0, 5.0, 10.0, 15.0],
         [5.0, 0.0, 6.0, 12.0],
         [10.0, 6.0, 0.0, 7.0],
@@ -42,14 +42,14 @@ def test_otimizacao_prioriza_tempo_sobre_distancia():
     ]
     
     # Matriz de tempo (trânsito): a rota 0->2->1->3->0 demora 24 min.
-    matriz_tempo = [
+    matrizTempo = [
         [0,  5, 10, 15],
         [5,  0,  2, 12],
         [10, 2,  0,  5],
         [15, 12, 5,  0]
     ]
 
-    resultado = calcular_rota_otimizada(matriz_dist, matriz_tempos=matriz_tempo)
+    resultado = CalcularRotaOtimizada(matrizDist, matrizTempos=matrizTempo)
 
     # O algoritmo deve escolher a rota mais RÁPIDA
     assert resultado["tempo_estimado_min"] == 27.0
@@ -65,37 +65,37 @@ def test_benchmark_desempenho_20_destinos():
     import random
     
     # Gera uma matriz 20x20 com distâncias aleatórias entre 1 e 50 km
-    num_pontos = 20
-    matriz = [[0.0 for _ in range(num_pontos)] for _ in range(num_pontos)]
+    numPontos = 20
+    matriz = [[0.0 for _ in range(numPontos)] for _ in range(numPontos)]
     
-    for i in range(num_pontos):
-        for j in range(num_pontos):
+    for i in range(numPontos):
+        for j in range(numPontos):
             if i != j:
                 matriz[i][j] = float(random.randint(1, 50))
                 
     # Inicia o cronômetro
-    tempo_inicio = time.time()
+    tempoInicio = time.time()
     
     # Roda o otimizador
-    resultado = calcular_rota_otimizada(matriz, velocidade_media_kmh=40)
+    resultado = CalcularRotaOtimizada(matriz, velocidadeMediaKmh=40)
     
     # Para o cronômetro
-    tempo_fim = time.time()
-    tempo_total = tempo_fim - tempo_inicio
+    tempoFim = time.time()
+    tempoTotal = tempoFim - tempoInicio
     
-    print(f"\n[Benchmark] Tempo para 20 destinos: {tempo_total:.4f} segundos")
+    print(f"\n[Benchmark] Tempo para 20 destinos: {tempoTotal:.4f} segundos")
     
     # A métrica exige <= 5 segundos
-    assert tempo_total <= 5.0, f"O cálculo demorou {tempo_total:.2f}s, o limite é 5s."
+    assert tempoTotal <= 5.0, f"O cálculo demorou {tempoTotal:.2f}s, o limite é 5s."
     
     # Verifica se a rota foi gerada corretamente
 
 
 def test_janelas_de_tempo_obrigam_ordem_viavel():
-    matriz_dist = [[0, 5, 10], [5, 0, 6], [10, 6, 0]]
-    matriz_tempo = [[0, 5, 10], [5, 0, 6], [10, 6, 0]]
+    matrizDist = [[0, 5, 10], [5, 0, 6], [10, 6, 0]]
+    matrizTempo = [[0, 5, 10], [5, 0, 6], [10, 6, 0]]
     janelas = [(0, 100), (0, 5), (10, 15)]
-    resultado = calcular_rota_otimizada(matriz_dist, matriz_tempos=matriz_tempo, janelas_tempo=janelas)
+    resultado = CalcularRotaOtimizada(matrizDist, matrizTempos=matrizTempo, janelasTempo=janelas)
     assert resultado["ordem_ids"] == [0, 1, 2, 0]
     assert resultado["tempo_estimado_min"] == 21.0
 
@@ -103,9 +103,9 @@ def test_janela_impossivel_rejeitada():
     matriz = [[0, 5, 10], [5, 0, 6], [10, 6, 0]]
     janelas = [(0, 100), (0, 1), (0, 2)]
     with pytest.raises(ValueError, match="Não existe sequência viável"):
-        calcular_rota_otimizada(matriz, matriz_tempos=matriz, janelas_tempo=janelas)
+        CalcularRotaOtimizada(matriz, matrizTempos=matriz, janelasTempo=janelas)
 
 def test_quantidade_de_janelas_invalida():
     matriz = [[0, 1], [1, 0]]
     with pytest.raises(ValueError, match="quantidade de janelas"):
-        calcular_rota_otimizada(matriz, janelas_tempo=[(0, 10)])
+        CalcularRotaOtimizada(matriz, janelasTempo=[(0, 10)])

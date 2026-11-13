@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
-from app.api.autenticacao import exigir_usuario_operacional
-from app.db.session import get_db
+from app.api.autenticacao import ExigirUsuarioOperacional
+from app.db.session import GetDb
 from app.models.pedido import PedidoModel
 from app.models.destino import DestinoModel
 
@@ -8,9 +8,9 @@ pedidos_bp = Blueprint("pedidos", __name__, url_prefix="/pedidos")
 
 @pedidos_bp.get("")
 @pedidos_bp.get("/")
-def listar_pedidos():
-    exigir_usuario_operacional()
-    db = get_db()
+def ListarPedidos():
+    ExigirUsuarioOperacional()
+    db = GetDb()
     registros = (db.query(PedidoModel, DestinoModel)
         .join(DestinoModel, PedidoModel.endereco_id == DestinoModel.id)
         .order_by(PedidoModel.data_entrega, PedidoModel.id).all())

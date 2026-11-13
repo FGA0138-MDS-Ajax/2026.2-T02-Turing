@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, abort
 
 from app.api.validacao import LerCorpo
-from app.db.session import get_db
+from app.db.session import GetDb
 from app.schemas.destino import DestinoCreate, DestinoUpdate, DestinoResponse
 from app.repositories import destino_repo
 
@@ -13,28 +13,28 @@ def _Serializar(destino):
 
 
 @destinos_bp.post("/", strict_slashes=False)
-def cadastrar_destino():
+def CadastrarDestino():
     destino = LerCorpo(DestinoCreate)
-    criado = destino_repo.criar_destino(get_db(), destino)
+    criado = destino_repo.CriarDestino(GetDb(), destino)
     return jsonify(_Serializar(criado)), 201
 
 
 @destinos_bp.get("/", strict_slashes=False)
-def listar_destinos():
-    return jsonify([_Serializar(d) for d in destino_repo.listar_destinos(get_db())])
+def ListarDestinos():
+    return jsonify([_Serializar(d) for d in destino_repo.ListarDestinos(GetDb())])
 
 
-@destinos_bp.put("/<int:destino_id>")
-def atualizar_destino(destino_id):
+@destinos_bp.put("/<int:destinoId>")
+def AtualizarDestino(destinoId):
     dados = LerCorpo(DestinoUpdate)
-    atualizado = destino_repo.atualizar_destino(get_db(), destino_id, dados)
+    atualizado = destino_repo.AtualizarDestino(GetDb(), destinoId, dados)
     if not atualizado:
         abort(404, description="Destino não encontrado")
     return jsonify(_Serializar(atualizado))
 
 
-@destinos_bp.delete("/<int:destino_id>")
-def deletar_destino(destino_id):
-    if not destino_repo.deletar_destino(get_db(), destino_id):
+@destinos_bp.delete("/<int:destinoId>")
+def DeletarDestino(destinoId):
+    if not destino_repo.DeletarDestino(GetDb(), destinoId):
         abort(404, description="Destino não encontrado")
     return "", 204

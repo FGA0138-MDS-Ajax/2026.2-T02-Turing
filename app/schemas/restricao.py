@@ -12,7 +12,7 @@ class RestricaoOperacionalCreate(BaseModel):
     observacoes: Optional[str] = Field(default=None, max_length=500)
 
     @model_validator(mode="after")
-    def validar_janela(self):
+    def ValidarJanela(self):
         if self.janela_inicio is not None and self.janela_fim is not None \
                 and self.janela_inicio > self.janela_fim:
             raise ValueError("janela_inicio não pode ser posterior a janela_fim.")
@@ -26,7 +26,7 @@ class RestricaoOperacionalUpdate(BaseModel):
     observacoes: Optional[str] = Field(default=None, max_length=500)
 
     @model_validator(mode="after")
-    def validar_janela(self):
+    def ValidarJanela(self):
         if self.janela_inicio is not None and self.janela_fim is not None \
                 and self.janela_inicio > self.janela_fim:
             raise ValueError("janela_inicio não pode ser posterior a janela_fim.")

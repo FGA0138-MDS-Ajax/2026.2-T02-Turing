@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash
 from app.db.session import SessionLocal
 from app.models.usuario import PerfilModel, UsuarioModel
 
-def main():
+def Main():
     nome=os.environ.get("ADM_NOME", "Administrador")
     email=os.environ["ADM_EMAIL"].strip().lower()
     senha=os.environ["ADM_SENHA"]
@@ -17,4 +17,4 @@ def main():
         db.add(UsuarioModel(perfil_id=perfil.id, nome=nome, email=email, senha_hash=generate_password_hash(senha), ativo=True))
         db.commit(); print("Conta ADM criada com sucesso.")
     finally: db.close()
-if __name__ == "__main__": main()
+if __name__ == "__main__": Main()

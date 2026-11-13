@@ -2,7 +2,7 @@ import json
 from app.db.session import SessionLocal
 from app.models.destino import DestinoModel, StatusValidacao
 
-def popular_banco():
+def PopularBanco():
     db = SessionLocal()
     try:
         with open("app/mocks/dados.json", "r", encoding="utf-8") as file:
@@ -11,7 +11,7 @@ def popular_banco():
         for item in dados:
             existe = db.query(DestinoModel).filter(DestinoModel.id == item["id"]).first()
             if not existe:
-                novo_destino = DestinoModel(
+                novoDestino = DestinoModel(
                     id=item["id"],
                     logradouro=item["endereco"],
                     numero="S/N",
@@ -22,7 +22,7 @@ def popular_banco():
                     longitude=item["longitude"],
                     validacao_status=StatusValidacao.VALIDADO
                 )
-                db.add(novo_destino)
+                db.add(novoDestino)
         db.commit()
         print("✅ Banco populado com sucesso!")
     except Exception as e:
@@ -31,4 +31,4 @@ def popular_banco():
         db.close()
 
 if __name__ == "__main__":
-    popular_banco()
+    PopularBanco()
