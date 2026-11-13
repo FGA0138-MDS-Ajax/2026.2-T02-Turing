@@ -17,6 +17,11 @@ O sistema possui somente dois perfis: `ADM` e `USUARIO`. O antigo perfil Motoris
 - `GET /usuarios/{id}` — consulta perfil (ADM).
 - `DELETE /usuarios/{id}` — desativa conta USUARIO e revoga suas sessões (ADM). A operação é lógica para preservar histórico operacional.
 - `GET /pedidos` — lista entregas para o painel operacional, exigindo sessão válida.
+- `POST /restricoes` — cadastra restrição de janela de horário vinculada a uma rota (USUARIO). Campos: `rota_id`, `janela_inicio` e `janela_fim` (`HH:MM[:SS]`), `observacoes` opcional.
+- `GET /restricoes` — lista as restrições do usuário autenticado; aceita `?rota_id=` para filtrar por rota (USUARIO).
+- `GET /restricoes/{id}` — consulta uma restrição (somente se pertence a rota do usuário autenticado).
+- `PUT /restricoes/{id}` — edita janela/observações; o vínculo `rota_id` é imutável (USUARIO).
+- `DELETE /restricoes/{id}` — remove uma restrição do usuário autenticado (USUARIO).
 
 Envie `Authorization: Bearer <token>` nas rotas protegidas. Para criar o primeiro ADM, configure `ADM_NOME`, `ADM_EMAIL` e `ADM_SENHA` no `.env` e execute `python criar_adm.py`.
 
