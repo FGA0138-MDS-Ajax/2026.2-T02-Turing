@@ -10,7 +10,7 @@ O sistema possui somente dois perfis: `ADM` e `USUARIO`. O antigo perfil Motoris
 4. Execute `python -m flask --app app.main run --debug`.
 
 ## API de autenticação e administração
-- `POST /auth/login` — `{ "email": "...", "senha": "..." }`; retorna token Bearer.
+- `POST /auth/login` — `{ "email": "...", "senha": "..." }`; retorna token Bearer. Sessões expiram por inatividade (`SESSAO_IDLE_MINUTOS`) e por duração máxima (`SESSAO_DURACAO_HORAS`).
 - `POST /auth/logout` — revoga a sessão.
 - `GET /usuarios` — lista usuários (ADM).
 - `POST /usuarios` — cria usuário com perfil USUARIO (ADM). Campos: `nome`, `email`, `senha` (mínimo 8 caracteres), `telefone` opcional.

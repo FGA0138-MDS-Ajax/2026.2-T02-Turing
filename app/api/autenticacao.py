@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, jsonify, request, g, abort
 from werkzeug.security import check_password_hash
 from app.api.validacao import LerCorpo
+from app.core.config import settings
 from app.db.session import GetDb
 from app.models.usuario import UsuarioModel, SessaoModel
 from app.schemas.usuario import LoginInput
@@ -20,11 +21,12 @@ def Login():
     usuario = db.query(UsuarioModel).filter(UsuarioModel.email == dados.email).first()
     if not usuario or not usuario.ativo or not check_password_hash(usuario.senha_hash, dados.senha):
         abort(401, description="E-mail ou senha inválidos.")
+    agora = datetime.utcnow()
     token = secrets.token_urlsafe(48)
     sessao = SessaoModel(usuario_id=usuario.id, token_hash=_HashToken(token),
         ip_origem=request.remote_addr, user_agent=request.headers.get("User-Agent"),
-        expira_em=datetime.utcnow() + timedelta(hours=12))
-    usuario.ultimo_acesso_em = datetime.utcnow()
+        atividade_em=agora, expira_em=agora + timedelta(hours=settings.SESSAO_DURACAO_HORAS))
+    usuario.ultimo_acesso_em = agora
     db.add(sessao); db.commit()
     return jsonify({"token": token, "tipo": "Bearer", "expira_em": sessao.expira_em.isoformat(),
                     "usuario": {"id": usuario.id, "nome": usuario.nome, "email": usuario.email, "perfil": usuario.perfil.codigo}})
@@ -44,12 +46,27 @@ def _TokenDoHeader():
         abort(401, description="Autenticação necessária.")
     return cabecalho[7:].strip()
 
+def _SessaoExpiradaPorInatividade(sessao, agora, idleMinutos):
+    """True se a última atividade excedeu o limite de inatividade (C01.2)."""
+    if sessao.atividade_em is None:
+        return True
+    return sessao.atividade_em < agora - timedelta(minutes=idleMinutos)
+
+
 def ExigirUsuario():
     token = _TokenDoHeader()
-    db = GetDb(); sessao = db.query(SessaoModel).filter(SessaoModel.token_hash == _HashToken(token),
-        SessaoModel.revogada_em.is_(None), SessaoModel.expira_em > datetime.utcnow()).first()
+    agora = datetime.utcnow()
+    db = GetDb()
+    sessao = db.query(SessaoModel).filter(SessaoModel.token_hash == _HashToken(token),
+        SessaoModel.revogada_em.is_(None), SessaoModel.expira_em > agora).first()
     if not sessao or not sessao.usuario.ativo:
         abort(401, description="Sessão inválida ou expirada.")
+    if _SessaoExpiradaPorInatividade(sessao, agora, settings.SESSAO_IDLE_MINUTOS):
+        sessao.revogada_em = agora
+        db.commit()
+        abort(401, description="Sessão expirada por inatividade.")
+    sessao.atividade_em = agora
+    db.commit()
     g.usuario = sessao.usuario
     return sessao.usuario
 

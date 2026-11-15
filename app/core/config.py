@@ -19,6 +19,10 @@ class Settings:
     DB_PASSWORD: str = os.getenv("DB_PASSWORD", "")
     DB_NAME: str = os.getenv("DB_NAME", "")
 
+    # --- Sessão (C01.2) ---
+    SESSAO_DURACAO_HORAS: int = int(os.getenv("SESSAO_DURACAO_HORAS", "12"))
+    SESSAO_IDLE_MINUTOS: int = int(os.getenv("SESSAO_IDLE_MINUTOS", "30"))
+
     @property
     def DATABASE_URL(self) -> str:
         # Monta a URL de conexão exigida pelo SQLAlchemy para MySQL
