@@ -1,0 +1,155 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaDestaque"
+  rotaLogo="/home"
+  (abaSelecionada)="selecionarAba($event)"
+></app-navbar>
+
+<main class="conteudo">
+
+    <div
+        *ngIf="mensagem"
+        class="aviso"
+        [ngClass]="mensagem.tipo === 'erro' ? 'aviso-erro' : 'aviso-sucesso'"
+        [attr.role]="mensagem.tipo === 'erro' ? 'alert' : 'status'"
+    >
+        {{ mensagem.texto }}
+    </div>
+
+    <section *ngIf="abaAtiva === 'listar-usuario'">
+
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Usuários</h1>
+                <p class="descricao">Usuários cadastrados no sistema</p>
+            </div>
+            <div>
+                <button type="button" class="botao botao-secundario botao-atualizar" (click)="atualizarListaUsuarios()" [disabled]="carregando">
+                    {{ carregando ? 'Carregando' : 'Atualizar lista'}}
+                </button>
+                <button type="button" class="botao botao-primario" (click)="selecionarAba('cadastrar-usuario')" [disabled]="carregando">
+                    Cadastrar usuário
+                </button>
+            </div>
+        </div>
+        <div class="cartao">
+            <div class="tabela-wrap">
+                <table *ngIf="this.usuarios.length > 0 && !erroLista" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Telefone</th>
+                            <th scope="col"><span class="sr-somente">Ações</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let usu of this.usuarios">
+                            <th>{{usu.nome}}</th>
+                            <th>{{usu.email}}</th>
+                            <th>{{usu.telefone || '----'}}</th>
+                            <th>
+                                <div class="coluna-acao">
+                                    <p class="fa fa-eye" (click)="abrirDetalhes(usu)"></p>
+                                </div>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+                <p *ngIf="carregando && !this.usuarios.length" class="carregando">
+                    Carregando Usuários
+                </p>
+                <div *ngIf="this.usuarios.length === 0 && !erroLista">
+                    <p>Nenhum usuário cadastrado</p>
+                </div>
+                <div *ngIf="erroLista" class="aviso aviso-erro" role="alert">
+                    {{ erroLista }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section *ngIf="abaAtiva === 'cadastrar-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Cadastro</h1>
+                <p class="descricao">Cadastre um usuário novo</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="abrirLista()">
+                Voltar
+            </button>
+        </div>
+        <form class="cartao" (ngSubmit)="cadastrarUsuario()">
+            <div class="grade-campos">
+                <div class="campo ocupa-tudo">
+                    <label for="nomeUsuario"><b>Nome</b></label>
+                    <input type="text" placeholder="Insira um nome" [(ngModel)]="usuarioNovo.nome" name="Nome" id="nomeUsuario" required>
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="emailUsuario"><b>Email</b></label>
+                    <input type="email" placeholder="Ex.: fulano@gmail.com" [(ngModel)]="usuarioNovo.email" name="Email" id="emailUsuario" required>
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="senhaUsuario"><b>Senha</b></label>
+                    <input type="password" placeholder="Insira uma senha" [(ngModel)]="usuarioNovo.senha" name="Senha" id="senhaUsuario" required>
+                </div>
+                <div class="campo ocupa-tudo">
+                    <label for="telefoneUsuario"><b>Telefone</b></label>
+                    <input type="tel" placeholder="Ex.: (61) 99876-5432" [(ngModel)]="usuarioNovo.telefone" name="Telefone" id="telefoneUsuario">
+                </div>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="botao botao-primario" [disabled]="cadastrando">Cadastrar Usuário</button>
+            </div>
+        </form>
+    </section>
+
+    <section *ngIf="abaAtiva === 'detalhar-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Detalhes</h1>
+                <p class="descricao">Detalhes do usuario de id {{usuarioDetalhado.id}}</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="abrirLista()">
+                Voltar
+            </button>
+        </div>
+        <div class="cartao">
+            <dl class="detalhes">
+                <div>
+                    <dt>Nome:</dt>
+                    <dd>{{usuarioDetalhado.nome}}</dd>
+                </div>
+                <div></div>
+                <div>
+                    <dt>Email:</dt>
+                    <dd>{{usuarioDetalhado.email}}</dd>
+                </div>
+                <div>
+                    <dt>Telefone:</dt>
+                    <dd>{{(usuarioDetalhado.telefone != undefined ? (usuarioDetalhado.telefone) : '----')}}</dd>
+                </div>
+                <div>
+                    <dt>Ativo?</dt>
+                    <dd>
+                        {{usuarioDetalhado.ativo ? 'Sim' : 'Não'}}
+                    </dd>
+                </div>
+                <div>
+                    <dt>Perfil:</dt>
+                    <dd>{{usuarioDetalhado.perfil}}</dd>
+                </div>
+                <div>
+                    <dt>Criado em:</dt>
+                    <dd>{{usuarioDetalhado.criado_em}}</dd>
+                </div>
+            </dl>
+            <div class="acoes-form">
+                <button class="botao botao-cancelar" type="button" [disabled]="this.editando" (click)="excluirUsuario()">Excluir usuario</button>
+            </div>
+        </div>
+    </section>
+</main>

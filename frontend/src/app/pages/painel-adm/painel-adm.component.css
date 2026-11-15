@@ -1,0 +1,55 @@
+.botao-atualizar{
+    margin-right: 1rem;
+}
+
+.coluna-acao {
+    text-align: right;
+    p{
+        cursor: pointer;
+        margin-inline: 10px;
+        font-size: larger;
+    }
+}
+
+.acoes-form {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+    button{
+        margin-left: 1rem;
+    }
+}
+
+.detalhes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 2rem;
+    margin: 0;
+}
+
+.detalhesObservacao{
+    display: grid;
+    grid-template-columns: repeat(1, 2fr);
+    gap: 1.25rem 2rem;
+    margin-top: 1.25rem;
+}
+
+.detalhesInterno{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin-left: 0.75rem;
+}
+
+.detalhes dt,
+.detalhesObservacao dt{
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--texto-suave);
+}
+
+.detalhes dd,
+.detalhesObservacao dd{
+    margin: 0;
+    color: var(--tinta);
+}

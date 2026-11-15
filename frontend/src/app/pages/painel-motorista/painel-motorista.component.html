@@ -1,0 +1,173 @@
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaAtiva"
+  rotaLogo="/"
+  (abaSelecionada)="abaAtiva = $event"
+></app-navbar>
+
+<main class="conteudo">
+
+  <div class="cabecalho-pagina">
+    <div>
+      <h1>Minhas entregas</h1>
+      <p class="descricao">
+        Marque as entregas que quer fazer juntas e calcule a ordem mais curta para percorrê-las.
+      </p>
+    </div>
+    <button type="button" class="botao botao-secundario" (click)="carregarPedidos()" [disabled]="carregando">
+      {{ carregando ? 'Atualizando…' : 'Atualizar lista' }}
+    </button>
+  </div>
+
+  <!-- escolha do ponto de partida e botão de calcular -->
+  <section class="cartao" aria-labelledby="titulo-calculo">
+    <h2 id="titulo-calculo">Calcular rota</h2>
+
+    <div class="linha-calculo">
+      <div class="campo">
+        <label for="partida">Ponto de partida e de volta</label>
+        <select
+          id="partida"
+          [ngModel]="pontoPartidaId"
+          (ngModelChange)="pontoPartidaId = $event"
+          [disabled]="pedidosSelecionados.length < 2"
+        >
+          <option *ngIf="!pedidosSelecionados.length" [ngValue]="null">Marque as entregas na tabela</option>
+          <option *ngFor="let pedido of pedidosSelecionados" [ngValue]="pedido.id">
+            Pedido {{ pedido.id }}: {{ textoEndereco(pedido) }}
+          </option>
+        </select>
+        <span class="ajuda">
+          {{ selecionados.size }} {{ selecionados.size === 1 ? 'entrega marcada' : 'entregas marcadas' }}.
+          A rota começa e termina no ponto escolhido. Marque pelo menos 2 entregas.
+        </span>
+      </div>
+
+      <button
+        type="button"
+        class="botao botao-primario"
+        (click)="calcularRota()"
+        [disabled]="pedidosSelecionados.length < 2 || calculando"
+      >
+        {{ calculando ? 'Calculando…' : 'Calcular rota otimizada' }}
+      </button>
+    </div>
+
+    <div *ngIf="erroRota" class="aviso aviso-erro aviso-calculo" role="alert">{{ erroRota }}</div>
+  </section>
+
+  <!-- resultado: resumo, ordem das paradas e mapa -->
+  <section
+    #blocoResultado
+    *ngIf="resultado"
+    class="cartao"
+    tabindex="-1"
+    aria-labelledby="titulo-resultado"
+  >
+    <h2 id="titulo-resultado">Rota otimizada</h2>
+
+    <dl class="resumo">
+      <div>
+        <dt>Distância total</dt>
+        <dd>{{ formatarKm(resultado.distancia_total_km) }}</dd>
+      </div>
+      <div>
+        <dt>Tempo estimado</dt>
+        <dd>{{ formatarDuracao(resultado.tempo_estimado_min) }}</dd>
+      </div>
+      <div>
+        <dt>Paradas</dt>
+        <dd>{{ resultado.rota_otimizada.length }}</dd>
+      </div>
+    </dl>
+
+    <div class="resultado-corpo">
+      <ol class="paradas">
+        <li *ngFor="let parada of resultado.rota_otimizada">
+          <span class="numero" aria-hidden="true">{{ parada.ordem }}</span>
+          <span class="parada-texto">
+            <span class="sr-somente">Parada {{ parada.ordem }}: </span>{{ parada.endereco }}
+            <small *ngIf="parada.ordem === 1">Partida e retorno</small>
+          </span>
+        </li>
+      </ol>
+
+      <app-mapa-rota [paradas]="resultado.rota_otimizada"></app-mapa-rota>
+    </div>
+
+    <p class="nota">
+      A linha liga as paradas em linha reta, e o trecho tracejado é a volta ao ponto de partida.
+      O tempo estimado considera velocidade média de 40 km/h.
+    </p>
+  </section>
+
+  <!-- tabela de entregas -->
+  <section *ngIf="abaAtiva === 'entregas'" class="cartao" aria-labelledby="titulo-entregas">
+    <h2 id="titulo-entregas">Entregas</h2>
+
+    <div *ngIf="erroLista" class="aviso aviso-erro" role="alert">
+      {{ erroLista }}
+      <button type="button" class="botao-link" (click)="carregarPedidos()">Tentar novamente</button>
+    </div>
+
+    <p *ngIf="carregando && !listaEntregas.length" class="carregando">Carregando entregas…</p>
+
+    <ng-container *ngIf="!erroLista && !(carregando && !listaEntregas.length)">
+      <div class="tabela-wrap" *ngIf="listaEntregas.length; else semEntregas">
+        <table>
+          <caption class="sr-somente">Entregas disponíveis para montar a rota</caption>
+          <thead>
+            <tr>
+              <th scope="col" class="coluna-check">
+                <input
+                  type="checkbox"
+                  [checked]="todasSelecionadas"
+                  [disabled]="!entregasSelecionaveis.length"
+                  (change)="alternarTodas()"
+                  aria-label="Marcar todas as entregas disponíveis"
+                >
+              </th>
+              <th scope="col">Pedido</th>
+              <th scope="col">Descrição</th>
+              <th scope="col">Endereço</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let entrega of listaEntregas; trackBy: trackPorId"
+              [class.linha-bloqueada]="!podeSelecionar(entrega)"
+            >
+              <td class="coluna-check">
+                <input
+                  type="checkbox"
+                  [checked]="selecionados.has(entrega.id)"
+                  [disabled]="!podeSelecionar(entrega)"
+                  (change)="alternarSelecao(entrega)"
+                  [attr.aria-label]="'Marcar o pedido ' + entrega.id"
+                >
+              </td>
+              <td>#{{ entrega.id }}</td>
+              <td>{{ entrega.descricao || 'Sem descrição' }}</td>
+              <td>
+                {{ textoEndereco(entrega) }}
+                <small class="obs" *ngIf="!podeSelecionar(entrega)">{{ motivoBloqueio(entrega) }}</small>
+              </td>
+              <td><span class="status" [ngClass]="classe(entrega.status)">{{ rotulo(entrega.status) }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #semEntregas>
+        <div class="vazio">
+          <p>Nenhuma entrega cadastrada no momento.</p>
+          <button type="button" class="botao botao-secundario" (click)="carregarPedidos()">
+            Atualizar lista
+          </button>
+        </div>
+      </ng-template>
+    </ng-container>
+  </section>
+
+</main>

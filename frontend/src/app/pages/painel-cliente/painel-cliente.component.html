@@ -1,0 +1,266 @@
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaDestaque"
+  rotaLogo="/home"
+  (abaSelecionada)="selecionarAba($event)"
+></app-navbar>
+
+<main class="conteudo">
+
+  <!-- aviso de sucesso ou erro (envio do pedido) -->
+  <div
+    *ngIf="mensagem"
+    class="aviso"
+    [ngClass]="mensagem.tipo === 'erro' ? 'aviso-erro' : 'aviso-sucesso'"
+    [attr.role]="mensagem.tipo === 'erro' ? 'alert' : 'status'"
+  >
+    {{ mensagem.texto }}
+  </div>
+
+  <!-- fazer pedido -->
+  <section *ngIf="abaAtiva === 'fazer-pedido'">
+    <div class="cabecalho-pagina">
+      <div>
+        <h1>Fazer pedido</h1>
+        <p class="descricao">Informe o que será entregue e o endereço de destino.</p>
+      </div>
+    </div>
+
+    <form class="cartao" (ngSubmit)="enviarPedido()" novalidate>
+      <div class="grade-campos">
+
+        <div class="campo ocupa-tudo" [class.campo-erro]="errosForm.descricao">
+          <label for="descricao">Descrição do pedido</label>
+          <input
+            id="descricao"
+            name="descricao"
+            type="text"
+            placeholder="Ex.: caixa de documentos"
+            [ngModel]="form.descricao"
+            (ngModelChange)="form.descricao = $event; revalidar()"
+            [attr.aria-invalid]="!!errosForm.descricao"
+            [attr.aria-describedby]="errosForm.descricao ? 'erro-descricao' : null"
+          >
+          <span *ngIf="errosForm.descricao" id="erro-descricao" class="erro-campo">{{ errosForm.descricao }}</span>
+        </div>
+
+        <div class="campo" [class.campo-erro]="errosForm.cep">
+          <label for="cep">CEP de destino</label>
+          <input
+            id="cep"
+            name="cep"
+            type="text"
+            inputmode="numeric"
+            autocomplete="postal-code"
+            maxlength="9"
+            placeholder="72115-000"
+            [ngModel]="form.cep"
+            (ngModelChange)="aoDigitarCep($event)"
+            [attr.aria-invalid]="!!errosForm.cep"
+            [attr.aria-describedby]="errosForm.cep ? 'erro-cep' : null"
+          >
+          <span *ngIf="errosForm.cep" id="erro-cep" class="erro-campo">{{ errosForm.cep }}</span>
+        </div>
+
+        <div class="campo" [class.campo-erro]="errosForm.numero">
+          <label for="numero">Número ou lote</label>
+          <input
+            id="numero"
+            name="numero"
+            type="text"
+            maxlength="20"
+            autocomplete="off"
+            placeholder="Ex.: 12 ou 12-B"
+            [ngModel]="form.numero"
+            (ngModelChange)="form.numero = $event; revalidar()"
+            [attr.aria-invalid]="!!errosForm.numero"
+            [attr.aria-describedby]="errosForm.numero ? 'erro-numero' : null"
+          >
+          <span *ngIf="errosForm.numero" id="erro-numero" class="erro-campo">{{ errosForm.numero }}</span>
+        </div>
+
+        <div class="campo" [class.campo-erro]="errosForm.dataEntrega">
+          <label for="data-entrega">Data de entrega</label>
+          <input
+            id="data-entrega"
+            name="dataEntrega"
+            type="date"
+            [min]="hoje"
+            [ngModel]="form.dataEntrega"
+            (ngModelChange)="form.dataEntrega = $event; revalidar()"
+            [attr.aria-invalid]="!!errosForm.dataEntrega"
+            [attr.aria-describedby]="errosForm.dataEntrega ? 'erro-data' : null"
+          >
+          <span *ngIf="errosForm.dataEntrega" id="erro-data" class="erro-campo">{{ errosForm.dataEntrega }}</span>
+        </div>
+
+        <fieldset class="janela ocupa-tudo">
+          <legend>Horário de recebimento (opcional)</legend>
+          <div class="grade-campos">
+            <div class="campo">
+              <label for="janela-inicio">A partir das</label>
+              <input
+                id="janela-inicio"
+                name="janelaInicio"
+                type="time"
+                [ngModel]="form.janelaInicio"
+                (ngModelChange)="form.janelaInicio = $event; revalidar()"
+              >
+            </div>
+            <div class="campo" [class.campo-erro]="errosForm.janelaFim">
+              <label for="janela-fim">Até as</label>
+              <input
+                id="janela-fim"
+                name="janelaFim"
+                type="time"
+                [ngModel]="form.janelaFim"
+                (ngModelChange)="form.janelaFim = $event; revalidar()"
+                [attr.aria-invalid]="!!errosForm.janelaFim"
+                [attr.aria-describedby]="errosForm.janelaFim ? 'erro-janela' : null"
+              >
+              <span *ngIf="errosForm.janelaFim" id="erro-janela" class="erro-campo">{{ errosForm.janelaFim }}</span>
+            </div>
+          </div>
+          <p class="ajuda">Preencha se quem recebe só estiver disponível em um intervalo de horário.</p>
+        </fieldset>
+
+      </div>
+
+      <div class="acoes-form">
+        <button type="submit" class="botao botao-primario" [disabled]="enviando">
+          {{ enviando ? 'Enviando…' : 'Solicitar pedido' }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- lista de pedidos -->
+  <section *ngIf="abaAtiva === 'ver-pedidos'">
+    <div class="cabecalho-pagina">
+      <div>
+        <h1>Meus pedidos</h1>
+        <p class="descricao">Acompanhe o status dos pedidos que você solicitou.</p>
+      </div>
+      <button type="button" class="botao botao-secundario" (click)="carregarPedidos()" [disabled]="carregando">
+        {{ carregando ? 'Atualizando…' : 'Atualizar lista' }}
+      </button>
+    </div>
+
+    <div class="cartao">
+
+      <div *ngIf="erroLista" class="aviso aviso-erro" role="alert">
+        {{ erroLista }}
+        <button type="button" class="botao-link" (click)="carregarPedidos()">Tentar novamente</button>
+      </div>
+
+      <p *ngIf="carregando && !listaPedidos.length" class="carregando">Carregando pedidos…</p>
+
+      <ng-container *ngIf="!erroLista && !(carregando && !listaPedidos.length)">
+        <ng-container *ngIf="listaPedidos.length; else semPedidos">
+
+          <div class="filtros">
+            <div class="campo">
+              <label for="filtro-texto" class="sr-somente">Buscar pedido</label>
+              <input
+                id="filtro-texto"
+                type="search"
+                placeholder="Buscar por número, descrição ou CEP"
+                [(ngModel)]="filtroTexto"
+                name="filtroTexto"
+              >
+            </div>
+            <div class="campo">
+              <label for="filtro-status" class="sr-somente">Filtrar por status</label>
+              <select id="filtro-status" [(ngModel)]="filtroStatus" name="filtroStatus">
+                <option value="">Todos os status</option>
+                <option *ngFor="let opcao of opcoesStatus" [value]="opcao.valor">{{ opcao.rotulo }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="tabela-wrap">
+            <table>
+              <caption class="sr-somente">Lista dos seus pedidos</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Pedido</th>
+                  <th scope="col">Descrição</th>
+                  <th scope="col">Entrega</th>
+                  <th scope="col">Status</th>
+                  <th scope="col"><span class="sr-somente">Ações</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let pedido of pedidosFiltrados; trackBy: trackPorId">
+                  <td>#{{ pedido.id }}</td>
+                  <td>{{ pedido.descricao || 'Sem descrição' }}</td>
+                  <td>{{ pedido.data_entrega ? (pedido.data_entrega | date: 'dd/MM/yyyy') : '-' }}</td>
+                  <td><span class="status" [ngClass]="classe(pedido.status)">{{ rotulo(pedido.status) }}</span></td>
+                  <td class="coluna-acao">
+                    <button type="button" class="botao botao-secundario" (click)="verDetalhes(pedido)">
+                      Ver detalhes
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p *ngIf="!pedidosFiltrados.length" class="vazio">Nenhum pedido corresponde à busca.</p>
+
+        </ng-container>
+
+        <ng-template #semPedidos>
+          <div class="vazio">
+            <p>Você ainda não fez nenhum pedido.</p>
+            <button type="button" class="botao botao-primario" (click)="selecionarAba('fazer-pedido')">
+              Fazer o primeiro pedido
+            </button>
+          </div>
+        </ng-template>
+      </ng-container>
+
+    </div>
+  </section>
+
+  <!-- detalhes de um pedido -->
+  <section *ngIf="abaAtiva === 'detalhes-pedido' && pedidoSelecionado">
+    <div class="cabecalho-pagina">
+      <div>
+        <h1>Pedido #{{ pedidoSelecionado.id }}</h1>
+        <p class="descricao">{{ pedidoSelecionado.descricao || 'Sem descrição' }}</p>
+      </div>
+      <button type="button" class="botao botao-secundario" (click)="selecionarAba('ver-pedidos')">
+        Voltar para a lista
+      </button>
+    </div>
+
+    <div class="cartao">
+      <dl class="detalhes">
+        <div>
+          <dt>Status</dt>
+          <dd>
+            <span class="status" [ngClass]="classe(pedidoSelecionado.status)">
+              {{ rotulo(pedidoSelecionado.status) }}
+            </span>
+          </dd>
+        </div>
+        <div>
+          <dt>Endereço de destino</dt>
+          <dd>{{ textoEndereco(pedidoSelecionado) }}</dd>
+        </div>
+        <div>
+          <dt>Data de entrega</dt>
+          <dd>
+            {{ pedidoSelecionado.data_entrega ? (pedidoSelecionado.data_entrega | date: 'dd/MM/yyyy') : 'Não informada' }}
+          </dd>
+        </div>
+        <div>
+          <dt>Horário de recebimento</dt>
+          <dd>{{ textoJanela(pedidoSelecionado) }}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+</main>

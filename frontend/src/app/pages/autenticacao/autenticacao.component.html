@@ -1,0 +1,151 @@
+<app-navbar
+  rotaLogo="/home"
+></app-navbar>
+
+<main class="conteudo">
+
+    <div
+        *ngIf="mensagem"
+        class="aviso"
+        [ngClass]="mensagem.tipo === 'erro' ? 'aviso-erro' : 'aviso-sucesso'"
+        [attr.role]="mensagem.tipo === 'erro' ? 'alert' : 'status'"
+    >
+        {{ mensagem.texto }}
+    </div>
+
+    <section *ngIf="abaAtiva === 'login-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Login</h1>
+                <p class="descricao">Insira as informações do usuário.</p>
+            </div>
+            <div>
+                <button type="button" (click)="selecionarAba('cadastro-usuario', null)" class="botao botao-secundario" [disabled]="logando">Criar conta</button>
+            </div>
+        </div>
+        <form class="cartao" (ngSubmit)="logarUsuario()">
+            <div class="grade-campos">
+                <div class="campo ocupa-tudo" [class.campo-erro]="errosFormLogin.email">
+                    <label for="emailLoginUsuario"><b>Email</b></label>
+                    <input
+                        name="emailLogin"
+                        id="emailLoginUsuario"
+                        type="email"
+                        placeholder="Ex.: fulano@gmail.com"
+                        [(ngModel)]="formLogin.email"
+                        (ngModelChange)="formLogin.email = $event; revalidarLogin()"
+                        [attr.aria-invalid]="!!errosFormLogin.email"
+                        [attr.aria-describedby]="errosFormLogin.email ? 'erro-emailLogin' : null"
+                    >
+                    <span *ngIf="errosFormLogin.email" id="erro-emailLogin" class="erro-campo">{{ errosFormLogin.email }}</span>
+                </div>
+                <div class="campo ocupa-tudo" [class.campo-erro]="errosFormLogin.senha">
+                    <label for="senhaLoginUsuario"><b>Senha</b></label>
+                    <input
+                        name="senhaLogin"
+                        id="senhaLoginUsuario"
+                        type="password"
+                        autocomplete="off"
+                        placeholder="Insira sua senha"
+                        [(ngModel)]="formLogin.senha"
+                        (ngModelChange)="formLogin.senha = $event; revalidarLogin()"
+                        [attr.aria-invalid]="!!errosFormLogin.senha"
+                        [attr.aria-describedby]="errosFormLogin.senha ? 'erro-senhaLogin' : null"
+                    >
+                    <span *ngIf="errosFormLogin.senha" id="erro-senhaLogin" class="erro-campo">{{ errosFormLogin.senha }}</span>
+                </div>
+                
+            </div>
+            <div class="acoes-form">
+                <button type="submit" class="botao botao-primario" [disabled]="logando">Efetuar login</button>
+            </div>
+        </form>
+    </section>
+
+    <section *ngIf="abaAtiva === 'cadastro-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Cadastro</h1>
+                <p class="descricao">Insira as informações para criar a conta.</p>
+            </div>
+            <div>
+                <button type="button" (click)="selecionarAba('login-usuario', null)" class="botao botao-secundario" [disabled]="cadastrando">Fazer login</button>
+            </div>
+        </div>
+        <form class="cartao" (ngSubmit)="cadastrarUsuario()">
+            <div class="grade-campos">
+                <div class="campo ocupa-tudo" [class.campo-erro]="errosFormCadastro.nome">
+                    <label for="nomeCadastroUsuario"><b>Nome</b></label>
+                    <input
+                        name="nomeCadastro"
+                        id="nomeCadastroUsuario"
+                        type="text"
+                        placeholder="Ex.: Fulano de Tal"
+                        [(ngModel)]="formCadastro.nome"
+                        (ngModelChange)="formCadastro.nome = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.nome"
+                        [attr.aria-describedby]="errosFormCadastro.nome ? 'erro-nomeCadastro' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.nome" id="erro-nomeCadastro" class="erro-campo">{{ errosFormCadastro.nome }}</span>
+                </div>
+                <div class="campo ocupa-tudo" [class.campo-erro]="errosFormCadastro.email">
+                    <label for="emailCadastroUsuario"><b>Email</b></label>
+                    <input
+                        name="emailCadastro"
+                        id="emailCadastroUsuario"
+                        type="email"
+                        placeholder="Ex.: fulano@gmail.com"
+                        [(ngModel)]="formCadastro.email"
+                        (ngModelChange)="formCadastro.email = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.email"
+                        [attr.aria-describedby]="errosFormCadastro.email ? 'erro-emailCadastro' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.email" id="erro-emailCadastro" class="erro-campo">{{ errosFormCadastro.email }}</span>
+                </div>
+                <div class="campo ocupa-tudo" [class.campo-erro]="errosFormCadastro.senha">
+                    <label for="senhaCadastroUsuario"><b>Senha</b></label>
+                    <input
+                        name="senhaCadastro"
+                        id="senhaCadastroUsuario"
+                        type="password"
+                        autocomplete="off"
+                        placeholder="Insira uma senha entre 8 e 20 caracteres"
+                        [(ngModel)]="formCadastro.senha"
+                        (ngModelChange)="formCadastro.senha = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.senha"
+                        [attr.aria-describedby]="errosFormCadastro.senha ? 'erro-senhaCadastro' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.senha" id="erro-senhaCadastro" class="erro-campo">{{ errosFormCadastro.senha }}</span>
+                </div>
+                <div class="campo ocupa-tudo" [class.campo-erro]="errosFormCadastro.telefone">
+                    <label for="telefoneCadastroUsuario"><b>Telefone (opcional)</b></label>
+                    <input
+                        name="telefoneCadastro"
+                        id="telefoneCadastroUsuario"
+                        type="text"
+                        placeholder="Ex.: 61 99876-5432"
+                        [(ngModel)]="formCadastro.telefone"
+                        (ngModelChange)="formCadastro.telefone = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.telefone"
+                        [attr.aria-describedby]="errosFormCadastro.telefone ? 'erro-telefoneCadastro' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.telefone" id="erro-telefoneCadastro" class="erro-campo">{{ errosFormCadastro.telefone }}</span>
+                </div>
+                
+            </div>
+            <div class="acoes-form">
+                <button type="submit" class="botao botao-primario" [disabled]="cadastrando">Efetuar cadastro</button>
+            </div>
+        </form>
+    </section>
+
+    <section *ngIf="abaAtiva === 'usuario-logado'">
+        <div class="vazio">
+            <p>Você já está logado, faça logout para trocar de conta.</p>
+            <button class="botao botao-primario" type="button" [disabled]="this.deslogando" (click)="deslogarUsuario()">
+                Fazer logout
+            </button>
+        </div>
+    </section>
+
+</main>
