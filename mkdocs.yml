@@ -1,9 +1,41 @@
-site_name: Documentação
+
+site_name: OpenRoute - Documentação
 
 nav:
-  - Instruções mkdocs: "index.md"
-  - Atas de Reunião:
-    - Ata 1: "atas-reuniao/ata-reuniao-1.md"
+  - Início: index.md
+
+  - Visão geral:
+      - Apresentação: visao-geral/apresentacao.md
+      - Escopo: visao-geral/escopo.md
+
+  - Arquitetura:
+      - Visão geral: arquitetura/arquitetura-geral.md
+      - Backend: arquitetura/backend.md
+      - Frontend: arquitetura/frontend.md
+      - Fluxo de otimização: arquitetura/fluxo-otimizacao.md
+      - Integrações: arquitetura/integracoes.md
+
+  - API:
+      - Autenticação: api/autenticacao.md
+      - Usuários: api/usuarios.md
+      - Destinos: api/destinos.md
+      - Pedidos: api/pedidos.md
+      - Rotas: api/rotas.md
+      - Restrições: api/restricoes.md
+
+  - Banco de dados:
+      - Modelo de dados: banco-de-dados/modelo-de-dados.md
+
+  - Instalação:
+      - Ambiente: instalacao/ambiente.md
+      - Backend: instalacao/backend.md
+      - Frontend: instalacao/frontend.md
+      - Banco de dados: instalacao/banco-de-dados.md
+
+  - Testes: testes/testes.md
+
+  - Atas de reunião:
+      - Ata 1: atas-reuniao/ata-reuniao-1.md
 
 theme:
   name: material
