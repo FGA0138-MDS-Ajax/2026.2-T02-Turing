@@ -1,4 +1,4 @@
-import { ApplicationConfig, Injectable, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import {  HttpHandlerFn, HttpInterceptorFn, HttpRequest, provideHttpClient, withInterceptors, withInterceptorsFromDi } from '@angular/common/http';
 
