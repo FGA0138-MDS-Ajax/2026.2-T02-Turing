@@ -7,3 +7,4 @@ sqlalchemy
 python-dotenv
 alembic
 requests
+email-validator
