@@ -26,7 +26,7 @@ def ListarUsuarios():
 @usuarios_bp.post("")
 @usuarios_bp.post("/")
 def CadastrarUsuario():
-    ExigirAdm(); dados = LerCorpo(UsuarioCreate); db = GetDb()
+    dados = LerCorpo(UsuarioCreate); db = GetDb()
     perfil = db.query(PerfilModel).filter(PerfilModel.codigo == "USUARIO").first()
     if not perfil:
         abort(500, description="Perfil USUARIO não cadastrado. Execute database.sql.")
