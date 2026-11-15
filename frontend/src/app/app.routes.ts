@@ -2,7 +2,8 @@ import { Routes } from '@angular/router';
 import { HomeComponent } from './pages/home/home.component';
 import { PainelMotoristaComponent } from './pages/painel-motorista/painel-motorista.component';
 import { PainelClienteComponent } from './pages/painel-cliente/painel-cliente.component';
-import { AdmRestricoesComponent } from './pages/painel-adm/painel-adm.component';
+import { PainelAdmComponent } from './pages/painel-adm/painel-adm.component';
+import { AutenticacaoComponent } from './pages/autenticacao/autenticacao.component';
 
 export const routes: Routes = [
     {
@@ -11,8 +12,13 @@ export const routes: Routes = [
         data: { breadcrumb: 'Home' }
     },
     {
+        path: 'autenticacao',
+        component: AutenticacaoComponent,
+        data: { breadcrumb: 'Autenticacao' }
+    },
+    {
         path: 'painel-adm',
-        component: AdmRestricoesComponent,
+        component: PainelAdmComponent,
         data: { breadcrumb: 'Painel do ADM' }
     },
     {

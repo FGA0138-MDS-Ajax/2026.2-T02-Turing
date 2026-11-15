@@ -1,8 +1,3 @@
-export interface LoginInput{
-    email: String
-    senha: String
-}
-
 export interface UsuarioCreate{
     nome: String
     email: String
@@ -10,7 +5,7 @@ export interface UsuarioCreate{
     telefone?: String
 }
 
-export interface UsuarioResponse{
+export interface Usuario{
     id: Number
     nome: String
     email: String
@@ -21,6 +16,6 @@ export interface UsuarioResponse{
 }
 
 export enum Perfil {
-    ADM = 'Administrador',
-    USUARIO = 'Usuário',
+    ADM = 'ADM',
+    USUARIO = 'USUARIO',
 }

@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { mensagemDeErro } from '../../shared/erro.util';
-import { UsuarioCreate, UsuarioResponse } from '../../models/usuario.model';
+import { UsuarioCreate, Usuario } from '../../models/usuario.model';
 import { UsuarioService } from '../../services/usuario.service';
+import { HttpResponse } from '@angular/common/http';
 
 type Aba = 'listar-usuario' | 'cadastrar-usuario' | 'detalhar-usuario';
 
@@ -20,24 +21,24 @@ interface Mensagem {
     templateUrl: './painel-adm.component.html',
     styleUrls: ['./painel-adm.component.css', '../../shared/painel-base.css']
 })
-export class AdmRestricoesComponent implements OnInit{
+export class PainelAdmComponent implements OnInit{
 
     readonly abas = [
         { id: 'listar-usuario', rotulo: 'Usuários' }
     ];
 
-  get abaDestaque(): string {
-    if(
-        this.abaAtiva === 'listar-usuario' ||
-        this.abaAtiva === 'cadastrar-usuario' ||
-        this.abaAtiva === 'detalhar-usuario'
-    ) {
-        return 'listar-usuario';
+    get abaDestaque(): string {
+        if(
+            this.abaAtiva === 'listar-usuario' ||
+            this.abaAtiva === 'cadastrar-usuario' ||
+            this.abaAtiva === 'detalhar-usuario'
+        ) {
+            return 'listar-usuario';
+        }
+        return '';
     }
-    return '';
-  }
 
-    public usuarios: Array<UsuarioResponse> = [];
+    public usuarios: Array<Usuario> = [];
 
     public abaAtiva: Aba = 'listar-usuario';
     public erroLista: String = '';
@@ -48,7 +49,7 @@ export class AdmRestricoesComponent implements OnInit{
     public deletando: Boolean = false;
 
     public usuarioNovo: UsuarioCreate = {} as UsuarioCreate;
-    public usuarioDetalhado: UsuarioResponse = {} as UsuarioResponse;
+    public usuarioDetalhado: Usuario = {} as Usuario;
 
     private readonly _destroy$ = new Subject<void>();
 
@@ -79,7 +80,7 @@ export class AdmRestricoesComponent implements OnInit{
         this._usuarioService.obterUsuarios().pipe(
             takeUntil(this._destroy$)
         ).subscribe({
-            next: (response: Array<UsuarioResponse>) => {
+            next: (response: Array<Usuario>) => {
                 this.carregando = false;
                 this.usuarios = response;
             },
@@ -91,10 +92,20 @@ export class AdmRestricoesComponent implements OnInit{
     }
     
     cadastrarUsuario(): void {
+        const inputCadastro = {
+            nome: this.usuarioNovo.nome,
+            email: this.usuarioNovo.email,
+            senha: this.usuarioNovo.senha
+        } as UsuarioCreate;
+        if(this.usuarioNovo.telefone){
+            inputCadastro.telefone = this.usuarioNovo.telefone;
+        }
+
+        this.cadastrando = true;
         this._usuarioService.cadastrarUsuario(
-            this.usuarioNovo
+            inputCadastro
         ).subscribe({
-            next: (response: UsuarioResponse) => {
+            next: (response: Usuario) => {
                 this.usuarios.push(response);
                 this.cadastrando = false;
                 this.abrirLista();
@@ -120,22 +131,14 @@ export class AdmRestricoesComponent implements OnInit{
         ).pipe(
             takeUntil(this._destroy$)
         ).subscribe({
-            next: (response: String) => {
-                if(response === ""){
+            next: (response: HttpResponse<any>) => {
+                if(response.status === 204){
                     const idUsuario = this.usuarios.findIndex((usuario) =>
                         usuario.id === this.usuarioDetalhado.id
                     );
                     this.usuarios.splice(idUsuario, 1);
                     this.editando = false;
                     this.abrirLista();
-                } else {
-                    this.mensagem = {
-                        tipo: 'erro',
-                        texto: mensagemDeErro(
-                            {},
-                            'Erro inesperado.'
-                        )
-                    };
                 }
             },
             error: (erro) => {
@@ -155,12 +158,12 @@ export class AdmRestricoesComponent implements OnInit{
         this._cdr.detectChanges();
 
         this.usuarioNovo = {} as UsuarioCreate;
-        this.usuarioDetalhado = {} as UsuarioResponse;
+        this.usuarioDetalhado = {} as Usuario;
         
         this.selecionarAba('listar-usuario');
     }
 
-    abrirDetalhes(usuario: UsuarioResponse): void {
+    abrirDetalhes(usuario: Usuario): void {
         this.usuarioDetalhado = usuario;
         this.selecionarAba('detalhar-usuario');
     }

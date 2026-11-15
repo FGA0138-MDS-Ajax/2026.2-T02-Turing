@@ -1,18 +1,20 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HeaderComponent } from '../../components/header/header.component';
+import { NavbarComponent } from '../../shared/navbar/navbar.component';
 
 @Component({
     selector: 'app-home',
     standalone: true,
-    imports: [CommonModule, RouterLink, HeaderComponent],
+    imports: [CommonModule, RouterLink, NavbarComponent],
     templateUrl: './home.component.html',
-    styleUrl: './home.component.css'
+    styleUrls: ['./home.component.css', '../../shared/painel-base.css']
 })
 export class HomeComponent {
 
-    funcaoExemplo() {
-        console.log('Texto clicado!');
+    public tipoUsuario: String;
+
+    constructor(){
+        this.tipoUsuario = sessionStorage.getItem('TipoUsuario') || '';
     }
 }
