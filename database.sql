@@ -79,15 +79,6 @@ CREATE TABLE pedidos (
     data_entrega DATE NOT NULL,
     janela_entrega_inicio TIME NULL,
     janela_entrega_fim TIME NULL,
-    status ENUM(
-        'PENDENTE',
-        'PLANEJADO',
-        'SAIU_PARA_ENTREGA',
-        'EM_ANDAMENTO',
-        'ENTREGUE',
-        'FALHOU',
-        'CANCELADO'
-    ) NOT NULL DEFAULT 'PENDENTE',
     criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -103,29 +94,6 @@ CREATE TABLE pedidos (
             OR janela_entrega_fim IS NULL
             OR janela_entrega_fim >= janela_entrega_inicio
         )
-);
-
-CREATE TABLE historico_status_pedidos (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    pedido_id BIGINT UNSIGNED NOT NULL,
-    usuario_id BIGINT UNSIGNED NULL,
-    status_anterior ENUM(
-        'PENDENTE', 'PLANEJADO', 'SAIU_PARA_ENTREGA', 'EM_ANDAMENTO',
-        'ENTREGUE', 'FALHOU', 'CANCELADO'
-    ) NULL,
-    status_novo ENUM(
-        'PENDENTE', 'PLANEJADO', 'SAIU_PARA_ENTREGA', 'EM_ANDAMENTO',
-        'ENTREGUE', 'FALHOU', 'CANCELADO'
-    ) NOT NULL,
-    observacao VARCHAR(500) NULL,
-    registrado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_historico_pedidos
-        FOREIGN KEY (pedido_id) REFERENCES pedidos (id)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT fk_historico_usuarios
-        FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-        ON UPDATE CASCADE ON DELETE SET NULL
 );
 
 CREATE TABLE rotas (

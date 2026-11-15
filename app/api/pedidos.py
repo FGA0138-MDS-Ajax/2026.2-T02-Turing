@@ -17,7 +17,7 @@ def ListarPedidos():
     resposta = []
     for pedido, endereco in registros:
         resposta.append({
-            "id": pedido.id, "descricao": pedido.descricao, "status": pedido.status.value,
+            "id": pedido.id, "descricao": pedido.descricao,
             "cep": endereco.cep, "numero": endereco.numero,
             "endereco": ", ".join(parte for parte in [endereco.logradouro, endereco.numero, endereco.bairro, endereco.cidade, endereco.estado] if parte),
             "latitude": float(endereco.latitude) if endereco.latitude is not None else None,
