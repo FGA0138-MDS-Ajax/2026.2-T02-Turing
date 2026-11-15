@@ -7,7 +7,7 @@ from app.api.validacao import LerCorpo
 from app.api.autenticacao import ExigirAdm
 from app.db.session import GetDb
 from app.models.usuario import UsuarioModel, PerfilModel
-from app.schemas.usuario import UsuarioCreate
+from app.schemas.usuario import UsuarioCreate, UsuarioUpdate
 
 usuarios_bp = Blueprint("usuarios", __name__, url_prefix="/usuarios")
 
@@ -26,7 +26,7 @@ def ListarUsuarios():
 @usuarios_bp.post("")
 @usuarios_bp.post("/")
 def CadastrarUsuario():
-    dados = LerCorpo(UsuarioCreate); db = GetDb()
+    ExigirAdm(); dados = LerCorpo(UsuarioCreate); db = GetDb()
     perfil = db.query(PerfilModel).filter(PerfilModel.codigo == "USUARIO").first()
     if not perfil:
         abort(500, description="Perfil USUARIO não cadastrado. Execute database.sql.")
@@ -43,6 +43,31 @@ def CadastrarUsuario():
 def ObterUsuario(usuarioId):
     ExigirAdm(); db = GetDb(); usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuarioId).first()
     if not usuario: abort(404, description="Usuário não encontrado.")
+    return jsonify(_Serializar(usuario))
+
+@usuarios_bp.put("/<int:usuarioId>")
+def AtualizarUsuario(usuarioId):
+    adm = ExigirAdm(); db = GetDb()
+    usuario = db.query(UsuarioModel).filter(UsuarioModel.id == usuarioId).first()
+    if not usuario: abort(404, description="Usuário não encontrado.")
+    dados = LerCorpo(UsuarioUpdate)
+    alteracoes = dados.model_dump(exclude_unset=True)
+    if usuario.id == adm.id and alteracoes.get("ativo") is False:
+        abort(400, description="O ADM não pode desativar a própria conta.")
+    if alteracoes.get("nome") is not None:
+        usuario.nome = alteracoes["nome"].strip()
+    if alteracoes.get("email") is not None:
+        usuario.email = alteracoes["email"].lower()
+    if "telefone" in alteracoes:
+        usuario.telefone = alteracoes["telefone"]
+    if alteracoes.get("senha") is not None:
+        usuario.senha_hash = generate_password_hash(alteracoes["senha"])
+    if alteracoes.get("ativo") is not None:
+        usuario.ativo = alteracoes["ativo"]
+    try:
+        db.commit(); db.refresh(usuario)
+    except IntegrityError:
+        db.rollback(); abort(409, description="Já existe uma conta com esse e-mail.")
     return jsonify(_Serializar(usuario))
 
 @usuarios_bp.delete("/<int:usuarioId>")
