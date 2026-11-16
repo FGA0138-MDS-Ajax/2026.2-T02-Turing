@@ -26,3 +26,9 @@ Este repositório também conta com uma pipeline de automatização de deploy do
 * Clique em salvar e pronto;
 
 Após essas etapas de configuração, o seu GitPages deve funcionar normalmente.
+
+## Documentação
+
+[Documento de visão](https://docs.google.com/document/d/108L0faapmcmAy5MJK7_qShOT1ENTuuP5/edit)
+
+[Documento de arquitetura](https://docs.google.com/document/d/1HGeXzP9B5Apm4zyVWTtlkK5UOrv09t0c/edit)
