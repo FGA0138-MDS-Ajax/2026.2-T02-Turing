@@ -1,34 +1,60 @@
-from flask import Blueprint, jsonify, abort
-from app.api.validacao import LerCorpo
-from app.db.session import GetDb
-from app.schemas.rota import RotaCreate, RotaResponse
-from app.repositories import rota_repo
-from app.api.autenticacao import ExigirUsuarioOperacional
 
-rotas_crud_bp = Blueprint("rotas_crud", __name__, url_prefix="/rotas")
+from flask import Blueprint, jsonify, abort
+from sqlalchemy.orm import selectinload
+
+from app.api.autenticacao import ExigirUsuarioOperacional
+from app.db.session import GetDb
+from app.models.rota import RotaModel
+from app.repositories import rota_repo
+from app.schemas.rota import RotaResponse
+
+
+rotas_crud_bp = Blueprint(
+    "rotas_crud",
+    __name__,
+    url_prefix="/rotas"
+)
+
 
 def _Serializar(rota):
-    return RotaResponse.model_validate(rota).model_dump(mode="json")
+    return RotaResponse.model_validate(rota).model_dump(
+        mode="json"
+    )
 
-@rotas_crud_bp.post("/", strict_slashes=False)
-def SalvarRota():
+
+@rotas_crud_bp.get("/", strict_slashes=False)
+def ListarRotas():
     usuario = ExigirUsuarioOperacional()
+
     db = GetDb()
-    try:
-        dados = LerCorpo(RotaCreate)
-        if dados.usuario_id != usuario.id:
-            abort(403, description="A rota deve ser vinculada ao usuário autenticado.")
-        criada = rota_repo.CriarRota(db, dados)
-        return jsonify(_Serializar(criada)), 201
-    except ValueError as erro:
-        abort(400, description=str(erro))
+
+    rotas = (
+        db.query(RotaModel)
+        .options(selectinload(RotaModel.enderecos))
+        .filter(RotaModel.usuario_id == usuario.id)
+        .order_by(RotaModel.criada_em.desc(), RotaModel.id.desc())
+        .all()
+    )
+
+    return jsonify([
+        _Serializar(rota)
+        for rota in rotas
+    ])
+
 
 @rotas_crud_bp.get("/<int:rotaId>")
 def ObterRota(rotaId):
     usuario = ExigirUsuarioOperacional()
-    rota = rota_repo.BuscarRotaPorId(GetDb(), rotaId)
-    if rota and rota.usuario_id != usuario.id:
-        abort(403, description="Você não tem acesso a esta rota.")
-    if not rota:
-        abort(404, description="Rota não encontrada")
+
+    rota = rota_repo.BuscarRotaPorId(
+        GetDb(),
+        rotaId
+    )
+
+    if rota is None or rota.usuario_id != usuario.id:
+        abort(
+            404,
+            description="Rota não encontrada."
+        )
+
     return jsonify(_Serializar(rota))

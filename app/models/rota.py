@@ -27,3 +27,8 @@ class RotaModel(Base):
     criada_em = Column(TIMESTAMP, server_default=func.now(), nullable=False)
     atualizada_em = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now(), nullable=False)
     pedidos = relationship("RotaPedidoModel", cascade="all, delete-orphan", order_by="RotaPedidoModel.ordem_parada")
+    enderecos = relationship(
+    "RotaEnderecoModel",
+    cascade="all, delete-orphan",
+    order_by="RotaEnderecoModel.ordem_parada"
+)

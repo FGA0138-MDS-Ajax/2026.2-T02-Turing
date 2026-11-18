@@ -4,3 +4,4 @@ from app.models.pedido import PedidoModel
 from app.models.restricao import RestricaoOperacionalModel
 from app.models.rota import RotaModel
 from app.models.rota_pedido import RotaPedidoModel
+from app.models.rota_endereco import RotaEnderecoModel
