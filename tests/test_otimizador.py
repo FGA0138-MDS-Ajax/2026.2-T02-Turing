@@ -109,3 +109,34 @@ def test_quantidade_de_janelas_invalida():
     matriz = [[0, 1], [1, 0]]
     with pytest.raises(ValueError, match="quantidade de janelas"):
         CalcularRotaOtimizada(matriz, janelasTempo=[(0, 10)])
+
+
+def test_janelas_encontra_alternativa_quando_primeira_escolha_falha():
+    # Matriz de distâncias em quilômetros.
+    matriz = [
+        [0, 1, 2],
+        [1, 0, 2.5],
+        [2, 2.5, 0]
+    ]
+
+    # Janelas em minutos após a partida.
+    # O endereço 2 tem prazo menor, mas visitá-lo
+    # primeiro impede chegar ao endereço 1 a tempo.
+    janelas = [
+        (0, 1000000000),
+        (0, 4.2),
+        (0, 4)
+    ]
+
+    resultado = CalcularRotaOtimizada(
+        matriz,
+        velocidadeMediaKmh=60,
+        janelasTempo=janelas
+    )
+
+    # Deve encontrar a sequência viável.
+    assert resultado["ordem_ids"] == [0, 1, 2, 0]
+
+    # Verifica as métricas da rota.
+    assert resultado["distancia_total_km"] == 5.5
+    assert resultado["tempo_estimado_min"] == 5.5

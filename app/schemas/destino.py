@@ -2,7 +2,7 @@
 from datetime import datetime, time
 from typing import Optional
 
-from pydantic import BaseModel, Field, ConfigDict, model_validator
+from pydantic import BaseModel, Field, ConfigDict, field_validator, model_validator
 
 from app.models.destino import StatusValidacao
 
@@ -39,6 +39,7 @@ class DestinoCreate(BaseModel):
         return self
 
 
+
 class DestinoUpdate(BaseModel):
     logradouro: Optional[str] = None
     numero: Optional[str] = None
@@ -52,6 +53,22 @@ class DestinoUpdate(BaseModel):
 
     janela_inicio: Optional[time] = None
     janela_fim: Optional[time] = None
+
+    @field_validator(
+        "logradouro",
+        "numero",
+        "cidade",
+        "estado",
+        "cep",
+        mode="before"
+    )
+    @classmethod
+    def ImpedirNuloEmCampoObrigatorio(cls, valor):
+        if valor is None:
+            raise ValueError(
+                "Este campo é obrigatório e não pode receber null."
+            )
+        return valor
 
 
 class DestinoResponse(BaseModel):
@@ -70,6 +87,20 @@ class DestinoResponse(BaseModel):
 
     janela_inicio: Optional[time] = None
     janela_fim: Optional[time] = None
+
+
+    @field_validator(
+        "logradouro", "numero", "cidade", "estado", "cep",
+        mode="before"
+    )
+    @classmethod
+    def ImpedirNuloEmCampoObrigatorio(cls, valor):
+        if valor is None:
+            raise ValueError(
+                "Este campo é obrigatório e não pode receber null."
+            )
+        return valor
+
 
     validacao_status: StatusValidacao
     criado_em: datetime

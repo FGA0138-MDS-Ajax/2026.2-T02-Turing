@@ -1,3 +1,10 @@
+-- OpenRoute: script para criar o banco do zero (MariaDB 10.4 / MySQL compatível).
+-- ATENÇÃO: NÃO execute este arquivo sobre um banco que já contém tabelas.
+-- Ele é um script de criação inicial, não uma migração; há CREATE TABLE sem IF NOT EXISTS.
+-- Não use DROP DATABASE para atualizar o ambiente existente.
+-- Estruturas legadas de pedidos/restrições/logs foram mantidas temporariamente
+-- até as dependências do backend serem revisadas e removidas.
+
 CREATE DATABASE IF NOT EXISTS open_route;
 
 USE open_route;
@@ -41,6 +48,7 @@ CREATE TABLE sessoes (
     revogada_em DATETIME NULL,
     criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    UNIQUE KEY uq_sessoes_token (token_hash),
     CONSTRAINT fk_sessoes_usuarios
         FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
         ON UPDATE CASCADE ON DELETE CASCADE
@@ -48,6 +56,7 @@ CREATE TABLE sessoes (
 
 CREATE TABLE enderecos (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    usuario_id BIGINT UNSIGNED NOT NULL,
     logradouro VARCHAR(180) NOT NULL,
     numero VARCHAR(20) NOT NULL,
     complemento VARCHAR(100) NULL,
@@ -57,14 +66,27 @@ CREATE TABLE enderecos (
     cep VARCHAR(9) NOT NULL,
     pais VARCHAR(80) NOT NULL DEFAULT 'Brasil',
     referencia VARCHAR(255) NULL,
+    janela_inicio TIME NULL,
+    janela_fim TIME NULL,
     latitude DECIMAL(10,7) NULL,
     longitude DECIMAL(10,7) NULL,
     validacao_status ENUM('PENDENTE', 'VALIDADO', 'FALHOU') NOT NULL DEFAULT 'PENDENTE',
     provedor_geocodificacao VARCHAR(50) NULL,
     geocodificado_em DATETIME NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
+    KEY ix_enderecos_usuario_id (usuario_id),
+    CONSTRAINT fk_enderecos_usuarios
+        FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
+        ON DELETE RESTRICT,
+    CONSTRAINT chk_enderecos_janela
+        CHECK (
+            (janela_inicio IS NULL AND janela_fim IS NULL)
+            OR
+            (janela_inicio IS NOT NULL AND janela_fim IS NOT NULL
+             AND janela_fim >= janela_inicio)
+        ),
     CONSTRAINT chk_enderecos_latitude
         CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
     CONSTRAINT chk_enderecos_longitude
@@ -107,7 +129,7 @@ CREATE TABLE rotas (
     tempo_estimado_segundos INT UNSIGNED NULL,
     geometria JSON NULL,
     provedor_calculo VARCHAR(50) NULL,
-    calculada_em DATETIME NULL,
+    calculada_em TIMESTAMP NULL DEFAULT NULL,
     criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     atualizada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -150,6 +172,47 @@ CREATE TABLE rota_pedidos (
     CONSTRAINT fk_rota_pedidos_pedidos
         FOREIGN KEY (pedido_id) REFERENCES pedidos (id)
         ON UPDATE CASCADE ON DELETE RESTRICT
+);
+
+-- Paradas de uma rota: snapshot do endereço na data do cálculo.
+-- O vínculo com o cadastro pode ficar NULL se o endereço original for excluído.
+CREATE TABLE rota_enderecos (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    rota_id BIGINT UNSIGNED NOT NULL,
+    endereco_id BIGINT UNSIGNED NULL,
+    ordem_parada SMALLINT NOT NULL,
+    logradouro VARCHAR(180) NOT NULL,
+    numero VARCHAR(20) NOT NULL,
+    complemento VARCHAR(100) NULL,
+    bairro VARCHAR(100) NULL,
+    cidade VARCHAR(100) NOT NULL,
+    estado VARCHAR(2) NOT NULL,
+    cep VARCHAR(9) NOT NULL,
+    pais VARCHAR(80) NOT NULL,
+    referencia VARCHAR(255) NULL,
+    latitude DECIMAL(10,7) NOT NULL,
+    longitude DECIMAL(10,7) NOT NULL,
+    janela_inicio TIME NULL,
+    janela_fim TIME NULL,
+    chegada_prevista TIMESTAMP NULL DEFAULT NULL,
+    saida_prevista TIMESTAMP NULL DEFAULT NULL,
+    adicionada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_rota_enderecos_ordem (rota_id, ordem_parada),
+    KEY ix_rota_enderecos_endereco_id (endereco_id),
+    CONSTRAINT fk_rota_enderecos_rotas
+        FOREIGN KEY (rota_id) REFERENCES rotas (id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_rota_enderecos_enderecos
+        FOREIGN KEY (endereco_id) REFERENCES enderecos (id)
+        ON DELETE SET NULL,
+    CONSTRAINT chk_rota_enderecos_janela
+        CHECK (
+            (janela_inicio IS NULL AND janela_fim IS NULL)
+            OR
+            (janela_inicio IS NOT NULL AND janela_fim IS NOT NULL
+             AND janela_fim >= janela_inicio)
+        )
 );
 
 CREATE TABLE ocorrencias (

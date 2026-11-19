@@ -6,13 +6,17 @@ from app.schemas.destino import DestinoCreate, DestinoUpdate
 from app.services.geocodificacao import AplicarGeocodificacao
 
 
+
 CAMPOS_DE_ENDERECO = {
     "logradouro",
     "numero",
+    "complemento",
+    "bairro",
     "cidade",
     "estado",
     "cep",
 }
+
 
 
 def CriarDestino(
