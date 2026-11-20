@@ -11,6 +11,16 @@
     }
 }
 
+.fa-check-circle {
+    font-size: medium;
+    color: mediumseagreen;
+}
+
+.fa-times-circle {
+    font-size: medium;
+    color: red;
+}
+
 .acoes-form {
     display: flex;
     justify-content: flex-end;

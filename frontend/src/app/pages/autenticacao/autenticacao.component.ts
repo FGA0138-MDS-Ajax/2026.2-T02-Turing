@@ -10,13 +10,10 @@ import { mensagemDeErro } from '../../shared/erro.util';
 import { LoginInput } from '../../models/autorizacao.model';
 import { Router } from '@angular/router';
 import { HttpResponse } from '@angular/common/http';
+import { Mensagem, TipoMensagem } from '../../models/mensagem.model';
+import { validarEmailUsuario, validarNomeUsuario, validarSenhaUsuario, validarTelefoneUsuario } from '../../shared/validacaoUsuario.util';
 
 type Aba = 'login-usuario' | 'cadastro-usuario' | 'usuario-logado';
-
-interface Mensagem {
-  tipo: 'erro' | 'sucesso';
-  texto: string;
-}
 
 type ErrosFormLogin = Partial<Record<keyof LoginInput, string>>;
 type ErrosFormCadastro = Partial<Record<keyof UsuarioCreateRequest, string>>;
@@ -51,7 +48,7 @@ export class AutenticacaoComponent {
         private _usuarioService: UsuarioService,
         private _router: Router
     ){
-        if(sessionStorage.getItem('TipoUsuario')){
+        if(sessionStorage.getItem('TipoUsuario') && sessionStorage.getItem('BearerToken')){
             this.abaAtiva = 'usuario-logado';
         }
     }
@@ -80,10 +77,9 @@ export class AutenticacaoComponent {
         ).subscribe({
             next: (response: HttpResponse<any>) => {
                 if(response.status === 204){
-                    sessionStorage.removeItem('BearerToken');
-                    sessionStorage.removeItem('TipoUsuario');
+                    this._autenticacaoService.removerSessionLogin();
                     const mensagem = {
-                        tipo: 'sucesso',
+                        tipo: TipoMensagem.SUCESSO,
                         texto: `Logout efetuado com sucesso.`
                     } as Mensagem;
                     this.selecionarAba('login-usuario', mensagem)
@@ -91,14 +87,14 @@ export class AutenticacaoComponent {
                 }
             },
             error: (erro) => {
-                this.deslogando = false;
                 this.mensagem = {
-                    tipo: 'erro',
+                    tipo: TipoMensagem.ERRO,
                     texto: mensagemDeErro(
                         erro,
                         'Não foi possível fazer logout, tente novamente.'
                     )
                 };
+                this.deslogando = false;
             }
         });
     }
@@ -129,39 +125,16 @@ export class AutenticacaoComponent {
                 this.tentouLogar = false;
             },
             error: (erro) => {
-                this.logando = false;
                 this.mensagem = {
-                    tipo: 'erro',
+                    tipo: TipoMensagem.ERRO,
                     texto: mensagemDeErro(
                         erro,
-                        'Não foi possível fazer login. Confira os dados e tente de novo.'
+                        'Não foi possível fazer login. Confira os dados e tente novamente.'
                     )
                 };
+                this.logando = false;
             }
         });
-    }
-
-    revalidarLogin(): void {
-        if (this.tentouLogar) {
-            this._validarLogin();
-        }
-    }
-
-    private _validarLogin(): boolean {
-        const f = this.formLogin;
-        const erros: ErrosFormLogin = {};
-
-        const erroEmail = this._validarEmail(f.email);
-        if(erroEmail) {
-            erros.email = erroEmail;
-        };
-        const erroSenha = this._validarSenha(f.senha);
-        if(erroSenha) {
-            erros.senha = erroSenha;
-        };
-
-        this.errosFormLogin = erros;
-        return Object.keys(erros).length === 0;
     }
 
     cadastrarUsuario(): void {
@@ -188,22 +161,45 @@ export class AutenticacaoComponent {
         ).subscribe({
             next: (response: Usuario) => {
                 const mensagem = {
-                    tipo: 'sucesso',
+                    tipo: TipoMensagem.SUCESSO,
                     texto: `Usuario ${response.nome} cadastrado com sucesso. Faça login para continuar.`
                 } as Mensagem;
                 this.selecionarAba('login-usuario', mensagem);
             },
             error: (erro) => {
-                this.cadastrando = false;
                 this.mensagem = {
-                    tipo: 'erro',
+                    tipo: TipoMensagem.ERRO,
                     texto: mensagemDeErro(
                         erro,
-                        'Não foi possível cadastrar. Confira os dados e tente de novo.'
+                        'Não foi possível cadastrar. Confira os dados e tente novamente.'
                     )
                 };
+                this.cadastrando = false;
             }
         });
+    }
+
+    revalidarLogin(): void {
+        if (this.tentouLogar) {
+            this._validarLogin();
+        }
+    }
+
+    private _validarLogin(): boolean {
+        const f = this.formLogin;
+        const erros: ErrosFormLogin = {};
+
+        const erroEmail = validarEmailUsuario(f.email);
+        if(erroEmail) {
+            erros.email = erroEmail;
+        };
+        const erroSenha = validarSenhaUsuario(f.senha);
+        if(erroSenha) {
+            erros.senha = erroSenha;
+        };
+
+        this.errosFormLogin = erros;
+        return Object.keys(erros).length === 0;
     }
 
     revalidarCadastro(): void {
@@ -216,64 +212,26 @@ export class AutenticacaoComponent {
         const f = this.formCadastro;
         const erros: ErrosFormCadastro = {};
 
-        const erroNome = this._validarNome(f.nome);
+        console.log(this.formCadastro, f)
+
+        const erroNome = validarNomeUsuario(f.nome);
         if(erroNome) {
             erros.nome = erroNome;
         };
-        const erroEmail = this._validarEmail(f.email);
+        const erroEmail = validarEmailUsuario(f.email);
         if(erroEmail) {
             erros.email = erroEmail;
         };
-        const erroSenha = this._validarSenha(f.senha);
+        const erroSenha = validarSenhaUsuario(f.senha);
         if(erroSenha) {
             erros.senha = erroSenha;
         };
-        const erroTelefone = this._validarTelefone(f.telefone);
+        const erroTelefone = validarTelefoneUsuario(f.telefone);
         if(erroTelefone) {
             erros.telefone = erroTelefone;
         };
 
         this.errosFormCadastro = erros;
         return Object.keys(erros).length === 0;
-    }
-
-    private _validarNome(nome: String): string | null {
-        if (nome === undefined || !nome.trim()) {
-            return 'Digite um nome.';
-        }
-        if (nome.trim().length < 4) {
-            return 'Nome deve conter ao menos 4 caracteres.';
-        }
-        return null;
-    }
-
-    private _validarEmail(email: String): string | null {
-        if (email === undefined || !email.trim()) {
-            return 'Digite um e-mail.';
-        }
-        if (!/^[a-z0-9.]+@[a-z0-9]+\.[a-z]+(\.([a-z]+))?$/i.test(email.valueOf())) {
-            return 'Email deve seguir o formato: "fulano@gmail.com".'
-        }
-        return null;
-    }
-
-    private _validarSenha(senha: String): string | null {
-        if (senha === undefined || !senha.trim()) {
-            return 'Digite uma senha.';
-        }
-        if ((senha.trim().length < 8) || (senha.trim().length > 20)) {
-            return 'Senha deve ter entre 8 e 20 caracteres.';
-        }
-        return null;
-    }
-
-    private _validarTelefone(telefone: String | undefined): string | null {
-        if (telefone === undefined || !telefone.trim()) {
-            return null;
-        }
-        if (!/^[1-9]{2}\s9?\d{4}-?\d{4}$/.test(telefone.valueOf())) {
-            return 'Telefone deve seguir o formato: "61 99876-5432';
-        }
-        return null;
     }
 }
