@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { mensagemDeErro } from '../../shared/erro.util';
-import { UsuarioCreate, Usuario } from '../../models/usuario.model';
+import { UsuarioCreateRequest, Usuario } from '../../models/usuario.model';
 import { UsuarioService } from '../../services/usuario.service';
 import { HttpResponse } from '@angular/common/http';
 
@@ -48,7 +48,7 @@ export class PainelAdmComponent implements OnInit{
     public editando: Boolean = false;
     public deletando: Boolean = false;
 
-    public usuarioNovo: UsuarioCreate = {} as UsuarioCreate;
+    public usuarioNovo: UsuarioCreateRequest = {} as UsuarioCreateRequest;
     public usuarioDetalhado: Usuario = {} as Usuario;
 
     private readonly _destroy$ = new Subject<void>();
@@ -77,7 +77,7 @@ export class PainelAdmComponent implements OnInit{
         this.carregando = true;
         this.erroLista = '';
 
-        this._usuarioService.obterUsuarios().pipe(
+        this._usuarioService.listarUsuarios().pipe(
             takeUntil(this._destroy$)
         ).subscribe({
             next: (response: Array<Usuario>) => {
@@ -96,7 +96,7 @@ export class PainelAdmComponent implements OnInit{
             nome: this.usuarioNovo.nome,
             email: this.usuarioNovo.email,
             senha: this.usuarioNovo.senha
-        } as UsuarioCreate;
+        } as UsuarioCreateRequest;
         if(this.usuarioNovo.telefone){
             inputCadastro.telefone = this.usuarioNovo.telefone;
         }
@@ -157,7 +157,7 @@ export class PainelAdmComponent implements OnInit{
     abrirLista(): void {
         this._cdr.detectChanges();
 
-        this.usuarioNovo = {} as UsuarioCreate;
+        this.usuarioNovo = {} as UsuarioCreateRequest;
         this.usuarioDetalhado = {} as Usuario;
         
         this.selecionarAba('listar-usuario');

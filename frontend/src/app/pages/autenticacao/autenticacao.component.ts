@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component } from '@angular/core';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { Perfil, Usuario, UsuarioCreate } from '../../models/usuario.model';
+import { Perfil, Usuario, UsuarioCreateRequest } from '../../models/usuario.model';
 import { AutenticacaoService } from '../../services/autenticacao.service';
 import { UsuarioService } from '../../services/usuario.service';
 import { Subject, takeUntil } from 'rxjs';
@@ -19,7 +19,7 @@ interface Mensagem {
 }
 
 type ErrosFormLogin = Partial<Record<keyof LoginInput, string>>;
-type ErrosFormCadastro = Partial<Record<keyof UsuarioCreate, string>>;
+type ErrosFormCadastro = Partial<Record<keyof UsuarioCreateRequest, string>>;
 
 @Component({
     selector: 'app-autenticacao',
@@ -36,7 +36,7 @@ export class AutenticacaoComponent {
     public tentouLogar: Boolean = false;
     public logando: Boolean = false;
 
-    public formCadastro: UsuarioCreate = {} as UsuarioCreate;
+    public formCadastro: UsuarioCreateRequest = {} as UsuarioCreateRequest;
     public errosFormCadastro: ErrosFormCadastro = {};
     public tentouCadastrar: Boolean = false;
     public cadastrando: Boolean = false;
@@ -64,7 +64,7 @@ export class AutenticacaoComponent {
         this.tentouLogar = false;
         this.logando = false;
 
-        this.formCadastro = {} as UsuarioCreate;
+        this.formCadastro = {} as UsuarioCreateRequest;
         this.errosFormCadastro = {};
         this.tentouCadastrar = false;
         this.cadastrando = false;
@@ -175,7 +175,7 @@ export class AutenticacaoComponent {
             nome: this.formCadastro.nome,
             email: this.formCadastro.email,
             senha: this.formCadastro.senha
-        } as UsuarioCreate;
+        } as UsuarioCreateRequest;
         if(this.formCadastro.telefone){
             inputCadastro.telefone = this.formCadastro.telefone;
         }

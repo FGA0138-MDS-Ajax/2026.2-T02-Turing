@@ -59,7 +59,7 @@ export class PainelMotoristaComponent implements OnInit {
 
   // busca as entregas no back
   carregarPedidos(): void {
-    this.carregando = true;
+    /*this.carregando = true;
     this.erroLista = '';
 
     this.rotaService.obterPedidos().subscribe({
@@ -79,7 +79,7 @@ export class PainelMotoristaComponent implements OnInit {
         this.carregando = false;
         this.erroLista = mensagemDeErro(erro, 'Não foi possível carregar as entregas.');
       }
-    });
+    });*/
   }
 
   // o back precisa de latitude e longitude para montar a matriz de distâncias
@@ -155,7 +155,7 @@ export class PainelMotoristaComponent implements OnInit {
   // envia as entregas marcadas p otimizador
   // o back trata o primeiro destino da lista como início e fim da rota então o ponto de partida escolhido vai na frente
   calcularRota(): void {
-    const marcadas = this.pedidosSelecionados;
+    /*const marcadas = this.pedidosSelecionados;
     if (marcadas.length < 2 || this.calculando) {
       return;
     }
@@ -192,7 +192,7 @@ export class PainelMotoristaComponent implements OnInit {
           'Não foi possível calcular a rota. Tente de novo em instantes.'
         );
       }
-    });
+    });*/
   }
 
   // 12.5 vira 12,50 km

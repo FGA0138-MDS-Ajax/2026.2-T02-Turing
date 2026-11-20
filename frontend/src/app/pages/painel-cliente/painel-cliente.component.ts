@@ -126,7 +126,7 @@ export class PainelClienteComponent implements OnInit {
 
   // busca os pedidos no back
   carregarPedidos(): void {
-    this.carregando = true;
+    /*this.carregando = true;
     this.erroLista = '';
 
     this.rotaService.obterPedidos().subscribe({
@@ -138,7 +138,7 @@ export class PainelClienteComponent implements OnInit {
         this.carregando = false;
         this.erroLista = mensagemDeErro(erro, 'Não foi possível carregar os pedidos.');
       }
-    });
+    });*/
   }
 
   // troca de aba (vem da navbar ou dos botões da tela)
@@ -195,7 +195,7 @@ export class PainelClienteComponent implements OnInit {
 
   // valida e envia o pedido para a api (o back descobre as coordenadas)
   enviarPedido(): void {
-    this.tentouEnviar = true;
+    /*this.tentouEnviar = true;
     this.mensagem = null;
 
     if (!this.validar() || this.enviando) {
@@ -239,7 +239,7 @@ export class PainelClienteComponent implements OnInit {
           )
         };
       }
-    });
+    });*/
   }
 
   private formVazio(): FormPedido {
