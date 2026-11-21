@@ -1,212 +1,481 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+
+import { DestinoService } from '../../services/destino.service';
 import { RotaService } from '../../services/rota.service';
 import { NavbarComponent } from '../../shared/navbar/navbar.component';
 import { MapaRotaComponent } from '../../shared/mapa-rota/mapa-rota.component';
 import { mensagemDeErro } from '../../shared/erro.util';
-import {
-  DestinoRota,
-  Pedido,
-  RespostaRota,
-  classeStatus,
-  rotuloStatus,
-  textoEndereco
-} from '../../models/pedido.model';
 
-// pedidos nesses status não entram mais em uma rota
-const STATUS_FINALIZADOS = ['ENTREGUE', 'CANCELADO'];
+import {
+  Destino,
+  DestinoCreateRequest,
+  StatusValidacao
+} from '../../models/destino.model';
+
+import {
+  RotaCreateRequest,
+  RotaCreateResponse
+} from '../../models/rota.model';
+
+
+function formularioVazio(): DestinoCreateRequest {
+  return {
+    logradouro: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: 'Brasília',
+    estado: 'DF',
+    cep: '',
+    janela_inicio: '',
+    janela_fim: ''
+  };
+}
+
+
+function dataLocalHoje(): string {
+  const hoje = new Date();
+
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+  const dia = String(hoje.getDate()).padStart(2, '0');
+
+  return `${ano}-${mes}-${dia}`;
+}
+
 
 @Component({
   selector: 'app-painel-motorista',
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent, MapaRotaComponent],
+  imports: [
+    CommonModule,
+    FormsModule,
+    NavbarComponent,
+    MapaRotaComponent
+  ],
   templateUrl: './painel-motorista.component.html',
-  styleUrls: ['../../shared/painel-base.css', './painel-motorista.component.css']
+  styleUrls: [
+    '../../shared/painel-base.css',
+    './painel-motorista.component.css'
+  ]
 })
 export class PainelMotoristaComponent implements OnInit {
-  // por enquanto o motorista só tem a aba de entregas
-  readonly abas = [{ id: 'entregas', rotulo: 'Entregas' }];
+
+  // Mantemos o ID antigo para nao quebrar o HTML atual.
+  readonly abas = [
+    { id: 'entregas', rotulo: 'Planejar rota' }
+  ];
+
   abaAtiva = 'entregas';
 
-  // helpers usados direto no html
-  readonly rotulo = rotuloStatus;
-  readonly classe = classeStatus;
-  readonly textoEndereco = textoEndereco;
+  // Enderecos cadastrados pelo motorista.
+  enderecos: Destino[] = [];
+  carregandoEnderecos = false;
+  erroEnderecos = '';
+  mensagemSucesso = '';
 
-  // lista de entregas vinda do back
-  listaEntregas: Pedido[] = [];
-  carregando = false;
-  erroLista = '';
+  // Formulario de cadastro e edicao.
+  exibirFormulario = false;
+  salvandoEndereco = false;
+  enderecoEmEdicaoId: number | null = null;
+  formEndereco: DestinoCreateRequest = formularioVazio();
+  erroFormulario = '';
 
-  // ids marcados nos checkboxes e ponto de partida escolhido entre eles
+  // Enderecos selecionados para a rota.
   selecionados = new Set<number>();
   pontoPartidaId: number | null = null;
 
-  // cálculo da rota
+  // Configuracoes da rota.
+  dataExecucao = dataLocalHoje();
+  horaSaida = '12:00';
+  nomeRota = '';
+
+  // Resultado do calculo.
   calculando = false;
   erroRota = '';
-  resultado: RespostaRota | null = null;
+  resultado: RotaCreateResponse | null = null;
 
-  // bloco do resultado, usado para levar o foco até ele quando a rota chega
-  @ViewChild('blocoResultado') private blocoResultado?: ElementRef<HTMLElement>;
+  @ViewChild('blocoResultado')
+  private blocoResultado?: ElementRef<HTMLElement>;
 
-  constructor(private rotaService: RotaService) {}
+  constructor(
+    private destinoService: DestinoService,
+    private rotaService: RotaService
+  ) {}
 
   ngOnInit(): void {
-    this.carregarPedidos();
+    this.carregarEnderecos();
   }
 
-  // busca as entregas no back
-  carregarPedidos(): void {
-    /*this.carregando = true;
-    this.erroLista = '';
+  // -----------------------------------------------
+  // Listagem de enderecos
+  // -----------------------------------------------
 
-    this.rotaService.obterPedidos().subscribe({
-      next: (pedidos) => {
-        this.listaEntregas = pedidos;
-        this.carregando = false;
+  carregarEnderecos(): void {
+    this.carregandoEnderecos = true;
+    this.erroEnderecos = '';
 
-        // tira da seleção o que sumiu da lista ou deixou de poder ser selecionado
+    this.destinoService.listarDestinos().subscribe({
+      next: (dados) => {
+        this.enderecos = dados;
+        this.carregandoEnderecos = false;
+
+        // Remove da selecao enderecos que deixaram
+        // de existir ou que nao estao validados.
         this.selecionados = new Set(
-          Array.from(this.selecionados).filter((id) =>
-            pedidos.some((p) => p.id === id && this.podeSelecionar(p))
+          [...this.selecionados].filter(id =>
+            dados.some(
+              endereco =>
+                endereco.id === id &&
+                this.podeSelecionar(endereco)
+            )
           )
         );
+
         this.ajustarPontoPartida();
       },
       error: (erro) => {
-        this.carregando = false;
-        this.erroLista = mensagemDeErro(erro, 'Não foi possível carregar as entregas.');
+        this.carregandoEnderecos = false;
+        this.erroEnderecos = mensagemDeErro(
+          erro,
+          'Não foi possível carregar seus endereços.'
+        );
       }
-    });*/
+    });
   }
 
-  // o back precisa de latitude e longitude para montar a matriz de distâncias
-  temCoordenadas(pedido: Pedido): boolean {
-    return pedido.latitude != null && pedido.longitude != null;
+  formatarEndereco(endereco: Destino): string {
+    const complemento = endereco.complemento
+      ? `, ${endereco.complemento}`
+      : '';
+
+    return (
+      `${endereco.logradouro}, ${endereco.numero}` +
+      `${complemento} - ${endereco.cidade}/${endereco.estado}`
+    );
   }
 
-  // só entra na rota quem tem coordenadas e ainda não foi finalizado
-  podeSelecionar(pedido: Pedido): boolean {
-    return this.temCoordenadas(pedido) && !STATUS_FINALIZADOS.includes(pedido.status);
+  // -----------------------------------------------
+  // Cadastro e edicao de enderecos
+  // -----------------------------------------------
+
+  abrirCadastro(): void {
+    this.enderecoEmEdicaoId = null;
+    this.formEndereco = formularioVazio();
+    this.erroFormulario = '';
+    this.mensagemSucesso = '';
+    this.exibirFormulario = true;
   }
 
-  // explica por que a entrega não pode ser marcada
-  motivoBloqueio(pedido: Pedido): string {
-    if (STATUS_FINALIZADOS.includes(pedido.status)) {
-      return 'Entrega já finalizada';
-    }
-    if (!this.temCoordenadas(pedido)) {
-      return 'Endereço ainda sem localização no mapa';
-    }
-    return '';
+  editarEndereco(endereco: Destino): void {
+    this.enderecoEmEdicaoId = endereco.id;
+
+    this.formEndereco = {
+      logradouro: endereco.logradouro,
+      numero: endereco.numero,
+      complemento: endereco.complemento || '',
+      bairro: endereco.bairro || '',
+      cidade: endereco.cidade,
+      estado: endereco.estado,
+      cep: endereco.cep,
+      janela_inicio: endereco.janela_inicio?.slice(0, 5) || '',
+      janela_fim: endereco.janela_fim?.slice(0, 5) || ''
+    };
+
+    this.erroFormulario = '';
+    this.mensagemSucesso = '';
+    this.exibirFormulario = true;
   }
 
-  get entregasSelecionaveis(): Pedido[] {
-    return this.listaEntregas.filter((p) => this.podeSelecionar(p));
+  cancelarFormulario(): void {
+    this.exibirFormulario = false;
+    this.enderecoEmEdicaoId = null;
+    this.formEndereco = formularioVazio();
+    this.erroFormulario = '';
   }
 
-  // entregas marcadas, na ordem em que aparecem na tabela
-  get pedidosSelecionados(): Pedido[] {
-    return this.listaEntregas.filter((p) => this.selecionados.has(p.id));
-  }
-
-  get todasSelecionadas(): boolean {
-    const selecionaveis = this.entregasSelecionaveis;
-    return selecionaveis.length > 0 && selecionaveis.every((p) => this.selecionados.has(p.id));
-  }
-
-  trackPorId(_indice: number, pedido: Pedido): number {
-    return pedido.id;
-  }
-
-  // marca ou desmarca uma entrega
-  alternarSelecao(pedido: Pedido): void {
-    if (!this.podeSelecionar(pedido)) {
+  salvarEndereco(): void {
+    if (this.salvandoEndereco) {
       return;
     }
-    if (this.selecionados.has(pedido.id)) {
-      this.selecionados.delete(pedido.id);
-    } else {
-      this.selecionados.add(pedido.id);
+
+    this.erroFormulario = '';
+    this.mensagemSucesso = '';
+
+    const dados: DestinoCreateRequest = {
+      ...this.formEndereco,
+      logradouro: this.formEndereco.logradouro.trim(),
+      numero: this.formEndereco.numero.trim(),
+      complemento: this.formEndereco.complemento?.trim(),
+      bairro: this.formEndereco.bairro?.trim(),
+      cidade: this.formEndereco.cidade.trim(),
+      estado: this.formEndereco.estado.trim().toUpperCase(),
+      cep: this.formEndereco.cep.replace(/\D/g, '')
+    };
+
+    if (
+      !dados.logradouro ||
+      !dados.numero ||
+      !dados.cidade ||
+      !dados.estado ||
+      !dados.cep
+    ) {
+      this.erroFormulario = 'Preencha os campos obrigatórios.';
+      return;
     }
+
+    if (dados.estado.length !== 2) {
+      this.erroFormulario = 'Informe a UF com duas letras.';
+      return;
+    }
+
+    if (!/^\d{8}$/.test(dados.cep)) {
+      this.erroFormulario = 'Informe um CEP com oito dígitos.';
+      return;
+    }
+
+    if (!dados.janela_inicio || !dados.janela_fim) {
+      this.erroFormulario =
+        'Informe o início e o fim da janela de horário.';
+      return;
+    }
+
+    if (dados.janela_fim < dados.janela_inicio) {
+      this.erroFormulario =
+        'O fim da janela não pode ser anterior ao início.';
+      return;
+    }
+
+    this.salvandoEndereco = true;
+
+    const editando = this.enderecoEmEdicaoId !== null;
+
+    const requisicao = editando
+      ? this.destinoService.atualizarDestino(
+          this.enderecoEmEdicaoId!,
+          dados
+        )
+      : this.destinoService.cadastrarDestino(dados);
+
+    requisicao.subscribe({
+      next: () => {
+        this.salvandoEndereco = false;
+        this.cancelarFormulario();
+
+        this.mensagemSucesso = editando
+          ? 'Endereço atualizado com sucesso.'
+          : 'Endereço cadastrado com sucesso.';
+
+        this.resultado = null;
+        this.carregarEnderecos();
+      },
+      error: (erro) => {
+        this.salvandoEndereco = false;
+
+        this.erroFormulario = mensagemDeErro(
+          erro,
+          'Não foi possível salvar o endereço.'
+        );
+      }
+    });
+  }
+
+  excluirEndereco(endereco: Destino): void {
+    const confirmou = window.confirm(
+      `Deseja excluir o endereço ${this.formatarEndereco(endereco)}?`
+    );
+
+    if (!confirmou) {
+      return;
+    }
+
+    this.destinoService.deletarDestino(endereco.id).subscribe({
+      next: () => {
+        this.selecionados.delete(endereco.id);
+        this.ajustarPontoPartida();
+        this.resultado = null;
+
+        this.mensagemSucesso = 'Endereço excluído com sucesso.';
+        this.carregarEnderecos();
+      },
+      error: (erro) => {
+        this.erroEnderecos = mensagemDeErro(
+          erro,
+          'Não foi possível excluir o endereço.'
+        );
+      }
+    });
+  }
+
+  // -----------------------------------------------
+  // Selecao de paradas
+  // -----------------------------------------------
+
+  podeSelecionar(endereco: Destino): boolean {
+    return (
+      endereco.validacao_status === StatusValidacao.VALIDADO &&
+      endereco.latitude != null &&
+      endereco.longitude != null
+    );
+  }
+
+  get enderecosSelecionados(): Destino[] {
+    return this.enderecos.filter(
+      endereco => this.selecionados.has(endereco.id)
+    );
+  }
+
+  get todosSelecionados(): boolean {
+    const disponiveis = this.enderecos.filter(
+      endereco => this.podeSelecionar(endereco)
+    );
+
+    return (
+      disponiveis.length > 0 &&
+      disponiveis.every(
+        endereco => this.selecionados.has(endereco.id)
+      )
+    );
+  }
+
+  alternarSelecao(endereco: Destino): void {
+    if (!this.podeSelecionar(endereco)) {
+      return;
+    }
+
+    if (this.selecionados.has(endereco.id)) {
+      this.selecionados.delete(endereco.id);
+    } else {
+      this.selecionados.add(endereco.id);
+    }
+
     this.ajustarPontoPartida();
   }
 
-  // marca ou desmarca todas as entregas que podem entrar na rota
-  alternarTodas(): void {
-    if (this.todasSelecionadas) {
+  alternarTodos(): void {
+    if (this.todosSelecionados) {
       this.selecionados.clear();
     } else {
-      this.entregasSelecionaveis.forEach((p) => this.selecionados.add(p.id));
+      this.enderecos
+        .filter(endereco => this.podeSelecionar(endereco))
+        .forEach(endereco =>
+          this.selecionados.add(endereco.id)
+        );
     }
+
     this.ajustarPontoPartida();
   }
 
-  // o ponto de partida precisa ser uma das entregas marcadas, se não for usa a primeira
   private ajustarPontoPartida(): void {
-    const marcadas = this.pedidosSelecionados;
-    if (!marcadas.some((p) => p.id === this.pontoPartidaId)) {
-      this.pontoPartidaId = marcadas.length ? marcadas[0].id : null;
+    const selecionados = this.enderecosSelecionados;
+
+    if (
+      !selecionados.some(
+        endereco => endereco.id === this.pontoPartidaId
+      )
+    ) {
+      this.pontoPartidaId = selecionados[0]?.id ?? null;
     }
   }
 
-  // envia as entregas marcadas p otimizador
-  // o back trata o primeiro destino da lista como início e fim da rota então o ponto de partida escolhido vai na frente
+  // -----------------------------------------------
+  // Calculo da rota
+  // -----------------------------------------------
+
   calcularRota(): void {
-    /*const marcadas = this.pedidosSelecionados;
-    if (marcadas.length < 2 || this.calculando) {
+    const enderecos = this.enderecosSelecionados;
+
+    if (this.calculando) {
       return;
     }
 
-    const partida = marcadas.find((p) => p.id === this.pontoPartidaId) ?? marcadas[0];
-    const ordenadas = [partida, ...marcadas.filter((p) => p.id !== partida.id)];
+    if (enderecos.length < 2) {
+      this.erroRota =
+        'Selecione pelo menos dois endereços validados.';
+      return;
+    }
 
-    const destinos: DestinoRota[] = ordenadas.map((p) => ({
-      id: p.id,
-      endereco: textoEndereco(p),
-      latitude: p.latitude as number,
-      longitude: p.longitude as number
-    }));
+    if (!this.dataExecucao || !this.horaSaida) {
+      this.erroRota =
+        'Informe a data e o horário de saída.';
+      return;
+    }
+
+    const partida = enderecos.find(
+      endereco => endereco.id === this.pontoPartidaId
+    ) ?? enderecos[0];
+
+    // O primeiro endereco enviado ao backend
+    // e o ponto inicial e final da rota.
+    const ordenados = [
+      partida,
+      ...enderecos.filter(
+        endereco => endereco.id !== partida.id
+      )
+    ];
+
+    const dados: RotaCreateRequest = {
+      ids_enderecos: ordenados.map(endereco => endereco.id),
+      data_execucao: this.dataExecucao,
+      hora_saida: this.horaSaida,
+      nome: this.nomeRota.trim() || undefined
+    };
 
     this.calculando = true;
     this.erroRota = '';
     this.resultado = null;
 
-    this.rotaService.calcularRota(destinos).subscribe({
+    this.rotaService.calcularRota(dados).subscribe({
       next: (resposta) => {
-        this.calculando = false;
         this.resultado = resposta;
-        // espera o bloco aparecer na tela e leva a visão até ele
+        this.calculando = false;
+
         setTimeout(() => {
-          const bloco = this.blocoResultado?.nativeElement;
-          bloco?.scrollIntoView({ block: 'start' });
-          bloco?.focus({ preventScroll: true });
+          this.blocoResultado?.nativeElement.scrollIntoView({
+            block: 'start',
+            behavior: 'smooth'
+          });
         });
       },
       error: (erro) => {
         this.calculando = false;
+
         this.erroRota = mensagemDeErro(
           erro,
-          'Não foi possível calcular a rota. Tente de novo em instantes.'
+          'Não foi possível calcular a rota.'
         );
       }
-    });*/
+    });
   }
 
-  // 12.5 vira 12,50 km
   formatarKm(km: number): string {
     return (
-      km.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' km'
+      km.toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + ' km'
     );
   }
 
-  // 65 vira "1 h 05 min"
   formatarDuracao(minutos: number): string {
+    if (minutos > 0 && minutos < 1) {
+      return 'Menos de 1 min';
+    }
+
     const total = Math.round(minutos);
     const horas = Math.floor(total / 60);
     const resto = total % 60;
-    return horas > 0 ? `${horas} h ${String(resto).padStart(2, '0')} min` : `${resto} min`;
+
+    return horas > 0
+      ? `${horas} h ${String(resto).padStart(2, '0')} min`
+      : `${resto} min`;
   }
 }

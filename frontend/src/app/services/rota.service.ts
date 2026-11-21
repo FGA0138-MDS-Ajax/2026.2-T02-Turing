@@ -1,8 +1,14 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { API_URL } from '../config/api.config';
-import { Rota, RotaCreateRequest } from '../models/rota.model';
+import {
+  Rota,
+  RotaCreateRequest,
+  RotaCreateResponse
+} from '../models/rota.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +18,27 @@ export class RotaService {
 
   constructor(private http: HttpClient) {}
 
-  // calcula a rota: o primeiro destino da lista vira o ponto de partida e de volta (regra do otimizador)
-  calcularRota(dadosRota: RotaCreateRequest): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/rotas/calcular-rota`, dadosRota);
+  // Calcula e armazena a rota no backend.
+  calcularRota(
+    dadosRota: RotaCreateRequest
+  ): Observable<RotaCreateResponse> {
+    return this.http.post<RotaCreateResponse>(
+      `${this.apiUrl}/calcular-rota`,
+      dadosRota
+    );
   }
 
-  // lista as rotas do usuario logado
+  // Lista as rotas do motorista autenticado.
   listarRotas(): Observable<Rota[]> {
-    return this.http.get<Rota[]>(`${this.apiUrl}/rotas`);
+    return this.http.get<Rota[]>(
+      `${this.apiUrl}/rotas`
+    );
   }
 
-  // obtem uma rota
+  // Consulta uma rota armazenada.
   obterRota(rotaId: number): Observable<Rota> {
-    return this.http.get<Rota>(`${this.apiUrl}/rotas/${rotaId}`);
+    return this.http.get<Rota>(
+      `${this.apiUrl}/rotas/${rotaId}`
+    );
   }
 }

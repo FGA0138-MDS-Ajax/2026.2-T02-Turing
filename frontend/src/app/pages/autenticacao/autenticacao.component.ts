@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Perfil, Usuario, UsuarioCreateRequest } from '../../models/usuario.model';
 import { AutenticacaoService } from '../../services/autenticacao.service';
-import { UsuarioService } from '../../services/usuario.service';
 import { Subject, takeUntil } from 'rxjs';
 import { mensagemDeErro } from '../../shared/erro.util';
 import { LoginInput } from '../../models/autorizacao.model';
@@ -43,10 +42,9 @@ export class AutenticacaoComponent {
     private readonly _destroy$ = new Subject<void>();
 
     constructor(
-        private _cdr: ChangeDetectorRef,
-        private _autenticacaoService: AutenticacaoService,
-        private _usuarioService: UsuarioService,
-        private _router: Router
+    private _cdr: ChangeDetectorRef,
+    private _autenticacaoService: AutenticacaoService,
+    private _router: Router
     ){
         if(sessionStorage.getItem('TipoUsuario') && sessionStorage.getItem('BearerToken')){
             this.abaAtiva = 'usuario-logado';
@@ -153,9 +151,8 @@ export class AutenticacaoComponent {
             inputCadastro.telefone = this.formCadastro.telefone;
         }
 
-        this.cadastrando = true;
-        this._usuarioService.cadastrarUsuario(
-            inputCadastro
+        this._autenticacaoService.cadastrarMotorista(
+        inputCadastro
         ).pipe(
             takeUntil(this._destroy$)
         ).subscribe({
@@ -212,7 +209,6 @@ export class AutenticacaoComponent {
         const f = this.formCadastro;
         const erros: ErrosFormCadastro = {};
 
-        console.log(this.formCadastro, f)
 
         const erroNome = validarNomeUsuario(f.nome);
         if(erroNome) {

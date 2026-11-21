@@ -1,59 +1,73 @@
+
+export interface GeometriaRota {
+  type: 'LineString';
+  coordinates: number[][];
+}
+
+export interface ParadaRota {
+  ordem: number;
+  id_destino: number;
+  endereco: string;
+  latitude: number;
+  longitude: number;
+}
+
 export interface Rota {
-    id: number;
-    data_execucao: string;
-    status: Status;
-    nome?: string;
-    distancia_total_metros?: number;
-    tempo_estimado_segundos?: number;
-    geometria?: string;
-    criada_em: string;
-    atualizada_em: string;
-    enderecos: Array<RotaEndereco>;
+  id: number;
+  data_execucao: string;
+  status: Status;
+  nome?: string | null;
+  distancia_total_metros?: number | null;
+  tempo_estimado_segundos?: number | null;
+  geometria?: GeometriaRota | null;
+  criada_em: string;
+  atualizada_em: string;
+  enderecos: RotaEndereco[];
 }
 
 export interface RotaEndereco {
-    endereco_id?: number;
-    ordem_parada: number;
-    logradouro: string;
-    numero: string;
-    complemento?: string;
-    bairro?: string;
-    cidade: string;
-    estado: string;
-    cep: string;
-    pais: string;
-    referencia?: string;
-    latitude: number;
-    longitude: number;
-    janela_inicio?: Date;
-    janela_fim?: Date;
-    chegada_prevista?: string;
-    saida_prevista?: string;
-} 
+  endereco_id?: number | null;
+  ordem_parada: number;
+  logradouro: string;
+  numero: string;
+  complemento?: string | null;
+  bairro?: string | null;
+  cidade: string;
+  estado: string;
+  cep: string;
+  pais: string;
+  referencia?: string | null;
+  latitude: number;
+  longitude: number;
+  janela_inicio?: string | null;
+  janela_fim?: string | null;
+  chegada_prevista?: string | null;
+  saida_prevista?: string | null;
+}
 
 export interface RotaCreateRequest {
-    ids_enderecos: Array<number>
-    data_execucao: string;
-    hora_saida: string;
-    nome?: string;
-    velocidade_media_kmh: number;
+  ids_enderecos: number[];
+  data_execucao: string;
+  hora_saida: string;
+  nome?: string;
+  velocidade_media_kmh?: number;
 }
 
 export interface RotaCreateResponse {
-    mensagem: string;
-    rota_id: number;
-    rota_otimizada: any;
-    distancia_total_km: number;
-    tempo_estimado_min: number;
-    geometria: any;
-    geometria_aproximada: any;
-    provedor_calculo: string;
+  mensagem: string;
+  rota_id: number;
+  rota_otimizada: ParadaRota[];
+  distancia_total_km: number;
+  tempo_estimado_min: number;
+  geometria: GeometriaRota;
+  geometria_aproximada: boolean;
+  provedor_calculo: string;
 }
 
 export enum Status {
-    RASCUNHO = "RASCUNHO",
-    CALCULADA = "CALCULADA",
-    EM_ANDAMENTO = "EM_ANDAMENTO",
-    CONCLUIDA = "CONCLUIDA",
-    CANCELADA = "CANCELADA"
+  RASCUNHO = 'RASCUNHO',
+  CALCULADA = 'CALCULADA',
+  EM_ANDAMENTO = 'EM_ANDAMENTO',
+  CONCLUIDA = 'CONCLUIDA',
+  CANCELADA = 'CANCELADA'
 }
