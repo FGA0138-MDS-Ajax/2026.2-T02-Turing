@@ -176,7 +176,10 @@
                     <dt>Nome:</dt>
                     <dd>{{usuarioDetalhado.nome}}</dd>
                 </div>
-                <div></div>
+                <div>
+                    <dt>Criado em:</dt>
+                    <dd>{{usuarioDetalhado.criado_em}}</dd>
+                </div>
                 <div>
                     <dt>Email:</dt>
                     <dd>{{usuarioDetalhado.email}}</dd>
@@ -194,10 +197,6 @@
                 <div>
                     <dt>Perfil:</dt>
                     <dd>{{usuarioDetalhado.perfil}}</dd>
-                </div>
-                <div>
-                    <dt>Criado em:</dt>
-                    <dd>{{usuarioDetalhado.criado_em}}</dd>
                 </div>
             </dl>
         </div>
@@ -268,6 +267,29 @@
                         type="checkbox"
                         [(ngModel)]="formEdicao.ativo"
                     >
+                </div>
+                <div class="campo">
+                    <label>Perfil</label>
+                    <div>
+                        <input
+                            name="PerfilEdicao"
+                            id="perfilEdicaoADM"
+                            type="radio"
+                            value="ADM"
+                            [(ngModel)]="formEdicao.perfil"
+                        >
+                        <label for="perfilEdicaoADM">ADM</label>
+                    </div>
+                    <div>
+                        <input
+                            name="PerfilEdicao"
+                            id="perfilEdicaoUsuario"
+                            type="radio"
+                            value="USUARIO"
+                            [(ngModel)]="formEdicao.perfil"
+                        >
+                        <label for="perfilEdicaoUsuario">Usuario</label>
+                    </div>
                 </div>
             </div>
             <div class="acoes-form">

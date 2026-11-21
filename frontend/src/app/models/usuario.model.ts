@@ -11,6 +11,7 @@ export interface UsuarioUpdateRequest{
     telefone?: string;
     senha?: string;
     ativo?: boolean;
+    perfil?: Perfil;
 }
 
 export interface Usuario{

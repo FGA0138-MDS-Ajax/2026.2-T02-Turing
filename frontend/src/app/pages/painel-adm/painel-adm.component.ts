@@ -282,7 +282,8 @@ export class PainelAdmComponent implements OnInit{
             nome: usuario.nome,
             email: usuario.email,
             ativo: usuario.ativo,
-            telefone: usuario.telefone != null ? usuario.telefone : undefined
+            telefone: usuario.telefone != null ? usuario.telefone : undefined,
+            perfil: usuario.perfil
         };
 
         this.selecionarAba('editar-usuario', null);
@@ -349,6 +350,9 @@ export class PainelAdmComponent implements OnInit{
         if(this.formEdicao.ativo != this.usuarioEditado.ativo) {
             input.ativo = this.formEdicao.ativo;
         }
+        if(this.formEdicao.perfil != this.usuarioEditado.perfil) {
+            input.perfil = this.formEdicao.perfil;
+        }
 
         return input;
     }
@@ -389,15 +393,14 @@ export class PainelAdmComponent implements OnInit{
             (
                 (
                     f.telefone === undefined &&
-                    (
-                        this.usuarioEditado.telefone === null
-                    )
+                    this.usuarioEditado.telefone === null
                 ) ||
                 (
                     f.telefone === this.usuarioEditado.telefone
                 )
             ) &&
-            f.ativo === this.usuarioEditado.ativo
+            f.ativo === this.usuarioEditado.ativo &&
+            f.perfil === this.usuarioEditado.perfil
         ) {
             return 'igual';
         }
