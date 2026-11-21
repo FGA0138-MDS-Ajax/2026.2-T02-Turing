@@ -44,7 +44,7 @@
                     <thead>
                         <tr>
                             <th scope="col">Nome</th>
-                            <th scope="col">Ativo?</th>
+                            <th scope="col">Status</th>
                             <th scope="col">Email</th>
                             <th scope="col">Telefone</th>
                             <th scope="col"><span class="sr-somente">Ações</span></th>
@@ -130,7 +130,7 @@
                         id="senhaCadastroUsuario"
                         type="password"
                         autocomplete="off"
-                        placeholder="Insira uma senha com mais 7 caracteres"
+                        placeholder="Insira uma senha com ao menos 8 caracteres"
                         [(ngModel)]="formCadastro.senha"
                         (ngModelChange)="formCadastro.senha = $event; revalidarCadastro()"
                         [attr.aria-invalid]="!!errosFormCadastro.senha"
@@ -189,14 +189,16 @@
                     <dd>{{(usuarioDetalhado.telefone != undefined ? (usuarioDetalhado.telefone) : '----')}}</dd>
                 </div>
                 <div>
-                    <dt>Ativo?</dt>
-                    <dd>
-                        {{usuarioDetalhado.ativo ? 'Sim' : 'Não'}}
-                    </dd>
-                </div>
-                <div>
                     <dt>Perfil:</dt>
                     <dd>{{usuarioDetalhado.perfil}}</dd>
+                </div>
+                <div>
+                    <dt>Status</dt>
+                    <dd>
+                        <p *ngIf="usuarioDetalhado.ativo" class="fa fa-check-circle"></p>
+                        <p *ngIf="!usuarioDetalhado.ativo" class="fa fa-times-circle"></p>
+                        {{usuarioDetalhado.ativo ? 'Conta ativa' : 'Conta desativada'}}
+                    </dd>
                 </div>
             </dl>
         </div>
@@ -260,17 +262,8 @@
                     <span *ngIf="errosFormEdicao.telefone" id="erro-telefoneEdicaoUsuario" class="erro-campo">{{ errosFormEdicao.telefone }}</span>
                 </div>
                 <div class="campo">
-                    <label for="ativoEdicaoUsuario">Ativo</label>
-                    <input
-                        name="AtivoEdicao"
-                        id="ativoEdicaoUsuario"
-                        type="checkbox"
-                        [(ngModel)]="formEdicao.ativo"
-                    >
-                </div>
-                <div class="campo">
                     <label>Perfil</label>
-                    <div>
+                    <div class="formEdicaoPerfil">
                         <input
                             name="PerfilEdicao"
                             id="perfilEdicaoADM"
@@ -280,7 +273,7 @@
                         >
                         <label for="perfilEdicaoADM">ADM</label>
                     </div>
-                    <div>
+                    <div class="formEdicaoPerfil">
                         <input
                             name="PerfilEdicao"
                             id="perfilEdicaoUsuario"
@@ -291,11 +284,46 @@
                         <label for="perfilEdicaoUsuario">Usuario</label>
                     </div>
                 </div>
+                <div class="campo">
+                    <label>Senha</label>
+                    <button class="botao botao-secundario" type="button" [disabled]="this.editando" (click)="abrirEdicaoSenha()">Alterar Senha</button>
+                </div>
             </div>
             <div class="acoes-form">
-                <button class="botao botao-cancelar" type="button" [disabled]="this.editando" (click)="excluirUsuario()">Excluir usuario</button>
+                <button *ngIf="!formEdicao.ativo" class="botao botao-secundario" type="button" [disabled]="this.editando" (click)="reativarUsuario()">Reativar conta</button>
+                <button *ngIf="formEdicao.ativo" class="botao botao-cancelar" type="button" [disabled]="this.editando" (click)="desativarUsuario()">Desativar conta</button>
                 <button class="botao botao-primario" type="submit" [disabled]="this.editando">Confirmar edição</button>
             </div>
         </form>
     </section>
+
+    <div *ngIf="alterarSenha" class="modalAlterarSenha">
+        <div class="conteudo">
+            <section>
+                <form class="cartao" (ngSubmit)="atualizarSenhaUsuario()">
+                    <div class="grade-campos">
+                        <div class="campo ocupa-tudo" [class.campo-erro]="errosFormEdicao.senha">
+                            <label for="senhaEdicaoUsuario">Senha nova</label>
+                            <input
+                                name="senhaEdicao"
+                                id="senhaEdicaoUsuario"
+                                type="password"
+                                autocomplete="off"
+                                placeholder="Insira uma senha nova com ao menos 8 caracteres"
+                                [(ngModel)]="formEdicao.senha"
+                                (ngModelChange)="formEdicao.senha = $event; revalidarEdicaoSenha()"
+                                [attr.aria-invalid]="!!errosFormEdicao.senha"
+                                [attr.aria-describedby]="errosFormEdicao.senha ? 'erro-senhaEdicaoUsuario' : null"
+                            >
+                            <span *ngIf="errosFormEdicao.senha" id="erro-senhaEdicaoUsuario" class="erro-campo">{{ errosFormEdicao.senha }}</span>
+                        </div>
+                    </div>
+                    <div class="acoes-form">
+                        <button type="button" class="botao botao-secundario" (click)="fecharEdicaoSenha(null)" [disabled]="editando">Voltar</button>
+                        <button class="botao botao-primario" type="submit" [disabled]="editando">Confirmar senha</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
 </main>

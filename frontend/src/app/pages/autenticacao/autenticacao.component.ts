@@ -152,7 +152,7 @@ export class AutenticacaoComponent {
         }
 
         this._autenticacaoService.cadastrarMotorista(
-        inputCadastro
+            inputCadastro
         ).pipe(
             takeUntil(this._destroy$)
         ).subscribe({

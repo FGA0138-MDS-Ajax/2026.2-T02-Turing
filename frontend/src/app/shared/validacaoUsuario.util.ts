@@ -28,12 +28,25 @@ export function validarSenhaUsuario(senha: string | undefined): string | null {
     return null;
 }
 
-export function validarTelefoneUsuario(telefone: string | undefined): string | null {
-    if (telefone === undefined || !telefone.trim()) {
+export function validarTelefoneUsuario(telefone: string | undefined | null): string | null {
+    const valorTelefone = limpaCampoTelefoneUsuario(telefone)
+    if (valorTelefone === null) {
         return null;
     }
-    if (!/^[1-9]{2}\s9?\d{4}-?\d{4}$/.test(telefone.valueOf())) {
+    if (!/^\([1-9]{2}\)\s9?\d{4}-?\d{4}$/.test(valorTelefone)) {
         return 'Telefone deve seguir o formato: "(61) 99876-5432".';
     }
     return null;
+}
+
+export function limpaCampoTelefoneUsuario(telefone: string | undefined | null): string | null {
+    if (telefone === null || telefone === undefined || !telefone.trim()) {
+        return null;
+    }
+    return telefone;
+}
+
+export function telefonesUsuarioIguais(telefone1: string | undefined | null, telefone2: string | undefined | null): boolean {
+    console.log(telefone1, telefone2, limpaCampoTelefoneUsuario(telefone1), limpaCampoTelefoneUsuario(telefone2));
+    return limpaCampoTelefoneUsuario(telefone1) === limpaCampoTelefoneUsuario(telefone2);
 }

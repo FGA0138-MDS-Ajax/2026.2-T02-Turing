@@ -8,7 +8,7 @@ import { UsuarioCreateRequest, Usuario, UsuarioUpdateRequest } from '../../model
 import { UsuarioService } from '../../services/usuario.service';
 import { HttpResponse } from '@angular/common/http';
 import { Mensagem, TipoMensagem } from '../../models/mensagem.model';
-import { validarEmailUsuario, validarNomeUsuario, validarSenhaUsuario, validarTelefoneUsuario } from '../../shared/validacaoUsuario.util';
+import { limpaCampoTelefoneUsuario, telefonesUsuarioIguais, validarEmailUsuario, validarNomeUsuario, validarSenhaUsuario, validarTelefoneUsuario } from '../../shared/validacaoUsuario.util';
 import { AutenticacaoService } from '../../services/autenticacao.service';
 import { Router } from '@angular/router';
 
@@ -62,6 +62,8 @@ export class PainelAdmComponent implements OnInit{
     public errosFormEdicao: ErrosFormEdicao = {};
     public tentouEditar: boolean = false;
     public editando: boolean = false;
+    public tentouEditarSenha: boolean = false;
+    public alterarSenha: boolean = false;
 
     public usuarioDetalhado: Usuario = {} as Usuario;
 
@@ -79,11 +81,11 @@ export class PainelAdmComponent implements OnInit{
         this.atualizarListaUsuarios();
     }
 
-    checkAdm(): void {
+    public checkAdm(): void {
         this.isAdm = Boolean(sessionStorage.getItem('TipoUsuario') === 'ADM') && Boolean(sessionStorage.getItem('BearerToken'));
     }
 
-    deslogar():void {
+    public deslogar():void {
         this.deslogando = true;
 
         this._autenticacaoService.logout().pipe(
@@ -109,12 +111,12 @@ export class PainelAdmComponent implements OnInit{
         });
     }
 
-    atualizarListaUsuarios(): void {
-        this.obterUsuarios();
+    public atualizarListaUsuarios(): void {
+        this.listarUsuarios();
         this._cdr.detectChanges();
     };
 
-    selecionarAba(aba: string, mensagem: Mensagem | null): void {
+    public selecionarAba(aba: string, mensagem: Mensagem | null): void {
         if(!this.isAdm){
             return
         }
@@ -129,7 +131,50 @@ export class PainelAdmComponent implements OnInit{
         this.abaAtiva = aba as Aba;
     }
 
-    obterUsuarios(): void {
+    public abrirDetalhes(usuario: Usuario): void {
+        this.usuarioDetalhado = usuario;
+
+        this.selecionarAba('detalhar-usuario', null);
+    }
+
+    public abrirEdicao(usuario: Usuario): void {
+        this.tentouEditar = false;
+        this.editando = false;
+        this.errosFormEdicao = {};
+
+        this.usuarioEditado = usuario;
+        this.formEdicao = {
+            nome: usuario.nome,
+            email: usuario.email,
+            ativo: usuario.ativo,
+            telefone: usuario.telefone,
+            perfil: usuario.perfil
+        };
+
+        this.selecionarAba('editar-usuario', null);
+    }
+
+    public abrirEdicaoSenha(): void {
+        this.alterarSenha = true;
+    }
+
+    public fecharEdicaoSenha(mensagem: Mensagem | null): void {
+        this.formEdicao = {
+            nome: this.formEdicao.nome,
+            email: this.formEdicao.email,
+            ativo: this.formEdicao.ativo,
+            telefone: this.formEdicao.telefone,
+            perfil: this.formEdicao.perfil
+        };
+        this.errosFormEdicao = {};
+        this.revalidarEdicao();
+
+        this.tentouEditarSenha = false;
+        this.mensagem = mensagem;
+        this.alterarSenha = false;
+    }
+
+    public listarUsuarios(): void {
         this.carregando = true;
         this.erroLista = '';
 
@@ -141,14 +186,15 @@ export class PainelAdmComponent implements OnInit{
                 this.carregando = false;
             },
             error: (erro) => {
+                console.log(erro);
                 this.usuarios = [];
-                this.erroLista = mensagemDeErro(erro, 'Não foi possível carregar os usuários. Tente novamente');
+                this.erroLista = mensagemDeErro(erro, 'Não foi possível carregar os usuários. Tente novamente mais tarde.');
                 this.carregando = false;
             }
         });
     }
     
-    cadastrarUsuario(): void {
+    public cadastrarUsuario(): void {
         this.tentouCadastrar = true;
         
         if(!this._validarCadastro() || this.cadastrando){
@@ -157,13 +203,13 @@ export class PainelAdmComponent implements OnInit{
             
         this.cadastrando = true;
         this._usuarioService.cadastrarUsuario(
-            this._setUsuarioCreateInput()
+            this._setUsuarioCadastroInput()
         ).subscribe({
             next: (response: Usuario) => {
                 this.usuarios.push(response);
                 const mensagem = {
                     tipo: TipoMensagem.SUCESSO,
-                    texto: `Usuario ${response.nome} cadastrado com sucesso.`
+                    texto: `Usuário ${response.nome} cadastrado com sucesso.`
                 } as Mensagem;
                 this.tentouCadastrar = false;
                 this.cadastrando = false;
@@ -174,7 +220,7 @@ export class PainelAdmComponent implements OnInit{
                     tipo: TipoMensagem.ERRO,
                     texto: mensagemDeErro(
                         erro,
-                        'Não foi possível cadastrar. Confira os dados e tente de novo.'
+                        'Não foi possível cadastrar o usuário. Confira os dados e tente novamente.'
                     )
                 };
                 this.tentouCadastrar = false;
@@ -183,23 +229,51 @@ export class PainelAdmComponent implements OnInit{
         });
     }
 
-    excluirUsuario(): void {
+    public reativarUsuario(): void {
+        this.editando = true;
+
+        this._usuarioService.atualizarUsuario(
+            this.usuarioEditado.id,
+            this._setUsuarioReativarInput()
+        ).pipe(
+            takeUntil(this._destroy$)
+        ).subscribe({
+            next: (response: Usuario) => {
+                this.atualizarListaUsuarios();
+                const mensagem = {
+                    tipo: TipoMensagem.SUCESSO,
+                    texto: `Usuário ${response.nome} reativado com sucesso.`
+                } as Mensagem;
+                this.editando = false;
+                this.selecionarAba('listar-usuario', mensagem);
+            },
+            error: (erro) => {
+                this.mensagem = {
+                    tipo: TipoMensagem.ERRO,
+                    texto: mensagemDeErro(
+                        erro,
+                        'Não foi possível reativar o usuário. Tente novamente mais tarde.'
+                    )
+                };
+                this.editando = false;
+            }
+        });
+    }
+
+    public desativarUsuario(): void {
         this.editando = true;
 
         this._usuarioService.excluirUsuario(
-            this.usuarioDetalhado.id
+            this.usuarioEditado.id
         ).pipe(
             takeUntil(this._destroy$)
         ).subscribe({
             next: (response: HttpResponse<any>) => {
                 if(response.status === 204){
-                    const idUsuario = this.usuarios.findIndex((usuario) =>
-                        usuario.id === this.usuarioDetalhado.id
-                    );
-                    this.usuarios.splice(idUsuario, 1);
+                    this.atualizarListaUsuarios();
                     const mensagem = {
                         tipo: TipoMensagem.SUCESSO,
-                        texto: `Usuario ${this.usuarioDetalhado.nome} desativado com sucesso.`
+                        texto: `Usuário ${this.usuarioEditado.nome} desativado com sucesso.`
                     } as Mensagem;
                     this.editando = false;
                     this.selecionarAba('listar-usuario', mensagem);
@@ -210,7 +284,7 @@ export class PainelAdmComponent implements OnInit{
                     tipo: TipoMensagem.ERRO,
                     texto: mensagemDeErro(
                         erro,
-                        'Não foi possível excluir. Tente novamente mais tarde.'
+                        'Não foi possível desativar o usuário. Tente novamente mais tarde.'
                     )
                 };
                 this.editando = false;
@@ -218,7 +292,7 @@ export class PainelAdmComponent implements OnInit{
         });
     }
 
-    atualizarUsuario(): void {
+    public atualizarUsuario(): void {
         this.tentouEditar = true;
 
         const erroValidar: erroEdicao = this._validarEdicao();
@@ -228,7 +302,7 @@ export class PainelAdmComponent implements OnInit{
         }else if(erroValidar === 'igual') {
             this.mensagem = {
                     tipo: TipoMensagem.ERRO,
-                    texto: `Nenhum dado foi alterado.`
+                    texto: `Nenhuma mudança a ser efetivada.`
                 } as Mensagem;
             this.tentouEditar = false;
             this.editando = false;
@@ -238,7 +312,7 @@ export class PainelAdmComponent implements OnInit{
         this.editando = true;
         this._usuarioService.atualizarUsuario(
             this.usuarioEditado.id,
-            this._setUsuarioUpdateInput()
+            this._setUsuarioAtualizarInput()
         ).pipe(
             takeUntil(this._destroy$)
         ).subscribe({
@@ -246,7 +320,7 @@ export class PainelAdmComponent implements OnInit{
                 this.atualizarListaUsuarios();
                 const mensagem = {
                     tipo: TipoMensagem.SUCESSO,
-                    texto: `Usuario ${response.nome} atualizado com sucesso.`
+                    texto: `Usuário ${response.nome} atualizado com sucesso.`
                 } as Mensagem;
                 this.tentouEditar = false;
                 this.editando = false;
@@ -266,37 +340,44 @@ export class PainelAdmComponent implements OnInit{
         });
     }
 
-    abrirDetalhes(usuario: Usuario): void {
-        this.usuarioDetalhado = usuario;
-
-        this.selecionarAba('detalhar-usuario', null);
-    }
-
-    abrirEdicao(usuario: Usuario): void {
-        this.tentouEditar = false;
-        this.editando = false;
-        this.errosFormEdicao = {};
-
-        this.usuarioEditado = usuario;
-        this.formEdicao = {
-            nome: usuario.nome,
-            email: usuario.email,
-            ativo: usuario.ativo,
-            telefone: usuario.telefone != null ? usuario.telefone : undefined,
-            perfil: usuario.perfil
-        };
-
-        this.selecionarAba('editar-usuario', null);
-    }
-
-    revalidarCadastro(): void {
-        this.mensagem = null;
-        if (this.tentouCadastrar) {
-            this._validarCadastro();
+    public atualizarSenhaUsuario(): void {
+        this.tentouEditarSenha = true;
+        
+        if(!this._validarEdicaoSenha() || this.editando) {
+            return;
         }
+
+        this.editando = true;
+        this._usuarioService.atualizarUsuario(
+            this.usuarioEditado.id,
+            this._setUsuarioAtualizarSenhaInput()
+        ).pipe(
+            takeUntil(this._destroy$)
+        ).subscribe({
+            next: (response: Usuario) => {
+                this.atualizarListaUsuarios();
+                const mensagem = {
+                    tipo: TipoMensagem.SUCESSO,
+                    texto: `Senha do usuário ${response.nome} alterada com sucesso.`
+                } as Mensagem;
+                this.editando = false;
+                this.fecharEdicaoSenha(mensagem);
+            },
+            error: (erro) => {
+                const mensagem = {
+                    tipo: TipoMensagem.ERRO,
+                    texto: mensagemDeErro(
+                        erro,
+                        'Não foi possível alterar senha. Tente novamente mais tarde.'
+                    )
+                };
+                this.editando = false;
+                this.fecharEdicaoSenha(mensagem);
+            }
+        });
     }
 
-    private _setUsuarioCreateInput(): UsuarioCreateRequest {
+    private _setUsuarioCadastroInput(): UsuarioCreateRequest {
         const input: UsuarioCreateRequest = {
             nome: this.formCadastro.nome,
             email: this.formCadastro.email,
@@ -308,6 +389,51 @@ export class PainelAdmComponent implements OnInit{
         }
 
         return input;
+    }
+
+    private _setUsuarioAtualizarInput(): UsuarioUpdateRequest {
+        const input: UsuarioUpdateRequest = {} as UsuarioUpdateRequest;
+
+        if(this.formEdicao.nome != this.usuarioEditado.nome) {
+            input.nome = this.formEdicao.nome;
+        }
+        if(this.formEdicao.email != this.usuarioEditado.email) {
+            input.email = this.formEdicao.email;
+        }
+        if(!telefonesUsuarioIguais(
+            this.formEdicao.telefone,
+            this.usuarioEditado.telefone
+        )) {
+            input.telefone = limpaCampoTelefoneUsuario(this.formEdicao.telefone);
+        }
+        if(this.formEdicao.perfil != this.usuarioEditado.perfil) {
+            input.perfil = this.formEdicao.perfil;
+        }
+
+        return input;
+    }
+
+    private _setUsuarioAtualizarSenhaInput(): UsuarioUpdateRequest {
+        const input: UsuarioUpdateRequest = {} as UsuarioUpdateRequest;
+
+        input.senha = this.formEdicao.senha;
+
+        return input;
+    }
+
+    private _setUsuarioReativarInput(): UsuarioUpdateRequest {
+        const input: UsuarioUpdateRequest = {} as UsuarioUpdateRequest;
+
+        input.ativo = true;
+
+        return input;
+    }
+
+    public revalidarCadastro(): void {
+        this.mensagem = null;
+        if (this.tentouCadastrar) {
+            this._validarCadastro();
+        }
     }
 
     private _validarCadastro(): boolean {
@@ -335,29 +461,7 @@ export class PainelAdmComponent implements OnInit{
         return Object.keys(erros).length === 0;
     }
 
-    private _setUsuarioUpdateInput(): UsuarioUpdateRequest {
-        const input: UsuarioUpdateRequest = {} as UsuarioUpdateRequest;
-
-        if(this.formEdicao.nome != this.usuarioEditado.nome) {
-            input.nome = this.formEdicao.nome;
-        }
-        if(this.formEdicao.email != this.usuarioEditado.email) {
-            input.email = this.formEdicao.email;
-        }
-        if(this.formEdicao.telefone != this.usuarioEditado.telefone) {
-            input.telefone = this.formEdicao.telefone;
-        }
-        if(this.formEdicao.ativo != this.usuarioEditado.ativo) {
-            input.ativo = this.formEdicao.ativo;
-        }
-        if(this.formEdicao.perfil != this.usuarioEditado.perfil) {
-            input.perfil = this.formEdicao.perfil;
-        }
-
-        return input;
-    }
-
-    revalidarEdicao(): void {
+    public revalidarEdicao(): void {
         this.mensagem = null;
         if (this.tentouEditar) {
             this._validarEdicao();
@@ -382,7 +486,6 @@ export class PainelAdmComponent implements OnInit{
         };
 
         this.errosFormEdicao = erros;
-
         if(Object.keys(erros).length != 0) {
             return 'validacao';
         }
@@ -390,21 +493,32 @@ export class PainelAdmComponent implements OnInit{
         if(
             f.nome === this.usuarioEditado.nome &&
             f.email === this.usuarioEditado.email &&
-            (
-                (
-                    f.telefone === undefined &&
-                    this.usuarioEditado.telefone === null
-                ) ||
-                (
-                    f.telefone === this.usuarioEditado.telefone
-                )
-            ) &&
-            f.ativo === this.usuarioEditado.ativo &&
+            telefonesUsuarioIguais(f.telefone, this.usuarioEditado.telefone) &&
             f.perfil === this.usuarioEditado.perfil
         ) {
             return 'igual';
         }
 
         return '';
+    }
+
+    public revalidarEdicaoSenha(): void {
+        this.mensagem = null;
+        if (this.tentouEditarSenha) {
+            this._validarEdicaoSenha();
+        }
+    }
+
+    private _validarEdicaoSenha(): boolean {
+        const f = this.formEdicao;
+        const erros: ErrosFormEdicao = {};
+
+        const erroSenha = validarSenhaUsuario(f.senha);
+        if(erroSenha) {
+            erros.senha = erroSenha;
+        };
+
+        this.errosFormEdicao = erros;
+        return Object.keys(erros).length === 0;
     }
 }
