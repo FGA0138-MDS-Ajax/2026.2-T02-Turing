@@ -19,11 +19,23 @@ class ErroGeoportal(Exception):
 
 
 def _IdentificarEndereco(logradouro, numero, complemento, cep):
+    """Extrai quadra, conjunto e lote de um endereço do DF."""
     texto = f"{logradouro or ''} {complemento or ''}"
-    quadra = re.search(r"\b(?:quadra|qd|q)\s*0*(\d+)\b", texto, re.I)
+
+    # Aceita Quadra 111, Q 111, QD 111, QR 111 e QS 111.
+    quadra = re.search(r"\b(?:quadra|qd|qr|qs|q)\s*0*(\d+)\b", texto, re.I)
+
+    # Também aceita um número isolado no campo logradouro, ex.: 111.
+    if quadra is None:
+        quadra = re.fullmatch(r"\s*0*(\d+)\s*", str(logradouro or ""))
+
     conjunto = re.search(r"\b(?:conjunto|cj)\s*0*(\d+)\b", texto, re.I)
-    lote = re.fullmatch(r"\s*(?:(?:casa|lote|lt)\s*)?0*(\d+)\s*", str(numero), re.I)
-    cepLimpo = re.sub(r"\D", "", str(cep))
+    lote = re.fullmatch(
+        r"\s*(?:(?:casa|lote|lt)\s*)?0*(\d+)\s*",
+        str(numero or ""),
+        re.I,
+    )
+    cepLimpo = re.sub(r"\D", "", str(cep or ""))
 
     if not (quadra and conjunto and lote and len(cepLimpo) == 8):
         return None
@@ -31,6 +43,7 @@ def _IdentificarEndereco(logradouro, numero, complemento, cep):
     q, cj, lt = (int(quadra.group(1)), int(conjunto.group(1)), int(lote.group(1)))
     if min(q, cj, lt) <= 0:
         return None
+
     return cepLimpo, q, cj, lt
 
 
@@ -66,9 +79,9 @@ def _CentroDoPoligono(aneis):
 
 
 def GeocodificarLoteDF(logradouro, numero, complemento, cep, estado):
-    """Retorna coordenadas do centro do lote ou None se não houver correspondência única.
+    """Retorna o centro do lote ou None se não houver correspondência única.
 
-    Consulta apenas endereços padronizados do DF: quadra, conjunto, lote e CEP.
+    Consulta endereços padronizados do DF usando quadra, conjunto, lote e CEP.
     """
     if (estado or "").strip().upper() != "DF":
         return None
@@ -78,11 +91,14 @@ def GeocodificarLoteDF(logradouro, numero, complemento, cep, estado):
         return None
 
     cepLimpo, quadra, conjunto, lote = identificacao
+
+    # O Geoportal usa prefixos variados para quadras e pode gravar
+    # lotes com zero à esquerda (LT 08) ou sem ele (LT 8).
     filtro = (
         f"cod_qdui_cep = '{cepLimpo}' "
-        f"AND txt_qdui_quadra = 'Q {quadra}' "
+        f"AND txt_qdui_quadra IN ('Q {quadra}', 'QR {quadra}', 'QS {quadra}') "
         f"AND txt_qdui_conjunto = 'CJ {conjunto}' "
-        f"AND txt_qdui_lote = 'LT {lote}'"
+        f"AND txt_qdui_lote IN ('LT {lote}', 'LT {lote:02d}')"
     )
 
     try:
