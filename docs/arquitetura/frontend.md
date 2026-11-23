@@ -1,10 +1,10 @@
 
 
-\# Arquitetura do Frontend
+# Arquitetura do Frontend
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -16,7 +16,7 @@ Sua responsabilidade é apresentar as funcionalidades do sistema ao usuário, pe
 
 
 
-\## Organização interna
+## Organização interna
 
 
 
@@ -24,35 +24,35 @@ O frontend está organizado em módulos e componentes com responsabilidades espe
 
 
 
-\- \*\*pages:\*\* reúne as páginas e interfaces principais da aplicação, incluindo as áreas administrativas e operacionais.
+- **pages:** reúne as páginas e interfaces principais da aplicação, incluindo as áreas administrativas e operacionais.
 
-\- \*\*services:\*\* concentra os serviços responsáveis pela comunicação com a API do backend.
+- **services:** concentra os serviços responsáveis pela comunicação com a API do backend.
 
-\- \*\*models:\*\* define as estruturas e os tipos de dados utilizados pela aplicação.
+- **models:** define as estruturas e os tipos de dados utilizados pela aplicação.
 
-\- \*\*shared:\*\* reúne componentes e recursos compartilhados entre diferentes partes da interface.
+- **shared:** reúne componentes e recursos compartilhados entre diferentes partes da interface.
 
-\- \*\*config:\*\* contém configurações utilizadas pela aplicação, incluindo o endereço da API.
-
-
-
-\## Tecnologias utilizadas
+- **config:** contém configurações utilizadas pela aplicação, incluindo o endereço da API.
 
 
 
-\- \*\*Angular:\*\* framework utilizado para o desenvolvimento da aplicação.
-
-\- \*\*TypeScript:\*\* linguagem utilizada na implementação da lógica do frontend.
-
-\- \*\*HTML:\*\* estruturação dos elementos das páginas.
-
-\- \*\*CSS:\*\* estilização das interfaces.
-
-\- \*\*Leaflet:\*\* biblioteca utilizada para a apresentação de mapas e informações geográficas.
+## Tecnologias utilizadas
 
 
 
-\## Comunicação com o backend
+- **Angular:** framework utilizado para o desenvolvimento da aplicação.
+
+- **TypeScript:** linguagem utilizada na implementação da lógica do frontend.
+
+- **HTML:** estruturação dos elementos das páginas.
+
+- **CSS:** estilização das interfaces.
+
+- **Leaflet:** biblioteca utilizada para a apresentação de mapas e informações geográficas.
+
+
+
+## Comunicação com o backend
 
 
 
@@ -64,7 +64,7 @@ Esses serviços são responsáveis por enviar os dados necessários às operaç�
 
 
 
-\## Visualização de mapas
+## Visualização de mapas
 
 
 

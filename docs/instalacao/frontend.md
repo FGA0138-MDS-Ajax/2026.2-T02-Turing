@@ -1,6 +1,6 @@
 
 
-\# Instalação e execução do frontend
+# Instalação e execução do frontend
 
 
 
@@ -12,11 +12,11 @@ O frontend é desenvolvido com Angular e utiliza TypeScript, HTML e CSS. Sua fun
 
 
 
-O OpenRoute possui dois perfis de acesso: \*\*ADM\*\*, responsável pelas atividades administrativas, e \*\*USUARIO\*\*, correspondente ao perfil operacional utilizado pelo motorista.
+O OpenRoute possui dois perfis de acesso: **ADM**, responsável pelas atividades administrativas, e **USUARIO**, correspondente ao perfil operacional utilizado pelo motorista.
 
 
 
-\## 1. Obter o código do frontend
+## 1. Obter o código do frontend
 
 
 
@@ -66,7 +66,7 @@ A branch atual deve aparecer com um asterisco ao lado:
 
 ```text
 
-\* front
+* front
 
 ```
 
@@ -100,7 +100,7 @@ Entre os arquivos esperados estão `package.json` e `package-lock.json`.
 
 
 
-\## 2. Verificar o Node.js e o npm
+## 2. Verificar o Node.js e o npm
 
 
 
@@ -130,7 +130,7 @@ Caso os comandos não sejam reconhecidos, confira as orientações de instalaç�
 
 
 
-\## 3. Instalar as dependências
+## 3. Instalar as dependências
 
 
 
@@ -162,11 +162,11 @@ Aguarde a conclusão da instalação.
 
 
 
-\*\*Importante:\*\* utilize `npm ci` para instalar as dependências em uma instalação limpa. Se o comando informar que não existe um `package-lock.json`, confira se você está na pasta correta e se os arquivos da branch `front` foram obtidos corretamente.
+**Importante:** utilize `npm ci` para instalar as dependências em uma instalação limpa. Se o comando informar que não existe um `package-lock.json`, confira se você está na pasta correta e se os arquivos da branch `front` foram obtidos corretamente.
 
 
 
-\## 4. Configurar o endereço do backend
+## 4. Configurar o endereço do backend
 
 
 
@@ -226,11 +226,11 @@ Salve as alterações com `Ctrl + S`.
 
 
 
-\*\*Atenção:\*\* o endereço configurado no frontend precisa corresponder ao endereço e à porta utilizados pelo backend. Se o backend estiver em outro endereço, a configuração também deverá ser ajustada.
+**Atenção:** o endereço configurado no frontend precisa corresponder ao endereço e à porta utilizados pelo backend. Se o backend estiver em outro endereço, a configuração também deverá ser ajustada.
 
 
 
-\## 5. Iniciar o backend
+## 5. Iniciar o backend
 
 
 
@@ -284,7 +284,7 @@ Caso o backend ainda não esteja configurado, consulte o documento `backend.md`.
 
 
 
-\## 6. Executar o frontend
+## 6. Executar o frontend
 
 
 
@@ -336,7 +336,7 @@ Ctrl + C
 
 
 
-\## 7. Verificar a comunicação com o backend
+## 7. Verificar a comunicação com o backend
 
 
 
@@ -344,13 +344,13 @@ Com o frontend e o backend em execução:
 
 
 
-1\. Acesse `http://localhost:4200` no navegador.
+1. Acesse `http://localhost:4200` no navegador.
 
-2\. Verifique se a interface do OpenRoute é carregada.
+2. Verifique se a interface do OpenRoute é carregada.
 
-3\. Acesse uma funcionalidade que realize uma requisição à API.
+3. Acesse uma funcionalidade que realize uma requisição à API.
 
-4\. Observe se os dados são carregados ou se a operação é concluída corretamente.
+4. Observe se os dados são carregados ou se a operação é concluída corretamente.
 
 
 
@@ -358,11 +358,11 @@ Se a interface abrir, mas alguma funcionalidade apresentar erro, isso não signi
 
 
 
-\## 8. Problemas comuns
+## 8. Problemas comuns
 
 
 
-\### O comando `node` ou `npm` não é reconhecido
+### O comando `node` ou `npm` não é reconhecido
 
 
 
@@ -384,7 +384,7 @@ npm --version
 
 
 
-\### O comando `npm ci` apresenta erro
+### O comando `npm ci` apresenta erro
 
 
 
@@ -418,7 +418,7 @@ Test-Path .\\package-lock.json
 
 
 
-\### A aplicação não inicia
+### A aplicação não inicia
 
 
 
@@ -426,19 +426,19 @@ Confira se:
 
 
 
-\- O Node.js e o npm estão instalados.
+- O Node.js e o npm estão instalados.
 
-\- As dependências foram instaladas com `npm ci`.
+- As dependências foram instaladas com `npm ci`.
 
-\- O terminal está na pasta `frontend`.
+- O terminal está na pasta `frontend`.
 
-\- O comando `npm start` foi executado corretamente.
+- O comando `npm start` foi executado corretamente.
 
-\- A porta utilizada pelo servidor de desenvolvimento não está ocupada por outro processo.
+- A porta utilizada pelo servidor de desenvolvimento não está ocupada por outro processo.
 
 
 
-\### A interface abre, mas não consegue acessar a API
+### A interface abre, mas não consegue acessar a API
 
 
 
@@ -446,19 +446,19 @@ Confira:
 
 
 
-\- Se o backend está em execução.
+- Se o backend está em execução.
 
-\- Se o endereço configurado em `src/app/config/api.config.ts` corresponde ao endereço do backend.
+- Se o endereço configurado em `src/app/config/api.config.ts` corresponde ao endereço do backend.
 
-\- Se o backend está acessível em `http://127.0.0.1:5000/health`.
+- Se o backend está acessível em `http://127.0.0.1:5000/health`.
 
-\- Se o terminal do backend apresenta alguma mensagem de erro.
+- Se o terminal do backend apresenta alguma mensagem de erro.
 
-\- Se o navegador apresenta erros de comunicação na ferramenta de desenvolvedor, na aba Console ou Network.
+- Se o navegador apresenta erros de comunicação na ferramenta de desenvolvedor, na aba Console ou Network.
 
 
 
-\### Erro de CORS
+### Erro de CORS
 
 
 
@@ -474,7 +474,7 @@ Não tente corrigir esse problema alterando apenas o endereço da API no fronten
 
 
 
-\## 9. Finalização
+## 9. Finalização
 
 
 

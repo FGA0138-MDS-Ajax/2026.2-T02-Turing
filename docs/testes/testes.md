@@ -1,10 +1,10 @@
 
 
-\# Testes do sistema
+# Testes do sistema
 
 
 
-\## 1. Objetivo
+## 1. Objetivo
 
 
 
@@ -20,7 +20,7 @@ Os testes abrangem o backend, a comunicação com o banco de dados, as integraç
 
 
 
-\## 2. Ambiente de testes
+## 2. Ambiente de testes
 
 
 
@@ -29,17 +29,11 @@ Para executar os testes do backend, são utilizadas as seguintes ferramentas:
 
 
 | Ferramenta | Finalidade |
-
 |---|---|
-
 | Python | Executar o código do backend. |
-
 | pytest | Executar os testes automatizados. |
-
 | MySQL | Disponibilizar o banco de dados utilizado pelo sistema. |
-
 | Flask | Executar a API durante as verificações funcionais. |
-
 
 
 Para as verificações do frontend, são utilizados:
@@ -47,20 +41,14 @@ Para as verificações do frontend, são utilizados:
 
 
 | Ferramenta | Finalidade |
-
 |---|---|
-
 | Node.js | Ambiente de execução do frontend. |
-
 | npm | Gerenciar as dependências do projeto. |
-
 | Angular | Executar a aplicação web. |
-
 | Navegador | Verificar a interface e o comportamento da aplicação. |
 
 
-
-\## 3. Testes automatizados do backend
+## 3. Testes automatizados do backend
 
 
 
@@ -72,7 +60,7 @@ Os testes devem ser executados na raiz do projeto backend, com o ambiente virtua
 
 
 
-\### 3.1. Acessar o projeto
+### 3.1. Acessar o projeto
 
 
 
@@ -104,7 +92,7 @@ Confira se o ambiente virtual está ativo. O terminal deverá apresentar `(venv)
 
 
 
-\### 3.2. Verificar a sintaxe dos arquivos Python
+### 3.2. Verificar a sintaxe dos arquivos Python
 
 
 
@@ -132,7 +120,7 @@ Essa verificação não substitui os testes funcionais: ela verifica a compilaç
 
 
 
-\### 3.3. Executar os testes automatizados
+### 3.3. Executar os testes automatizados
 
 
 
@@ -160,7 +148,7 @@ Quando todos os testes forem aprovados, o resultado deverá indicar a quantidade
 
 
 
-\### 3.4. Interpretar os resultados
+### 3.4. Interpretar os resultados
 
 
 
@@ -169,24 +157,18 @@ Durante a execução, podem ocorrer diferentes resultados:
 
 
 | Resultado | Significado |
-
 |---|---|
-
 | Passed | O teste foi executado e aprovado. |
-
 | Failed | O teste foi executado, mas o resultado não correspondeu ao esperado. |
-
 | Error | Ocorreu um erro durante a execução do teste. |
-
 | Skipped | O teste foi ignorado por alguma condição definida. |
-
 
 
 Caso algum teste apresente falha, consulte a mensagem apresentada pelo pytest para identificar o arquivo, a função e a condição que causaram o problema.
 
 
 
-\## 4. Resultados de testes registrados
+## 4. Resultados de testes registrados
 
 
 
@@ -197,11 +179,8 @@ O relatório de correções do OpenRoute registra a execução dos seguintes pro
 | Procedimento | Resultado registrado |
 
 |---|---|
-
 | `python -m compileall -q app tests` | Concluído sem erros. |
-
 | `pytest -q` | 16 testes aprovados. |
-
 
 
 Esses resultados correspondem à execução registrada no relatório de correções disponibilizado para o projeto.
@@ -212,7 +191,7 @@ A quantidade de testes aprovados pode mudar conforme alterações no código e n
 
 
 
-\## 5. Verificações funcionais do backend
+## 5. Verificações funcionais do backend
 
 
 
@@ -220,7 +199,7 @@ Além dos testes automatizados, o backend pode ser verificado por meio de requis
 
 
 
-\### 5.1. Verificar a disponibilidade da API
+### 5.1. Verificar a disponibilidade da API
 
 
 
@@ -252,7 +231,7 @@ A rota `/health` permite verificar se a API está acessível.
 
 
 
-\### 5.2. Verificar a geocodificação
+### 5.2. Verificar a geocodificação
 
 
 
@@ -264,13 +243,13 @@ Durante a verificação, devem ser observados os seguintes aspectos:
 
 
 
-\- O endereço informado é enviado corretamente ao backend.
+- O endereço informado é enviado corretamente ao backend.
 
-\- O backend realiza a consulta ao serviço de geocodificação.
+- O backend realiza a consulta ao serviço de geocodificação.
 
-\- Quando a consulta é bem-sucedida, são obtidas latitude e longitude.
+- Quando a consulta é bem-sucedida, são obtidas latitude e longitude.
 
-\- Quando ocorre uma falha, o sistema deve tratar a resposta sem assumir que o endereço foi validado.
+- Quando ocorre uma falha, o sistema deve tratar a resposta sem assumir que o endereço foi validado.
 
 
 
@@ -278,7 +257,7 @@ O usuário informa os dados do endereço, não sendo necessário preencher manua
 
 
 
-\### 5.3. Verificar o cálculo de rotas
+### 5.3. Verificar o cálculo de rotas
 
 
 
@@ -290,17 +269,17 @@ Devem ser observados os seguintes aspectos:
 
 
 
-\- A API recebe os pontos necessários ao cálculo.
+- A API recebe os pontos necessários ao cálculo.
 
-\- O sistema verifica se existe a quantidade mínima de destinos exigida.
+- O sistema verifica se existe a quantidade mínima de destinos exigida.
 
-\- O backend consulta o OSRM para obter informações de deslocamento.
+- O backend consulta o OSRM para obter informações de deslocamento.
 
-\- O resultado apresenta a sequência de atendimento calculada.
+- O resultado apresenta a sequência de atendimento calculada.
 
-\- As informações de distância e tempo são retornadas quando disponíveis.
+- As informações de distância e tempo são retornadas quando disponíveis.
 
-\- O tratamento alternativo utilizado quando o OSRM falha deve ser verificado.
+- O tratamento alternativo utilizado quando o OSRM falha deve ser verificado.
 
 
 
@@ -308,7 +287,7 @@ O backend possui um mecanismo de aproximação baseado em Haversine para situaç
 
 
 
-\## 6. Verificações do banco de dados
+## 6. Verificações do banco de dados
 
 
 
@@ -362,7 +341,7 @@ Por exemplo:
 
 ```sql
 
-SELECT \* FROM usuarios;
+SELECT * FROM usuarios;
 
 ```
 
@@ -370,7 +349,7 @@ SELECT \* FROM usuarios;
 
 ```sql
 
-SELECT \* FROM enderecos;
+SELECT * FROM enderecos;
 
 ```
 
@@ -378,7 +357,7 @@ SELECT \* FROM enderecos;
 
 ```sql
 
-SELECT \* FROM rotas;
+SELECT * FROM rotas;
 
 ```
 
@@ -388,11 +367,11 @@ As consultas devem ser realizadas considerando os dados existentes no ambiente d
 
 
 
-\*\*Atenção:\*\* não utilize comandos de exclusão ou alteração de registros em um banco com dados importantes durante a execução de verificações.
+**Atenção:** não utilize comandos de exclusão ou alteração de registros em um banco com dados importantes durante a execução de verificações.
 
 
 
-\## 7. Verificações manuais do frontend
+## 7. Verificações manuais do frontend
 
 
 
@@ -433,28 +412,20 @@ Durante a utilização da aplicação, podem ser verificadas as seguintes situa�
 
 
 | Verificação | Resultado esperado |
-
 |---|---|
-
 | Abertura da aplicação | A interface deve ser carregada no navegador. |
-
 | Acesso às funcionalidades disponíveis | As telas devem apresentar os recursos correspondentes ao perfil de acesso. |
-
 | Gerenciamento de destinos | As operações disponíveis devem permitir trabalhar com os dados dos endereços. |
-
 | Visualização de mapas | Os recursos de mapa devem apresentar as informações geográficas recebidas pela aplicação. |
-
 | Comunicação com a API | As requisições devem alcançar o backend e receber respostas compatíveis com as operações solicitadas. |
-
 | Exibição de erros | Problemas nas operações devem ser apresentados ou tratados sem interromper indevidamente a aplicação. |
-
 
 
 Essas verificações são procedimentos manuais. Sua descrição não significa que todas as funcionalidades listadas estejam implementadas ou tenham sido aprovadas em uma execução de testes.
 
 
 
-\## 8. Verificações de integração
+## 8. Verificações de integração
 
 
 
@@ -466,7 +437,7 @@ No OpenRoute, devem ser observadas principalmente as seguintes integrações:
 
 
 
-\### 8.1. Frontend e backend
+### 8.1. Frontend e backend
 
 
 
@@ -474,35 +445,17 @@ Verificar se:
 
 
 
-\- O frontend utiliza o endereço correto da API.
+- O frontend utiliza o endereço correto da API.
 
-\- As requisições são enviadas aos endpoints correspondentes.
+- As requisições são enviadas aos endpoints correspondentes.
 
-\- As respostas do backend são interpretadas corretamente.
+- As respostas do backend são interpretadas corretamente.
 
-\- Os erros retornados pela API são tratados pela interface.
-
-
-
-\### 8.2. Backend e banco de dados
+- Os erros retornados pela API são tratados pela interface.
 
 
 
-Verificar se:
-
-
-
-\- A aplicação consegue estabelecer conexão com o MySQL.
-
-\- As consultas retornam os dados esperados.
-
-\- As operações de persistência funcionam corretamente.
-
-\- Os relacionamentos entre as tabelas são respeitados.
-
-
-
-\### 8.3. Backend e serviços externos
+### 8.2. Backend e banco de dados
 
 
 
@@ -510,17 +463,35 @@ Verificar se:
 
 
 
-\- O backend consegue consultar o Nominatim para geocodificação.
+- A aplicação consegue estabelecer conexão com o MySQL.
 
-\- O backend consegue consultar o OSRM para obter informações de roteamento.
+- As consultas retornam os dados esperados.
 
-\- As respostas recebidas são tratadas corretamente.
+- As operações de persistência funcionam corretamente.
 
-\- As falhas de comunicação são tratadas sem interromper indevidamente a aplicação.
+- Os relacionamentos entre as tabelas são respeitados.
 
 
 
-\## 9. Funcionalidades que exigem testes adicionais
+### 8.3. Backend e serviços externos
+
+
+
+Verificar se:
+
+
+
+- O backend consegue consultar o Nominatim para geocodificação.
+
+- O backend consegue consultar o OSRM para obter informações de roteamento.
+
+- As respostas recebidas são tratadas corretamente.
+
+- As falhas de comunicação são tratadas sem interromper indevidamente a aplicação.
+
+
+
+## 9. Funcionalidades que exigem testes adicionais
 
 
 
@@ -532,23 +503,23 @@ O relatório de correções do projeto identifica funcionalidades que ainda exig
 
 
 
-\- Autenticação e gerenciamento de sessões.
+- Autenticação e gerenciamento de sessões.
 
-\- Cadastro, edição e exclusão de usuários.
+- Cadastro, edição e exclusão de usuários.
 
-\- Associação e gerenciamento de perfis.
+- Associação e gerenciamento de perfis.
 
-\- Operações completas de cadastro, listagem e edição de entregas.
+- Operações completas de cadastro, listagem e edição de entregas.
 
-\- Endpoints de gerenciamento de restrições operacionais.
+- Endpoints de gerenciamento de restrições operacionais.
 
-\- Integração completa da visualização de mapas com o contrato do backend.
+- Integração completa da visualização de mapas com o contrato do backend.
 
-\- Melhorias de desempenho da visualização de mapas.
+- Melhorias de desempenho da visualização de mapas.
 
-\- Implementação de um segundo provedor de roteamento como alternativa ao OSRM.
+- Implementação de um segundo provedor de roteamento como alternativa ao OSRM.
 
-\- Verificação das medidas de segurança e proteção de dados conforme a LGPD.
+- Verificação das medidas de segurança e proteção de dados conforme a LGPD.
 
 
 
@@ -556,7 +527,7 @@ Esses itens não devem ser considerados aprovados apenas pela execução dos tes
 
 
 
-\## 10. Registro dos resultados
+## 10. Registro dos resultados
 
 
 
@@ -569,28 +540,20 @@ O registro pode conter:
 
 
 | Informação | Descrição |
-
 |---|---|
-
 | Data da execução | Dia em que os testes foram realizados. |
-
 | Versão do código | Branch e identificação da versão testada. |
-
 | Procedimento | Comando ou funcionalidade verificada. |
-
 | Resultado | Aprovado, reprovado ou não executado. |
-
 | Problemas encontrados | Descrição das falhas identificadas. |
-
 | Responsável | Integrante responsável pela execução. |
-
 
 
 Esse registro facilita a comparação dos resultados entre diferentes versões do sistema e permite acompanhar a correção de problemas.
 
 
 
-\## 11. Considerações finais
+## 11. Considerações finais
 
 
 

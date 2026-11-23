@@ -1,10 +1,10 @@
 
 
-\# Integrações Externas
+# Integrações Externas
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -16,11 +16,11 @@ Essas integrações complementam a API própria do sistema, permitindo utilizar 
 
 
 
-\## Serviços identificados
+## Serviços identificados
 
 
 
-\### Nominatim
+### Nominatim
 
 
 
@@ -36,7 +36,7 @@ Documentação oficial: https://nominatim.org/
 
 
 
-\### OSRM
+### OSRM
 
 
 
@@ -52,7 +52,7 @@ Documentação oficial: https://project-osrm.org/
 
 
 
-\### TomTom
+### TomTom
 
 
 
@@ -68,7 +68,7 @@ Documentação oficial: https://developer.tomtom.com/
 
 
 
-\## Configuração das integrações
+## Configuração das integrações
 
 
 

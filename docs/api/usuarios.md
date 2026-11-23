@@ -1,10 +1,10 @@
 
 
-\# API de Usuários
+# API de Usuários
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -16,15 +16,15 @@ O sistema possui dois perfis de acesso:
 
 
 
-\- \*\*ADM:\*\* perfil responsável pelas atividades administrativas e pelo gerenciamento de contas.
+- **ADM:** perfil responsável pelas atividades administrativas e pelo gerenciamento de contas.
 
-\- \*\*USUARIO:\*\* perfil operacional utilizado pelo motorista.
-
-
+- **USUARIO:** perfil operacional utilizado pelo motorista.
 
 
 
-\## Funcionalidades
+
+
+## Funcionalidades
 
 
 
@@ -32,7 +32,7 @@ A API de usuários contempla operações administrativas e operacionais, de acor
 
 
 
-\### Operações do ADM
+### Operações do ADM
 
 
 
@@ -40,19 +40,19 @@ O perfil ADM é responsável pelo gerenciamento das contas cadastradas no sistem
 
 
 
-\- Cadastrar novos usuários.
+- Cadastrar novos usuários.
 
-\- Consultar informações de usuários cadastrados.
+- Consultar informações de usuários cadastrados.
 
-\- Listar os usuários registrados.
+- Listar os usuários registrados.
 
-\- Atualizar dados cadastrais.
+- Atualizar dados cadastrais.
 
-\- Desativar contas de acesso, quando disponível.
+- Desativar contas de acesso, quando disponível.
 
 
 
-\### Operações do USUARIO
+### Operações do USUARIO
 
 
 
@@ -60,17 +60,17 @@ O perfil USUARIO corresponde ao motorista e utiliza os recursos relacionados à 
 
 
 
-\- Consultar suas próprias informações cadastrais.
+- Consultar suas próprias informações cadastrais.
 
-\- Visualizar os dados associados à sua conta.
+- Visualizar os dados associados à sua conta.
 
-\- Atualizar informações próprias, caso essa operação esteja disponível.
+- Atualizar informações próprias, caso essa operação esteja disponível.
 
-\- Há outras operações em relação ao sistema em geral que são descritas no arquivo usuarios.md.
+- Há outras operações em relação ao sistema em geral que são descritas no arquivo usuarios.md.
 
 
 
-\## Controle de acesso
+## Controle de acesso
 
 
 
@@ -82,7 +82,7 @@ O ADM possui acesso às operações administrativas de gerenciamento de usuário
 
 
 
-\## Controle de acesso
+## Controle de acesso
 
 
 
@@ -94,7 +94,7 @@ O perfil ADM é responsável pelo gerenciamento das contas, enquanto o perfil US
 
 
 
-\## Comunicação com o backend
+## Comunicação com o backend
 
 
 

@@ -1,6 +1,6 @@
 
 
-\# Configuração do banco de dados
+# Configuração do banco de dados
 
 
 
@@ -14,7 +14,7 @@ O sistema utiliza o MySQL para armazenar informações relacionadas aos usuário
 
 
 
-\## 1. Verificar a instalação do MySQL
+## 1. Verificar a instalação do MySQL
 
 
 
@@ -44,7 +44,7 @@ Para consultar os serviços relacionados ao MySQL no Windows, execute:
 
 ```powershell
 
-Get-Service \*mysql\*
+Get-Service *mysql*
 
 ```
 
@@ -58,7 +58,7 @@ Caso o comando `mysql` não seja reconhecido, verifique se a pasta `bin` da inst
 
 
 
-\## 2. Verificar a porta do servidor
+## 2. Verificar a porta do servidor
 
 
 
@@ -86,7 +86,7 @@ Caso esteja utilizando outra, será necessário ajustar a variável `DB\_PORT` n
 
 
 
-\## 3. Acessar o MySQL
+## 3. Acessar o MySQL
 
 
 
@@ -118,7 +118,7 @@ Após a conexão, o terminal apresentará o prompt do MySQL, permitindo executar
 
 
 
-\## 4. Criar o banco de dados
+## 4. Criar o banco de dados
 
 
 
@@ -166,7 +166,7 @@ USE open\_route;
 
 
 
-\## 5. Criar as tabelas do sistema
+## 5. Criar as tabelas do sistema
 
 
 
@@ -183,28 +183,18 @@ A estrutura do banco de dados do OpenRoute contempla as seguintes tabelas:
 
 
 | Tabela | Finalidade |
-
 |---|---|
-
 | `perfis` | Armazena os perfis de acesso do sistema. |
-
 | `usuarios` | Armazena os usuários cadastrados. |
-
 | `sessoes` | Armazena informações relacionadas às sessões de acesso. |
-
 | `enderecos` | Armazena os endereços utilizados nas entregas, incluindo as coordenadas geográficas. |
-
 | `pedidos` | Armazena os registros internos de entregas. |
-
 | `rotas` | Armazena as rotas cadastradas e calculadas. |
-
 | `restricoes\_operacionais` | Armazena as restrições operacionais associadas às rotas. |
-
 | `rota\_pedidos` | Relaciona as rotas às entregas e registra a sequência de atendimento. |
 
 
-
-\*\*Importante:\*\* a tabela `pedidos` representa registros internos de entregas utilizados na operação do sistema. Ela não representa um fluxo de compras ou pedidos realizados por clientes.
+**Importante:** a tabela `pedidos` representa registros internos de entregas utilizados na operação do sistema. Ela não representa um fluxo de compras ou pedidos realizados por clientes.
 
 
 
@@ -214,7 +204,7 @@ O banco utiliza os perfis `ADM` e `USUARIO`, sendo `USUARIO` o perfil operaciona
 
 
 
-\## 6. Conferir a criação das tabelas
+## 6. Conferir a criação das tabelas
 
 
 
@@ -274,7 +264,7 @@ Esses comandos permitem verificar se as tabelas foram criadas e consultar suas c
 
 
 
-\## 7. Configurar a conexão com o backend
+## 7. Configurar a conexão com o backend
 
 
 
@@ -287,19 +277,12 @@ As principais variáveis são:
 
 
 | Variável | Descrição |
-
 |---|---|
-
 | `DB\_HOST` | Endereço do servidor MySQL. |
-
 | `DB\_PORT` | Porta utilizada pelo servidor MySQL. |
-
 | `DB\_USER` | Usuário utilizado na conexão. |
-
 | `DB\_PASSWORD` | Senha do usuário do banco. |
-
 | `DB\_NAME` | Nome do banco de dados. |
-
 
 
 Exemplo de configuração local:
@@ -326,7 +309,7 @@ Substitua `sua\_senha` pela senha real do usuário configurado no MySQL.
 
 
 
-\*\*Atenção:\*\* esse exemplo apresenta valores de referência. As credenciais devem corresponder à configuração efetiva do servidor instalado no computador.
+**Atenção:** esse exemplo apresenta valores de referência. As credenciais devem corresponder à configuração efetiva do servidor instalado no computador.
 
 
 
@@ -334,7 +317,7 @@ Não compartilhe o arquivo `.env` nem envie senhas ou outras credenciais para o 
 
 
 
-\## 8. Verificar a conexão com o banco
+## 8. Verificar a conexão com o banco
 
 
 
@@ -350,17 +333,17 @@ Caso ocorram erros de conexão, confira:
 
 
 
-\- Se o serviço do MySQL está em execução.
+- Se o serviço do MySQL está em execução.
 
-\- Se o banco `open\_route` existe.
+- Se o banco `open\_route` existe.
 
-\- Se as tabelas necessárias foram criadas.
+- Se as tabelas necessárias foram criadas.
 
-\- Se o endereço e a porta estão corretos.
+- Se o endereço e a porta estão corretos.
 
-\- Se o usuário e a senha estão corretos.
+- Se o usuário e a senha estão corretos.
 
-\- Se as variáveis do arquivo `.env` correspondem à configuração do servidor.
+- Se as variáveis do arquivo `.env` correspondem à configuração do servidor.
 
 
 
@@ -368,7 +351,7 @@ As mensagens de erro apresentadas no terminal do backend podem ajudar a identifi
 
 
 
-\## 9. Encerrar a conexão com o MySQL
+## 9. Encerrar a conexão com o MySQL
 
 
 
@@ -388,7 +371,7 @@ O banco de dados continuará disponível enquanto o serviço do MySQL estiver em
 
 
 
-\## 10. Finalização
+## 10. Finalização
 
 
 

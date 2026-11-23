@@ -1,6 +1,6 @@
 
 
-\# Apresentação
+# Apresentação
 
 
 
@@ -16,7 +16,7 @@ A plataforma integra recursos de gerenciamento de informações, cálculo de rot
 
 
 
-O OpenRoute possui dois perfis de acesso: \*\*ADM\*\*, responsável pelas atividades administrativas do sistema, e \*\*USUARIO\*\*, correspondente ao perfil operacional utilizado pelo motorista.
+O OpenRoute possui dois perfis de acesso: **ADM**, responsável pelas atividades administrativas do sistema, e **USUARIO**, correspondente ao perfil operacional utilizado pelo motorista.
 
 
 

@@ -1,6 +1,6 @@
 
 
-\# Preparação do Ambiente
+# Preparação do Ambiente
 
 
 
@@ -12,9 +12,9 @@ O projeto é dividido em duas aplicações:
 
 
 
-\- \*\*Backend:\*\* desenvolvido em Python, utilizando Flask.
+- **Backend:** desenvolvido em Python, utilizando Flask.
 
-\- \*\*Frontend:\*\* desenvolvido em Angular, utilizando TypeScript.
+- **Frontend:** desenvolvido em Angular, utilizando TypeScript.
 
 
 
@@ -26,29 +26,22 @@ Antes de iniciar a instalação e a configuração das aplicações, é necessá
 
 
 
-\## 1. Programas necessários
+## 1. Programas necessários
 
 
 
 | Programa | Finalidade | Obrigatório |
-
 |---|---|---|
-
 | Git | Obter os repositórios e trabalhar com as branches do projeto. | Sim |
-
 | Python | Executar o backend. | Sim |
-
 | Node.js | Disponibilizar o ambiente de execução do Angular. | Sim |
-
 | npm | Instalar e gerenciar as dependências do frontend. | Sim |
-
 | MySQL Server | Gerenciar o banco de dados utilizado pelo sistema. | Sim |
 
 
 
 
-
-\## 2. Além do git e Python, é necessário Node.js e npm
+## 2. Além do git e Python, é necessário Node.js e npm
 
 
 
@@ -64,17 +57,17 @@ O frontend do OpenRoute utiliza Angular 19.2.
 
 
 
-\### 2.1 Instalação
+### 2.1 Instalação
 
 
 
-1\. Acesse o site oficial: https://nodejs.org/.
+1. Acesse o site oficial: https://nodejs.org/.
 
-2\. Baixe uma versão LTS compatível com Angular 19.2. Recomenda-se Node.js 22 LTS.
+2. Baixe uma versão LTS compatível com Angular 19.2. Recomenda-se Node.js 22 LTS.
 
-3\. Execute o instalador.
+3. Execute o instalador.
 
-4\. Conclua a instalação mantendo as opções recomendadas.
+4. Conclua a instalação mantendo as opções recomendadas.
 
 
 
@@ -82,7 +75,7 @@ O npm será instalado automaticamente junto com o Node.js.
 
 
 
-\### 2.2 Verificação
+### 2.2 Verificação
 
 
 
@@ -114,7 +107,7 @@ Os dois comandos deverão apresentar as versões instaladas.
 
 
 
-\## 3. MySQL Server
+## 3. MySQL Server
 
 
 
@@ -126,21 +119,21 @@ Ele é responsável por armazenar as informações persistentes da aplicação, 
 
 
 
-\### 3.1 Instalação
+### 3.1 Instalação
 
 
 
-1\. Acesse o site oficial: https://dev.mysql.com/downloads/installer/.
+1. Acesse o site oficial: https://dev.mysql.com/downloads/installer/.
 
-2\. Baixe o instalador do MySQL para Windows.
+2. Baixe o instalador do MySQL para Windows.
 
-3\. Execute o instalador.
+3. Execute o instalador.
 
-4\. Selecione a instalação do MySQL Server.
+4. Selecione a instalação do MySQL Server.
 
-5\. Durante a configuração, defina um usuário administrativo e uma senha.
+5. Durante a configuração, defina um usuário administrativo e uma senha.
 
-6\. Conclua a instalação e configure o servidor para iniciar como serviço do Windows.
+6. Conclua a instalação e configure o servidor para iniciar como serviço do Windows.
 
 
 
@@ -152,7 +145,7 @@ Também é possível utilizar o MariaDB, que é compatível com o mecanismo de c
 
 
 
-\### 3.2 Verificação
+### 3.2 Verificação
 
 
 
@@ -176,7 +169,7 @@ Caso o comando não seja reconhecido, verifique se a pasta `bin` da instalação
 
 
 
-\## 4. Ferramentas opcionais
+## 4. Ferramentas opcionais
 
 
 
@@ -184,7 +177,7 @@ Além dos programas obrigatórios, algumas ferramentas podem facilitar o desenvo
 
 
 
-\### 4.1 MySQL Workbench
+### 4.1 MySQL Workbench
 
 
 
@@ -200,7 +193,7 @@ Sua instalação é opcional. As operações com o banco também podem ser reali
 
 
 
-\## 5. Conferência dos programas instalados
+## 5. Conferência dos programas instalados
 
 
 
@@ -208,7 +201,7 @@ Após concluir as instalações, abra o PowerShell e execute os comandos abaixo 
 
 
 
-\### Git
+### Git
 
 
 
@@ -220,7 +213,7 @@ git --version
 
 
 
-\### Python
+### Python
 
 
 
@@ -232,7 +225,7 @@ python --version
 
 
 
-\### pip
+### pip
 
 
 
@@ -244,7 +237,7 @@ python -m pip --version
 
 
 
-\### Node.js
+### Node.js
 
 
 
@@ -256,7 +249,7 @@ node --version
 
 
 
-\### npm
+### npm
 
 
 
@@ -268,7 +261,7 @@ npm --version
 
 
 
-\### MySQL
+### MySQL
 
 
 
@@ -288,7 +281,7 @@ Caso algum comando não seja reconhecido, verifique se o programa foi instalado 
 
 
 
-\## 6. Próximas etapas
+## 6. Próximas etapas
 
 
 
@@ -300,9 +293,9 @@ Os procedimentos seguintes estão separados em documentos específicos:
 
 
 
-\- \*\*Instalação do backend:\*\* apresenta como obter o código da branch correta, criar o ambiente virtual, instalar as dependências, configurar as variáveis de ambiente e executar a API.
+- **Instalação do backend:** apresenta como obter o código da branch correta, criar o ambiente virtual, instalar as dependências, configurar as variáveis de ambiente e executar a API.
 
-\- \*\*Instalação do frontend:\*\* apresenta como obter o código da branch correta, instalar as dependências do Angular, configurar a comunicação com a API e executar a interface.
+- **Instalação do frontend:** apresenta como obter o código da branch correta, instalar as dependências do Angular, configurar a comunicação com a API e executar a interface.
 
 
 

@@ -1,6 +1,6 @@
 
 
-\# Instalação e execução do backend
+# Instalação e execução do backend
 
 
 
@@ -12,7 +12,7 @@ O backend é desenvolvido em Python e utiliza Flask para disponibilizar a API, M
 
 
 
-\## 1. Obter o código do backend
+## 1. Obter o código do backend
 
 
 
@@ -62,7 +62,7 @@ A branch atual deve aparecer com um asterisco ao lado:
 
 ```text
 
-\* backend
+* backend
 
 ```
 
@@ -84,7 +84,7 @@ Entre os arquivos e diretórios esperados estão `app`, `requirements.txt` e `.e
 
 
 
-\## 2. Criar o ambiente virtual
+## 2. Criar o ambiente virtual
 
 
 
@@ -108,7 +108,7 @@ Esse comando cria a pasta `venv`, que armazenará o ambiente virtual do projeto.
 
 
 
-\## 3. Ativar o ambiente virtual
+## 3. Ativar o ambiente virtual
 
 
 
@@ -128,7 +128,7 @@ Após a ativação, o nome `(venv)` deverá aparecer no início da linha do term
 
 
 
-\*\*Caso o PowerShell bloqueie a execução do script\*\*, execute:
+**Caso o PowerShell bloqueie a execução do script**, execute:
 
 
 
@@ -156,7 +156,7 @@ Essa alteração vale somente para a sessão atual do PowerShell.
 
 
 
-\## 4. Atualizar o instalador de pacotes
+## 4. Atualizar o instalador de pacotes
 
 
 
@@ -172,7 +172,7 @@ python -m pip install --upgrade pip
 
 
 
-\## 5. Instalar as dependências do backend
+## 5. Instalar as dependências do backend
 
 
 
@@ -208,7 +208,7 @@ pip list
 
 
 
-\## 6. Configurar as variáveis de ambiente
+## 6. Configurar as variáveis de ambiente
 
 
 
@@ -252,17 +252,17 @@ Entre as configurações previstas no arquivo estão:
 
 
 
-\- \*\*Banco de dados:\*\* endereço do servidor, porta, usuário, senha e nome do banco.
+- **Banco de dados:** endereço do servidor, porta, usuário, senha e nome do banco.
 
-\- \*\*Nominatim:\*\* configurações utilizadas na consulta de endereços e obtenção de coordenadas geográficas.
+- **Nominatim:** configurações utilizadas na consulta de endereços e obtenção de coordenadas geográficas.
 
-\- \*\*OSRM:\*\* endereço do serviço utilizado no cálculo de matrizes e trajetos.
+- **OSRM:** endereço do serviço utilizado no cálculo de matrizes e trajetos.
 
-\- \*\*TomTom:\*\* campo destinado à chave de acesso ao serviço.
+- **TomTom:** campo destinado à chave de acesso ao serviço.
 
-\- \*\*Timeout:\*\* tempo limite de espera para as requisições externas.
+- **Timeout:** tempo limite de espera para as requisições externas.
 
-\- \*\*Administrador:\*\* campos de nome, e-mail e senha previstos no modelo de configuração.
+- **Administrador:** campos de nome, e-mail e senha previstos no modelo de configuração.
 
 
 
@@ -271,22 +271,17 @@ Para a configuração do banco de dados, confira especialmente:
 
 
 | Variável | Valor de referência |
-
 |---|---|
-
 | `DB\_HOST` | `localhost` |
-
 | `DB\_PORT` | `3307` |
-
 | `DB\_NAME` | `open\_route` |
-
 
 
 Os valores de usuário e senha devem corresponder às credenciais configuradas no MySQL instalado no computador.
 
 
 
-\*\*Atenção:\*\* a porta `3307` é a porta de referência presente no modelo de configuração do projeto. Caso o MySQL esteja utilizando outra porta, ajuste a variável `DB\_PORT` para corresponder à porta real do servidor.
+**Atenção:** a porta `3307` é a porta de referência presente no modelo de configuração do projeto. Caso o MySQL esteja utilizando outra porta, ajuste a variável `DB\_PORT` para corresponder à porta real do servidor.
 
 
 
@@ -294,7 +289,7 @@ Não compartilhe o arquivo `.env`, pois ele pode conter senhas e chaves de acess
 
 
 
-\## 7. Preparar o banco de dados
+## 7. Preparar o banco de dados
 
 
 
@@ -302,7 +297,7 @@ O backend utiliza o MySQL para armazenar as informações do sistema.
 
 
 
-\### 7.1. Iniciar o servidor MySQL
+### 7.1. Iniciar o servidor MySQL
 
 
 
@@ -316,7 +311,7 @@ Antes de configurar o banco, verifique se o serviço do MySQL está em execuçã
 
 ```powershell
 
-Get-Service \*mysql\*
+Get-Service *mysql*
 
 ```
 
@@ -326,7 +321,7 @@ Se o serviço estiver parado, inicie-o pelo aplicativo de gerenciamento de servi
 
 
 
-\### 7.2. Criar o banco de dados
+### 7.2. Criar o banco de dados
 
 
 
@@ -386,7 +381,7 @@ EXIT;
 
 
 
-\### 7.3. Criar as tabelas do sistema
+### 7.3. Criar as tabelas do sistema
 
 
 
@@ -398,7 +393,7 @@ A criação do banco de dados não cria automaticamente as tabelas necessárias 
 
 
 
-\*\*Atenção:\*\* o repositório da branch `backend` utilizado como referência nesta documentação não disponibiliza um script completo de criação inicial de todas as tabelas. Portanto, não considere o banco pronto apenas por executar o comando `CREATE DATABASE`.
+**Atenção:** o repositório da branch `backend` utilizado como referência nesta documentação não disponibiliza um script completo de criação inicial de todas as tabelas. Portanto, não considere o banco pronto apenas por executar o comando `CREATE DATABASE`.
 
 
 
@@ -410,7 +405,7 @@ Não utilize scripts de migração de versões antigas como se fossem scripts de
 
 
 
-\## 8. Iniciar o backend
+## 8. Iniciar o backend
 
 
 
@@ -458,7 +453,7 @@ Ctrl + C
 
 
 
-\## 9. Verificar se a API está funcionando
+## 9. Verificar se a API está funcionando
 
 
 
@@ -494,11 +489,11 @@ A resposta deve ser apresentada no terminal caso a rota esteja acessível.
 
 
 
-\*\*Importante:\*\* conseguir acessar a rota de verificação não significa, por si só, que todas as funcionalidades estão operacionais. As operações que dependem do banco de dados e dos serviços externos também exigem que essas dependências estejam configuradas e disponíveis.
+**Importante:** conseguir acessar a rota de verificação não significa, por si só, que todas as funcionalidades estão operacionais. As operações que dependem do banco de dados e dos serviços externos também exigem que essas dependências estejam configuradas e disponíveis.
 
 
 
-\## 10. Executar os testes
+## 10. Executar os testes
 
 
 
@@ -526,11 +521,11 @@ Caso não existam testes automatizados no diretório do projeto, o comando poder
 
 
 
-\## 11. Problemas comuns
+## 11. Problemas comuns
 
 
 
-\### O comando `python` não é reconhecido
+### O comando `python` não é reconhecido
 
 
 
@@ -550,7 +545,7 @@ python --version
 
 
 
-\### O ambiente virtual não ativa
+### O ambiente virtual não ativa
 
 
 
@@ -578,7 +573,7 @@ Depois, tente novamente:
 
 
 
-\### O comando `pip install -r requirements.txt` apresenta erro
+### O comando `pip install -r requirements.txt` apresenta erro
 
 
 
@@ -610,7 +605,7 @@ Test-Path .\\requirements.txt
 
 
 
-\### A conexão com o banco de dados falha
+### A conexão com o banco de dados falha
 
 
 
@@ -618,19 +613,19 @@ Verifique:
 
 
 
-\- Se o servidor MySQL está em execução.
+- Se o servidor MySQL está em execução.
 
-\- Se o banco `open\_route` foi criado.
+- Se o banco `open\_route` foi criado.
 
-\- Se a porta configurada em `DB\_PORT` corresponde à porta utilizada pelo servidor.
+- Se a porta configurada em `DB\_PORT` corresponde à porta utilizada pelo servidor.
 
-\- Se o usuário e a senha configurados no `.env` estão corretos.
+- Se o usuário e a senha configurados no `.env` estão corretos.
 
-\- Se as tabelas necessárias foram criadas a partir do esquema correspondente à versão atual do projeto.
+- Se as tabelas necessárias foram criadas a partir do esquema correspondente à versão atual do projeto.
 
 
 
-\### A API não inicia
+### A API não inicia
 
 
 
@@ -638,19 +633,19 @@ Confira se:
 
 
 
-\- O ambiente virtual está ativado.
+- O ambiente virtual está ativado.
 
-\- As dependências foram instaladas.
+- As dependências foram instaladas.
 
-\- O arquivo `.env` foi criado e está preenchido.
+- O arquivo `.env` foi criado e está preenchido.
 
-\- O comando foi executado na pasta raiz do backend.
+- O comando foi executado na pasta raiz do backend.
 
-\- A porta `5000` não está sendo utilizada por outro processo.
+- A porta `5000` não está sendo utilizada por outro processo.
 
 
 
-\### A API inicia, mas uma funcionalidade apresenta erro
+### A API inicia, mas uma funcionalidade apresenta erro
 
 
 
@@ -658,7 +653,7 @@ Verifique a mensagem apresentada no terminal em que o Flask está sendo executad
 
 
 
-\## 12. Finalização
+## 12. Finalização
 
 
 

@@ -1,10 +1,10 @@
 
 
-\# Fluxo de Otimização de Rotas
+# Fluxo de Otimização de Rotas
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -16,7 +16,7 @@ Para isso, o sistema utiliza informações dos destinos cadastrados e considera 
 
 
 
-\## Etapas do processo
+## Etapas do processo
 
 
 
@@ -24,19 +24,19 @@ De forma geral, o fluxo de otimização envolve as seguintes etapas:
 
 
 
-1\. \*\*Recebimento dos destinos:\*\* o sistema recebe as informações dos destinos que farão parte da operação.
+1. **Recebimento dos destinos:** o sistema recebe as informações dos destinos que farão parte da operação.
 
-2\. \*\*Preparação dos dados geográficos:\*\* os endereços precisam ser associados a coordenadas geográficas para que possam ser utilizados nos cálculos.
+2. **Preparação dos dados geográficos:** os endereços precisam ser associados a coordenadas geográficas para que possam ser utilizados nos cálculos.
 
-3\. \*\*Obtenção das informações de deslocamento:\*\* serviços externos podem ser utilizados para obter informações sobre distâncias e trajetos entre os pontos.
+3. **Obtenção das informações de deslocamento:** serviços externos podem ser utilizados para obter informações sobre distâncias e trajetos entre os pontos.
 
-4\. \*\*Otimização da sequência:\*\* o sistema processa os dados disponíveis para determinar uma sequência de atendimento dos destinos.
+4. **Otimização da sequência:** o sistema processa os dados disponíveis para determinar uma sequência de atendimento dos destinos.
 
-5\. \*\*Apresentação do resultado:\*\* a sequência e os trajetos calculados são disponibilizados para visualização na aplicação.
+5. **Apresentação do resultado:** a sequência e os trajetos calculados são disponibilizados para visualização na aplicação.
 
 
 
-\## Serviços envolvidos
+## Serviços envolvidos
 
 
 
@@ -44,15 +44,15 @@ O processo pode utilizar diferentes serviços e recursos:
 
 
 
-\- \*\*Nominatim:\*\* serviço de geocodificação utilizado para converter endereços em coordenadas geográficas.
+- **Nominatim:** serviço de geocodificação utilizado para converter endereços em coordenadas geográficas.
 
-\- \*\*OSRM:\*\* serviço de roteamento utilizado para obter informações sobre trajetos e deslocamentos.
+- **OSRM:** serviço de roteamento utilizado para obter informações sobre trajetos e deslocamentos.
 
-\- \*\*Algoritmos de otimização:\*\* responsáveis por auxiliar na definição da sequência de atendimento dos destinos.
+- **Algoritmos de otimização:** responsáveis por auxiliar na definição da sequência de atendimento dos destinos.
 
 
 
-\## Resultado esperado
+## Resultado esperado
 
 
 

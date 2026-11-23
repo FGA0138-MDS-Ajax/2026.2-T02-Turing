@@ -1,10 +1,10 @@
 
 
-\# API de Pedidos
+# API de Pedidos
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -16,7 +16,7 @@ O gerenciamento de pedidos está previsto no projeto, mas os endpoints completos
 
 
 
-\## Estrutura dos pedidos
+## Estrutura dos pedidos
 
 
 
@@ -25,36 +25,24 @@ A tabela `pedidos`, definida no banco de dados, possui os seguintes campos:
 
 
 | Campo | Descrição |
-
 |---|---|
-
 | id | Identificador do pedido. |
-
 | endereco\_id | Identificador do endereço associado ao pedido. |
-
 | criado\_por\_id | Identificador do usuário responsável pela criação, quando informado. |
-
 | descricao | Descrição adicional do pedido. |
-
 | data\_entrega | Data prevista para a entrega. |
-
 | janela\_entrega\_inicio | Horário inicial permitido para a entrega. |
-
 | janela\_entrega\_fim | Horário final permitido para a entrega. |
-
 | status | Situação atual do pedido. |
-
 | criado\_em | Data e horário de criação do registro. |
-
 | atualizado\_em | Data e horário da última atualização. |
-
 
 
 As coordenadas geográficas não precisam ser preenchidas diretamente no pedido. Elas pertencem ao endereço associado e são obtidas pelo processo de geocodificação.
 
 
 
-\## Status dos pedidos
+## Status dos pedidos
 
 
 
@@ -62,23 +50,23 @@ O modelo de dados prevê os seguintes estados:
 
 
 
-\- `PENDENTE`: pedido ainda não planejado em uma rota.
+- `PENDENTE`: pedido ainda não planejado em uma rota.
 
-\- `PLANEJADO`: pedido associado ao planejamento de uma rota.
+- `PLANEJADO`: pedido associado ao planejamento de uma rota.
 
-\- `SAIU\_PARA\_ENTREGA`: pedido cuja entrega foi iniciada.
+- `SAIU\_PARA\_ENTREGA`: pedido cuja entrega foi iniciada.
 
-\- `EM\_ANDAMENTO`: entrega em andamento.
+- `EM\_ANDAMENTO`: entrega em andamento.
 
-\- `ENTREGUE`: entrega concluída.
+- `ENTREGUE`: entrega concluída.
 
-\- `FALHOU`: entrega não realizada.
+- `FALHOU`: entrega não realizada.
 
-\- `CANCELADO`: pedido cancelado.
+- `CANCELADO`: pedido cancelado.
 
 
 
-\## Relação com a API de rotas
+## Relação com a API de rotas
 
 
 
@@ -90,19 +78,19 @@ A API de rotas recebe os identificadores dos pedidos que devem fazer parte do pl
 
 
 
-\## Endpoints disponíveis
+## Endpoints disponíveis
 
 
 
-\- Cadastro de pedidos.
+- Cadastro de pedidos.
 
-\- Listagem de pedidos.
+- Listagem de pedidos.
 
-\- Edição de pedidos.
+- Edição de pedidos.
 
 
 
-\## Observação
+## Observação
 
 
 

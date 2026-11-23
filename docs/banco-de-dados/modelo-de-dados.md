@@ -1,8 +1,8 @@
-\# Modelo de Dados
+# Modelo de Dados
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -14,7 +14,7 @@ A estrutura é organizada em tabelas relacionadas entre si por meio de chaves pr
 
 
 
-\## Tabelas do banco de dados
+## Tabelas do banco de dados
 
 
 
@@ -22,7 +22,7 @@ O modelo de dados contempla as seguintes tabelas:
 
 
 
-\### 1. perfis
+### 1. perfis
 
 
 
@@ -34,17 +34,17 @@ Principais campos:
 
 
 
-\- `id`: identificador do perfil.
+- `id`: identificador do perfil.
 
-\- `codigo`: código do perfil, como ADM ou USUARIO.
+- `codigo`: código do perfil, como ADM ou USUARIO.
 
-\- `nome`: nome do perfil.
+- `nome`: nome do perfil.
 
-\- `descricao`: descrição das permissões ou finalidade do perfil.
+- `descricao`: descrição das permissões ou finalidade do perfil.
 
 
 
-\### 2. usuarios
+### 2. usuarios
 
 
 
@@ -56,29 +56,29 @@ Principais campos:
 
 
 
-\- `id`: identificador do usuário.
+- `id`: identificador do usuário.
 
-\- `perfil\_id`: identificador do perfil associado.
+- `perfil\_id`: identificador do perfil associado.
 
-\- `nome`: nome do usuário.
+- `nome`: nome do usuário.
 
-\- `email`: endereço de e-mail.
+- `email`: endereço de e-mail.
 
-\- `senha\_hash`: representação protegida da senha.
+- `senha\_hash`: representação protegida da senha.
 
-\- `telefone`: telefone do usuário.
+- `telefone`: telefone do usuário.
 
-\- `ativo`: indica se a conta está ativa.
+- `ativo`: indica se a conta está ativa.
 
-\- `ultimo\_acesso\_em`: data e horário do último acesso.
+- `ultimo\_acesso\_em`: data e horário do último acesso.
 
-\- `criado\_em`: data de criação da conta.
+- `criado\_em`: data de criação da conta.
 
-\- `atualizado\_em`: data da última atualização.
+- `atualizado\_em`: data da última atualização.
 
 
 
-\### 3. sessoes
+### 3. sessoes
 
 
 
@@ -90,27 +90,27 @@ Principais campos:
 
 
 
-\- `id`: identificador da sessão.
+- `id`: identificador da sessão.
 
-\- `usuario\_id`: identificador do usuário associado.
+- `usuario\_id`: identificador do usuário associado.
 
-\- `token\_hash`: representação protegida do token da sessão.
+- `token\_hash`: representação protegida do token da sessão.
 
-\- `ip\_origem`: endereço IP de origem.
+- `ip\_origem`: endereço IP de origem.
 
-\- `user\_agent`: informações sobre o navegador ou dispositivo.
+- `user\_agent`: informações sobre o navegador ou dispositivo.
 
-\- `atividade\_em`: data e horário da última atividade.
+- `atividade\_em`: data e horário da última atividade.
 
-\- `expira\_em`: data e horário de expiração.
+- `expira\_em`: data e horário de expiração.
 
-\- `revogada\_em`: data e horário da revogação, quando existente.
+- `revogada\_em`: data e horário da revogação, quando existente.
 
-\- `criada\_em`: data de criação da sessão.
+- `criada\_em`: data de criação da sessão.
 
 
 
-\### 4. enderecos
+### 4. enderecos
 
 
 
@@ -122,35 +122,35 @@ Principais campos:
 
 
 
-\- `id`: identificador do endereço.
+- `id`: identificador do endereço.
 
-\- `logradouro`: rua ou avenida.
+- `logradouro`: rua ou avenida.
 
-\- `numero`: número do imóvel.
+- `numero`: número do imóvel.
 
-\- `complemento`: complemento do endereço.
+- `complemento`: complemento do endereço.
 
-\- `bairro`: bairro.
+- `bairro`: bairro.
 
-\- `cidade`: cidade.
+- `cidade`: cidade.
 
-\- `estado`: unidade federativa.
+- `estado`: unidade federativa.
 
-\- `cep`: Código de Endereçamento Postal.
+- `cep`: Código de Endereçamento Postal.
 
-\- `pais`: país do endereço.
+- `pais`: país do endereço.
 
-\- `referencia`: informação adicional para localização.
+- `referencia`: informação adicional para localização.
 
-\- `latitude`: coordenada geográfica de latitude.
+- `latitude`: coordenada geográfica de latitude.
 
-\- `longitude`: coordenada geográfica de longitude.
+- `longitude`: coordenada geográfica de longitude.
 
-\- `validacao\_status`: situação da validação do endereço.
+- `validacao\_status`: situação da validação do endereço.
 
-\- `provedor\_geocodificacao`: serviço utilizado para obter as coordenadas.
+- `provedor\_geocodificacao`: serviço utilizado para obter as coordenadas.
 
-\- `geocodificado\_em`: data e horário da geocodificação.
+- `geocodificado\_em`: data e horário da geocodificação.
 
 
 
@@ -158,7 +158,7 @@ As coordenadas são obtidas pelo processo de geocodificação do backend a parti
 
 
 
-\### 5. pedidos
+### 5. pedidos
 
 
 
@@ -170,25 +170,25 @@ Principais campos:
 
 
 
-\- `id`: identificador do pedido.
+- `id`: identificador do pedido.
 
-\- `endereco\_id`: identificador do endereço associado.
+- `endereco\_id`: identificador do endereço associado.
 
-\- `criado\_por\_id`: identificador do usuário responsável pela criação, quando informado.
+- `criado\_por\_id`: identificador do usuário responsável pela criação, quando informado.
 
-\- `descricao`: descrição adicional do pedido.
+- `descricao`: descrição adicional do pedido.
 
-\- `data\_entrega`: data prevista para a entrega.
+- `data\_entrega`: data prevista para a entrega.
 
-\- `janela\_entrega\_inicio`: horário inicial permitido para a entrega.
+- `janela\_entrega\_inicio`: horário inicial permitido para a entrega.
 
-\- `janela\_entrega\_fim`: horário final permitido para a entrega.
+- `janela\_entrega\_fim`: horário final permitido para a entrega.
 
-\- `status`: situação atual do pedido.
+- `status`: situação atual do pedido.
 
-\- `criado\_em`: data de criação do registro.
+- `criado\_em`: data de criação do registro.
 
-\- `atualizado\_em`: data da última atualização.
+- `atualizado\_em`: data da última atualização.
 
 
 
@@ -196,23 +196,23 @@ O status do pedido pode assumir os seguintes valores:
 
 
 
-\- `PENDENTE`
+- `PENDENTE`
 
-\- `PLANEJADO`
+- `PLANEJADO`
 
-\- `SAIU\_PARA\_ENTREGA`
+- `SAIU\_PARA\_ENTREGA`
 
-\- `EM\_ANDAMENTO`
+- `EM\_ANDAMENTO`
 
-\- `ENTREGUE`
+- `ENTREGUE`
 
-\- `FALHOU`
+- `FALHOU`
 
-\- `CANCELADO`
+- `CANCELADO`
 
 
 
-\### 6. rotas
+### 6. rotas
 
 
 
@@ -224,31 +224,31 @@ Principais campos:
 
 
 
-\- `id`: identificador da rota.
+- `id`: identificador da rota.
 
-\- `usuario\_id`: identificador do usuário associado à rota.
+- `usuario\_id`: identificador do usuário associado à rota.
 
-\- `criada\_por\_id`: identificador do usuário responsável pela criação, quando informado.
+- `criada\_por\_id`: identificador do usuário responsável pela criação, quando informado.
 
-\- `nome`: nome da rota.
+- `nome`: nome da rota.
 
-\- `data\_execucao`: data prevista para execução.
+- `data\_execucao`: data prevista para execução.
 
-\- `status`: situação atual da rota.
+- `status`: situação atual da rota.
 
-\- `distancia\_total\_metros`: distância total calculada, em metros.
+- `distancia\_total\_metros`: distância total calculada, em metros.
 
-\- `tempo\_estimado\_segundos`: tempo estimado de execução, em segundos.
+- `tempo\_estimado\_segundos`: tempo estimado de execução, em segundos.
 
-\- `geometria`: representação geográfica do trajeto.
+- `geometria`: representação geográfica do trajeto.
 
-\- `provedor\_calculo`: serviço utilizado no cálculo.
+- `provedor\_calculo`: serviço utilizado no cálculo.
 
-\- `calculada\_em`: data e horário do cálculo.
+- `calculada\_em`: data e horário do cálculo.
 
-\- `criada\_em`: data de criação do registro.
+- `criada\_em`: data de criação do registro.
 
-\- `atualizada\_em`: data da última atualização.
+- `atualizada\_em`: data da última atualização.
 
 
 
@@ -256,19 +256,19 @@ O status da rota pode assumir os valores:
 
 
 
-\- `RASCUNHO`
+- `RASCUNHO`
 
-\- `CALCULADA`
+- `CALCULADA`
 
-\- `EM\_ANDAMENTO`
+- `EM\_ANDAMENTO`
 
-\- `CONCLUIDA`
+- `CONCLUIDA`
 
-\- `CANCELADA`
+- `CANCELADA`
 
 
 
-\### 7. restricoes\_operacionais
+### 7. restricoes\_operacionais
 
 
 
@@ -280,23 +280,23 @@ Principais campos:
 
 
 
-\- `id`: identificador da restrição.
+- `id`: identificador da restrição.
 
-\- `rota\_id`: identificador da rota associada.
+- `rota\_id`: identificador da rota associada.
 
-\- `janela\_inicio`: horário inicial da restrição.
+- `janela\_inicio`: horário inicial da restrição.
 
-\- `janela\_fim`: horário final da restrição.
+- `janela\_fim`: horário final da restrição.
 
-\- `observacoes`: informações adicionais.
+- `observacoes`: informações adicionais.
 
-\- `criada\_em`: data de criação do registro.
+- `criada\_em`: data de criação do registro.
 
-\- `atualizada\_em`: data da última atualização.
+- `atualizada\_em`: data da última atualização.
 
 
 
-\### 8. rota\_pedidos
+### 8. rota\_pedidos
 
 
 
@@ -308,23 +308,23 @@ Principais campos:
 
 
 
-\- `id`: identificador do registro.
+- `id`: identificador do registro.
 
-\- `rota\_id`: identificador da rota.
+- `rota\_id`: identificador da rota.
 
-\- `pedido\_id`: identificador do pedido.
+- `pedido\_id`: identificador do pedido.
 
-\- `ordem\_parada`: posição do pedido na sequência de atendimento.
+- `ordem\_parada`: posição do pedido na sequência de atendimento.
 
-\- `chegada\_prevista`: horário previsto de chegada ao destino.
+- `chegada\_prevista`: horário previsto de chegada ao destino.
 
-\- `saida\_prevista`: horário previsto de saída do destino.
+- `saida\_prevista`: horário previsto de saída do destino.
 
-\- `adicionada\_em`: data de inclusão do pedido na rota.
+- `adicionada\_em`: data de inclusão do pedido na rota.
 
 
 
-\## Relacionamentos entre as tabelas
+## Relacionamentos entre as tabelas
 
 
 
@@ -332,23 +332,23 @@ Os relacionamentos são estabelecidos por meio de chaves estrangeiras:
 
 
 
-\- \*\*perfis e usuarios:\*\* um perfil pode estar associado a vários usuários, enquanto cada usuário possui um perfil.
+- **perfis e usuarios:** um perfil pode estar associado a vários usuários, enquanto cada usuário possui um perfil.
 
-\- \*\*usuarios e sessoes:\*\* um usuário pode possuir várias sessões de acesso.
+- **usuarios e sessoes:** um usuário pode possuir várias sessões de acesso.
 
-\- \*\*enderecos e pedidos:\*\* um endereço pode estar associado a vários pedidos, enquanto cada pedido possui um endereço.
+- **enderecos e pedidos:** um endereço pode estar associado a vários pedidos, enquanto cada pedido possui um endereço.
 
-\- \*\*usuarios e pedidos:\*\* um usuário pode ser associado à criação de vários pedidos.
+- **usuarios e pedidos:** um usuário pode ser associado à criação de vários pedidos.
 
-\- \*\*usuarios e rotas:\*\* um usuário pode estar associado a várias rotas, tanto como usuário responsável pela rota quanto como responsável por sua criação.
+- **usuarios e rotas:** um usuário pode estar associado a várias rotas, tanto como usuário responsável pela rota quanto como responsável por sua criação.
 
-\- \*\*rotas e restricoes\_operacionais:\*\* uma rota pode possuir várias restrições operacionais.
+- **rotas e restricoes\_operacionais:** uma rota pode possuir várias restrições operacionais.
 
-\- \*\*rotas e pedidos:\*\* o relacionamento é realizado pela tabela intermediária `rota\_pedidos`, que registra os pedidos associados a cada rota e a ordem de atendimento.
+- **rotas e pedidos:** o relacionamento é realizado pela tabela intermediária `rota\_pedidos`, que registra os pedidos associados a cada rota e a ordem de atendimento.
 
 
 
-\## Integridade dos dados
+## Integridade dos dados
 
 
 

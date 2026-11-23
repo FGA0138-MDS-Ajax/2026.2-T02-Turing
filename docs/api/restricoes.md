@@ -1,8 +1,8 @@
-\# API de Restrições
+# API de Restrições
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -10,7 +10,7 @@ A API de restrições operacionais tem como finalidade permitir o gerenciamento 
 
 
 
-\## Estrutura das restrições
+## Estrutura das restrições
 
 
 
@@ -19,22 +19,15 @@ O modelo de restrição contempla informações como:
 
 
 | Campo | Descrição |
-
 |---|---|
-
 | `id` | Identificador da restrição. |
-
 | `rota\_id` | Identificador da rota à qual a restrição está associada. |
-
 | `janela\_inicio` | Horário inicial da janela permitida. |
-
 | `janela\_fim` | Horário final da janela permitida. |
-
 | `observacoes` | Informações adicionais sobre a restrição. |
 
 
-
-\## Operações previstas
+## Operações previstas
 
 
 
@@ -42,19 +35,19 @@ A interface do frontend contempla chamadas para as seguintes operações:
 
 
 
-\- \*\*Cadastrar restrição:\*\* informar a rota associada, os horários permitidos e as observações.
+- **Cadastrar restrição:** informar a rota associada, os horários permitidos e as observações.
 
-\- \*\*Consultar restrições:\*\* obter as restrições cadastradas.
+- **Consultar restrições:** obter as restrições cadastradas.
 
-\- \*\*Atualizar restrição:\*\* modificar os dados de uma restrição existente.
+- **Atualizar restrição:** modificar os dados de uma restrição existente.
 
-\- \*\*Excluir restrição:\*\* remover uma restrição cadastrada.
-
-
+- **Excluir restrição:** remover uma restrição cadastrada.
 
 
 
-\## Relação com a otimização de rotas
+
+
+## Relação com a otimização de rotas
 
 
 

@@ -1,10 +1,10 @@
 
 
-\# API de Rotas
+# API de Rotas
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -16,95 +16,89 @@ O sistema utiliza os destinos e pedidos informados para organizar a sequência d
 
 
 
-\## Endpoints disponíveis
+## Endpoints disponíveis
 
 
 
 | Método HTTP | Endpoint | Descrição |
-
 |---|---|---|
-
 | POST | `/calcular-rota` | Calcula uma sequência otimizada para os destinos recebidos. |
-
 | POST | `/rotas/` | Cadastra uma rota no banco de dados. |
-
 | GET | `/rotas/{rota\_id}` | Consulta uma rota pelo seu identificador. |
-
 | GET | `/health` | Verifica se a API está funcionando. |
 
 
-
-\## Detalhamento dos endpoints
-
-
-
-\### 1. Calcular rota
+## Detalhamento dos endpoints
 
 
 
-\- \*\*Método:\*\* POST
-
-\- \*\*Endpoint:\*\* `/calcular-rota`
-
-\- \*\*Descrição:\*\* recebe uma lista de destinos e calcula uma sequência otimizada de atendimento.
-
-\- \*\*Dados de entrada:\*\* lista de destinos contendo suas informações e coordenadas geográficas.
-
-\- \*\*Validação:\*\* exige pelo menos dois destinos e coordenadas de latitude e longitude para cada ponto.
-
-\- \*\*Processamento:\*\* utiliza informações de deslocamento do OSRM e o algoritmo de otimização implementado no backend.
-
-\- \*\*Alternativa:\*\* caso o OSRM apresente falha, o sistema utiliza distâncias calculadas pela fórmula de Haversine.
-
-\- \*\*Resposta:\*\* informações relacionadas à rota calculada.
+### 1. Calcular rota
 
 
 
-\### 2. Cadastrar rota
+- **Método:** POST
+
+- **Endpoint:** `/calcular-rota`
+
+- **Descrição:** recebe uma lista de destinos e calcula uma sequência otimizada de atendimento.
+
+- **Dados de entrada:** lista de destinos contendo suas informações e coordenadas geográficas.
+
+- **Validação:** exige pelo menos dois destinos e coordenadas de latitude e longitude para cada ponto.
+
+- **Processamento:** utiliza informações de deslocamento do OSRM e o algoritmo de otimização implementado no backend.
+
+- **Alternativa:** caso o OSRM apresente falha, o sistema utiliza distâncias calculadas pela fórmula de Haversine.
+
+- **Resposta:** informações relacionadas à rota calculada.
 
 
 
-\- \*\*Método:\*\* POST
-
-\- \*\*Endpoint:\*\* `/rotas/`
-
-\- \*\*Descrição:\*\* recebe os dados de uma rota e solicita ao repositório seu armazenamento no banco de dados.
-
-\- \*\*Resposta de sucesso:\*\* HTTP 201.
+### 2. Cadastrar rota
 
 
 
-\### 3. Consultar rota
+- **Método:** POST
+
+- **Endpoint:** `/rotas/`
+
+- **Descrição:** recebe os dados de uma rota e solicita ao repositório seu armazenamento no banco de dados.
+
+- **Resposta de sucesso:** HTTP 201.
 
 
 
-\- \*\*Método:\*\* GET
-
-\- \*\*Endpoint:\*\* `/rotas/{rota\_id}`
-
-\- \*\*Descrição:\*\* consulta uma rota pelo identificador informado.
-
-\- \*\*Resposta de sucesso:\*\* HTTP 200.
-
-\- \*\*Rota não encontrada:\*\* HTTP 404.
+### 3. Consultar rota
 
 
 
-\### 4. Verificar funcionamento da API
+- **Método:** GET
+
+- **Endpoint:** `/rotas/{rota\_id}`
+
+- **Descrição:** consulta uma rota pelo identificador informado.
+
+- **Resposta de sucesso:** HTTP 200.
+
+- **Rota não encontrada:** HTTP 404.
 
 
 
-\- \*\*Método:\*\* GET
-
-\- \*\*Endpoint:\*\* `/health`
-
-\- \*\*Descrição:\*\* verifica se a API está em funcionamento.
-
-\- \*\*Resposta:\*\* informa o estado da aplicação.
+### 4. Verificar funcionamento da API
 
 
 
-\## Algoritmo de otimização
+- **Método:** GET
+
+- **Endpoint:** `/health`
+
+- **Descrição:** verifica se a API está em funcionamento.
+
+- **Resposta:** informa o estado da aplicação.
+
+
+
+## Algoritmo de otimização
 
 
 
@@ -116,7 +110,7 @@ A implementação contempla a heurística do vizinho mais próximo e uma etapa d
 
 
 
-\## Integração com serviços externos
+## Integração com serviços externos
 
 
 
@@ -132,7 +126,7 @@ O TomTom aparece como uma possibilidade de integração futura, mas não está i
 
 
 
-\## Dados armazenados
+## Dados armazenados
 
 
 
@@ -140,25 +134,25 @@ A estrutura de uma rota contempla informações como:
 
 
 
-\- Identificador da rota.
+- Identificador da rota.
 
-\- Usuário associado.
+- Usuário associado.
 
-\- Data de execução.
+- Data de execução.
 
-\- Status da rota.
+- Status da rota.
 
-\- Distância total.
+- Distância total.
 
-\- Tempo estimado.
+- Tempo estimado.
 
-\- Geometria do trajeto.
+- Geometria do trajeto.
 
-\- Provedor utilizado no cálculo.
+- Provedor utilizado no cálculo.
 
 
 
-\## Observações
+## Observações
 
 
 

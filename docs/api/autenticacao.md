@@ -1,10 +1,10 @@
 
 
-\# API de Autenticação
+# API de Autenticação
 
 
 
-\## Visão geral
+## Visão geral
 
 
 
@@ -12,11 +12,11 @@ A API de autenticação é responsável por controlar o acesso dos usuários ao 
 
 
 
-O sistema possui dois perfis de acesso: \*\*ADM\*\*, destinado às atividades administrativas, e \*\*USUARIO\*\*, correspondente ao perfil operacional utilizado pelo motorista.
+O sistema possui dois perfis de acesso: **ADM**, destinado às atividades administrativas, e **USUARIO**, correspondente ao perfil operacional utilizado pelo motorista.
 
 
 
-\## Funcionalidades
+## Funcionalidades
 
 
 
@@ -24,15 +24,15 @@ A autenticação permite:
 
 
 
-\- Realizar o acesso ao sistema por meio das credenciais do usuário.
+- Realizar o acesso ao sistema por meio das credenciais do usuário.
 
-\- Identificar o usuário autenticado.
+- Identificar o usuário autenticado.
 
-\- Controlar o acesso conforme o perfil associado à conta.
+- Controlar o acesso conforme o perfil associado à conta.
 
 
 
-\## Comunicação com o backend
+## Comunicação com o backend
 
 
 
