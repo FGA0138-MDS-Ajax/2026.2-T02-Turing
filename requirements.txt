@@ -1,10 +1,10 @@
-
-fastapi
-uvicorn
+flask
+flask-cors
 pydantic
-ortools
 pytest
 pymysql
 sqlalchemy
 python-dotenv
 alembic
+requests
+email-validator

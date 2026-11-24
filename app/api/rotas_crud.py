@@ -1,18 +1,60 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.schemas.rota import RotaCreate, RotaResponse
+
+from flask import Blueprint, jsonify, abort
+from sqlalchemy.orm import selectinload
+
+from app.api.autenticacao import ExigirUsuarioOperacional
+from app.db.session import GetDb
+from app.models.rota import RotaModel
 from app.repositories import rota_repo
+from app.schemas.rota import RotaResponse
 
-router = APIRouter(prefix="/rotas", tags=["Rotas"])
 
-@router.post("/", response_model=RotaResponse, status_code=201)
-def salvar_rota(rota: RotaCreate, db: Session = Depends(get_db)):
-    return rota_repo.criar_rota(db, rota)
+rotas_crud_bp = Blueprint(
+    "rotas_crud",
+    __name__,
+    url_prefix="/rotas"
+)
 
-@router.get("/{rota_id}", response_model=RotaResponse)
-def obter_rota(rota_id: int, db: Session = Depends(get_db)):
-    rota = rota_repo.buscar_rota_por_id(db, rota_id)
-    if not rota:
-        raise HTTPException(status_code=404, detail="Rota não encontrada")
-    return rota
+
+def _Serializar(rota):
+    return RotaResponse.model_validate(rota).model_dump(
+        mode="json"
+    )
+
+
+@rotas_crud_bp.get("/", strict_slashes=False)
+def ListarRotas():
+    usuario = ExigirUsuarioOperacional()
+
+    db = GetDb()
+
+    rotas = (
+        db.query(RotaModel)
+        .options(selectinload(RotaModel.enderecos))
+        .filter(RotaModel.usuario_id == usuario.id)
+        .order_by(RotaModel.criada_em.desc(), RotaModel.id.desc())
+        .all()
+    )
+
+    return jsonify([
+        _Serializar(rota)
+        for rota in rotas
+    ])
+
+
+@rotas_crud_bp.get("/<int:rotaId>")
+def ObterRota(rotaId):
+    usuario = ExigirUsuarioOperacional()
+
+    rota = rota_repo.BuscarRotaPorId(
+        GetDb(),
+        rotaId
+    )
+
+    if rota is None or rota.usuario_id != usuario.id:
+        abort(
+            404,
+            description="Rota não encontrada."
+        )
+
+    return jsonify(_Serializar(rota))

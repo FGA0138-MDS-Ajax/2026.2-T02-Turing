@@ -1,0 +1,667 @@
+
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaAtiva"
+  rotaLogo="/"
+  (abaSelecionada)="abaAtiva = $event"
+></app-navbar>
+
+<main class="conteudo">
+
+  <!-- CABECALHO -->
+
+  <div class="cabecalho-pagina">
+    <div>
+      <h1>Planejamento de rotas</h1>
+      <p class="descricao">
+        Cadastre seus endereços, selecione as paradas
+        e calcule a melhor rota para suas entregas.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="botao botao-primario"
+      (click)="abrirCadastro()"
+    >
+      + Novo endereço
+    </button>
+  </div>
+
+  <!-- MENSAGEM DE SUCESSO -->
+
+  <div
+    *ngIf="mensagemSucesso"
+    class="aviso aviso-sucesso"
+    role="status"
+  >
+    {{ mensagemSucesso }}
+  </div>
+
+  <!-- CADASTRO E EDICAO DE ENDERECOS -->
+
+  <section
+    *ngIf="exibirFormulario"
+    class="cartao"
+    aria-labelledby="titulo-formulario"
+  >
+    <h2 id="titulo-formulario">
+      {{ enderecoEmEdicaoId === null
+          ? 'Cadastrar endereço'
+          : 'Editar endereço' }}
+    </h2>
+
+    <p class="descricao">
+      Informe o endereço normalmente. O OpenRoute
+      buscará as coordenadas automaticamente.
+    </p>
+
+    <form
+      #formCadastroEndereco="ngForm"
+      (ngSubmit)="salvarEndereco()"
+    >
+      <div class="grade-campos">
+
+        <div class="campo">
+          <label for="logradouro">Quadra ou logradouro *</label>
+          <input
+            id="logradouro"
+            name="logradouro"
+            type="text"
+            [(ngModel)]="formEndereco.logradouro"
+            placeholder="Ex.: Quadra 110"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <label for="numero">Número ou lote *</label>
+          <input
+            id="numero"
+            name="numero"
+            type="text"
+            [(ngModel)]="formEndereco.numero"
+            placeholder="Ex.: 3"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <label for="complemento">Conjunto / Complemento</label>
+          <input
+            id="complemento"
+            name="complemento"
+            type="text"
+            [(ngModel)]="formEndereco.complemento"
+            placeholder="Ex.: Conjunto 3"
+          >
+        </div>
+
+        <div class="campo">
+          <label for="bairro">Bairro</label>
+          <input
+            id="bairro"
+            name="bairro"
+            type="text"
+            [(ngModel)]="formEndereco.bairro"
+            placeholder="Ex.: Recanto das Emas"
+          >
+        </div>
+
+        <div class="campo">
+          <label for="cidade">Cidade *</label>
+          <input
+            id="cidade"
+            name="cidade"
+            type="text"
+            [(ngModel)]="formEndereco.cidade"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado (UF) *</label>
+          <input
+            id="estado"
+            name="estado"
+            type="text"
+            [(ngModel)]="formEndereco.estado"
+            placeholder="DF"
+            minlength="2"
+            maxlength="2"
+            required
+          >
+        </div>
+
+        <div class="campo ocupa-tudo">
+          <label for="cep">CEP *</label>
+          <input
+            id="cep"
+            name="cep"
+            type="text"
+            [(ngModel)]="formEndereco.cep"
+            placeholder="Ex.: 72602-203"
+            maxlength="9"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <label for="janela-inicio">
+            Início da janela de horário *
+          </label>
+
+          <input
+            id="janela-inicio"
+            name="janela_inicio"
+            type="time"
+            [(ngModel)]="formEndereco.janela_inicio"
+            required
+          >
+        </div>
+
+        <div class="campo">
+          <label for="janela-fim">
+            Fim da janela de horário *
+          </label>
+
+          <input
+            id="janela-fim"
+            name="janela_fim"
+            type="time"
+            [(ngModel)]="formEndereco.janela_fim"
+            required
+          >
+        </div>
+
+        <p class="ajuda ocupa-tudo">
+          A janela de horário indica o período em que
+          a entrega pode acontecer nesse endereço.
+
+          Não é necessário informar latitude ou longitude.
+        </p>
+
+      </div>
+
+      <div
+        *ngIf="erroFormulario"
+        class="aviso aviso-erro"
+        role="alert"
+      >
+        {{ erroFormulario }}
+      </div>
+
+      <div
+        style="
+          display: flex;
+          justify-content: flex-end;
+          gap: 0.75rem;
+          flex-wrap: wrap;
+          margin-top: 1.25rem;
+        "
+      >
+        <button
+          type="button"
+          class="botao botao-secundario"
+          (click)="cancelarFormulario()"
+          [disabled]="salvandoEndereco"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="botao botao-primario"
+          [disabled]="
+            salvandoEndereco ||
+            formCadastroEndereco.invalid
+          "
+        >
+          {{
+            salvandoEndereco
+              ? 'Salvando...'
+              : enderecoEmEdicaoId === null
+                ? 'Cadastrar endereço'
+                : 'Salvar alterações'
+          }}
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+  <!-- LISTAGEM DOS ENDERECOS -->
+
+  <section
+    class="cartao"
+    aria-labelledby="titulo-enderecos"
+  >
+    <div class="cabecalho-pagina">
+      <div>
+        <h2 id="titulo-enderecos">Meus endereços</h2>
+        <p class="descricao">
+          Selecione os endereços que deseja incluir na rota.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="botao botao-secundario"
+        (click)="carregarEnderecos()"
+        [disabled]="carregandoEnderecos"
+      >
+        {{
+          carregandoEnderecos
+            ? 'Atualizando...'
+            : 'Atualizar lista'
+        }}
+      </button>
+    </div>
+
+    <div
+      *ngIf="erroEnderecos"
+      class="aviso aviso-erro"
+      role="alert"
+    >
+      {{ erroEnderecos }}
+
+      <button
+        type="button"
+        class="botao-link"
+        (click)="carregarEnderecos()"
+      >
+        Tentar novamente
+      </button>
+    </div>
+
+    <p
+      *ngIf="carregandoEnderecos"
+      class="carregando"
+    >
+      Carregando endereços...
+    </p>
+
+    <ng-container
+      *ngIf="!carregandoEnderecos && !erroEnderecos"
+    >
+
+      <div
+        *ngIf="enderecos.length > 0; else semEnderecos"
+        class="tabela-wrap"
+      >
+        <table>
+          <caption class="sr-somente">
+            Lista dos endereços cadastrados pelo motorista
+          </caption>
+
+          <thead>
+            <tr>
+              <th scope="col" class="coluna-check">
+                <input
+                  type="checkbox"
+                  [checked]="todosSelecionados"
+                  (change)="alternarTodos()"
+                  aria-label="Selecionar todos os endereços validados"
+                >
+              </th>
+
+              <th scope="col">Endereço</th>
+              <th scope="col">Janela de horário</th>
+              <th scope="col">Localização</th>
+              <th scope="col">Ações</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr
+              *ngFor="let endereco of enderecos"
+              [class.linha-bloqueada]="!podeSelecionar(endereco)"
+            >
+              <td class="coluna-check">
+                <input
+                  type="checkbox"
+                  [checked]="selecionados.has(endereco.id)"
+                  [disabled]="!podeSelecionar(endereco)"
+                  (change)="alternarSelecao(endereco)"
+                  [attr.aria-label]="
+                    'Selecionar endereço ' + endereco.id
+                  "
+                >
+              </td>
+
+              <td>
+                <strong>
+                  {{ endereco.logradouro }},
+                  {{ endereco.numero }}
+                </strong>
+
+                <small
+                  class="obs"
+                  *ngIf="endereco.complemento"
+                >
+                  {{ endereco.complemento }}
+                </small>
+
+                <small class="obs">
+                  {{ endereco.bairro || 'Bairro não informado' }}
+                </small>
+
+                <small class="obs">
+                  {{ endereco.cidade }}/{{ endereco.estado }}
+                </small>
+
+                <small class="obs">
+                  CEP: {{ endereco.cep }}
+                </small>
+              </td>
+
+              <td>
+                <ng-container
+                  *ngIf="
+                    endereco.janela_inicio &&
+                    endereco.janela_fim;
+                    else janelaNaoInformada
+                  "
+                >
+                  {{ endereco.janela_inicio.slice(0, 5) }}
+                  às
+                  {{ endereco.janela_fim.slice(0, 5) }}
+                </ng-container>
+
+                <ng-template #janelaNaoInformada>
+                  Não informada
+                </ng-template>
+              </td>
+
+              <td>
+                <span
+                  class="status"
+                  [ngClass]="{
+                    'status-entregue':
+                      endereco.validacao_status === 'VALIDADO',
+                    'status-pendente':
+                      endereco.validacao_status === 'PENDENTE',
+                    'status-falhou':
+                      endereco.validacao_status === 'FALHOU'
+                  }"
+                >
+                  {{ endereco.validacao_status }}
+                </span>
+
+                <small
+                  class="obs"
+                  *ngIf="!podeSelecionar(endereco)"
+                >
+                  Endereço ainda não disponível para cálculo.
+                </small>
+              </td>
+
+              <td>
+                <button
+                  type="button"
+                  class="botao-link"
+                  (click)="editarEndereco(endereco)"
+                >
+                  Editar
+                </button>
+
+                <span aria-hidden="true"> | </span>
+
+                <button
+                  type="button"
+                  class="botao-link"
+                  (click)="excluirEndereco(endereco)"
+                >
+                  Excluir
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #semEnderecos>
+        <div class="vazio">
+          <p>
+            Você ainda não possui endereços cadastrados.
+          </p>
+
+          <button
+            type="button"
+            class="botao botao-primario"
+            (click)="abrirCadastro()"
+          >
+            Cadastrar meu primeiro endereço
+          </button>
+        </div>
+      </ng-template>
+
+    </ng-container>
+  </section>
+
+  <!-- CALCULO DA ROTA -->
+
+  <section
+    class="cartao"
+    aria-labelledby="titulo-calculo"
+  >
+    <h2 id="titulo-calculo">Calcular rota otimizada</h2>
+
+    <p class="descricao">
+      Escolha pelo menos dois endereços validados
+      e configure sua saída.
+    </p>
+
+    <p class="ajuda">
+      {{ enderecosSelecionados.length }}
+      {{
+        enderecosSelecionados.length === 1
+          ? 'endereço selecionado'
+          : 'endereços selecionados'
+      }}
+    </p>
+
+    <div class="grade-campos">
+
+      <div class="campo ocupa-tudo">
+        <label for="ponto-partida">
+          Ponto de partida e retorno *
+        </label>
+
+        <select
+          id="ponto-partida"
+          name="ponto_partida"
+          [(ngModel)]="pontoPartidaId"
+          [disabled]="enderecosSelecionados.length < 2"
+        >
+          <option [ngValue]="null">
+            Selecione os endereços na tabela
+          </option>
+
+          <option
+            *ngFor="let endereco of enderecosSelecionados"
+            [ngValue]="endereco.id"
+          >
+            {{ formatarEndereco(endereco) }}
+          </option>
+        </select>
+
+        <span class="ajuda">
+          A rota começa e termina nesse endereço.
+        </span>
+      </div>
+
+      <div class="campo">
+        <label for="data-execucao">Data da rota *</label>
+
+        <input
+          id="data-execucao"
+          name="data_execucao"
+          type="date"
+          [(ngModel)]="dataExecucao"
+          required
+        >
+      </div>
+
+      <div class="campo">
+        <label for="hora-saida">Horário de saída *</label>
+
+        <input
+          id="hora-saida"
+          name="hora_saida"
+          type="time"
+          [(ngModel)]="horaSaida"
+          required
+        >
+      </div>
+
+      <div class="campo ocupa-tudo">
+        <label for="nome-rota">
+          Nome da rota (opcional)
+        </label>
+
+        <input
+          id="nome-rota"
+          name="nome_rota"
+          type="text"
+          [(ngModel)]="nomeRota"
+          placeholder="Ex.: Entregas da manhã"
+        >
+      </div>
+
+    </div>
+
+    <div
+      *ngIf="erroRota"
+      class="aviso aviso-erro aviso-calculo"
+      role="alert"
+    >
+      {{ erroRota }}
+    </div>
+
+    <div style="margin-top: 1.25rem;">
+      <button
+        type="button"
+        class="botao botao-primario"
+        (click)="calcularRota()"
+        [disabled]="
+          calculando ||
+          enderecosSelecionados.length < 2
+        "
+      >
+        {{
+          calculando
+            ? 'Calculando rota...'
+            : 'Calcular rota otimizada'
+        }}
+      </button>
+    </div>
+  </section>
+
+  <!-- RESULTADO E MAPA -->
+
+  <section
+    #blocoResultado
+    *ngIf="resultado"
+    class="cartao"
+    tabindex="-1"
+    aria-labelledby="titulo-resultado"
+  >
+    <h2 id="titulo-resultado">
+      Resultado da rota
+    </h2>
+
+    <div
+      class="aviso aviso-sucesso"
+      role="status"
+    >
+      {{ resultado.mensagem }}
+    </div>
+
+    <dl class="resumo">
+
+      <div>
+        <dt>Distância total</dt>
+        <dd>
+          {{ formatarKm(resultado.distancia_total_km) }}
+        </dd>
+      </div>
+
+      <div>
+        <dt>Tempo estimado</dt>
+        <dd>
+          {{ formatarDuracao(resultado.tempo_estimado_min) }}
+        </dd>
+      </div>
+
+      <div>
+        <dt>Paradas</dt>
+        <dd>
+          {{ resultado.rota_otimizada.length }}
+        </dd>
+      </div>
+
+      <div>
+        <dt>ID da rota</dt>
+        <dd>#{{ resultado.rota_id }}</dd>
+      </div>
+
+    </dl>
+
+    <div class="resultado-corpo">
+
+      <div>
+        <h3>Ordem das paradas</h3>
+
+        <ol class="paradas">
+          <li
+            *ngFor="let parada of resultado.rota_otimizada"
+          >
+            <span
+              class="numero"
+              aria-hidden="true"
+            >
+              {{ parada.ordem }}
+            </span>
+
+            <span class="parada-texto">
+              <span class="sr-somente">
+                Parada {{ parada.ordem }}:
+              </span>
+
+              {{ parada.endereco }}
+
+              <small *ngIf="parada.ordem === 1">
+                Partida e retorno
+              </small>
+            </span>
+          </li>
+        </ol>
+      </div>
+
+      <div>
+        <h3>Mapa da rota</h3>
+
+        <app-mapa-rota
+          [paradas]="resultado.rota_otimizada"
+          [geometria]="resultado.geometria"
+          [geometriaAproximada]="
+            resultado.geometria_aproximada
+          "
+        ></app-mapa-rota>
+      </div>
+
+    </div>
+
+    <p class="nota">
+      O trajeto é calculado pelo backend utilizando
+      os dados viários disponíveis.
+
+      <span *ngIf="resultado.geometria_aproximada">
+        A geometria desta rota é aproximada.
+      </span>
+    </p>
+
+  </section>
+
+</main>

@@ -1,6 +1,24 @@
+# Ambiente virtual
+venv/
 .venv/
-__pycache__/
-*.pyc
+
+# Vari�veis de ambiente e segredos
 .env
+.env.*
+
+# Mant�m o exemplo de configura��o
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
 .pytest_cache/
-.venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

@@ -1,39 +1,70 @@
-from pydantic import BaseModel
-from typing import List, Optional
-from datetime import datetime, date
+
+from datetime import datetime, date, time
+from typing import List, Optional, Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
 from app.models.rota import StatusRotaEnum
 
-class RotaPedidoResponse(BaseModel):
-    pedido_id: int
+
+class RotaEnderecoResponse(BaseModel):
+    endereco_id: Optional[int] = None
     ordem_parada: int
+
+    logradouro: str
+    numero: str
+    complemento: Optional[str] = None
+    bairro: Optional[str] = None
+    cidade: str
+    estado: str
+    cep: str
+    pais: str
+    referencia: Optional[str] = None
+
+    latitude: float
+    longitude: float
+
+    janela_inicio: Optional[time] = None
+    janela_fim: Optional[time] = None
+
     chegada_prevista: Optional[datetime] = None
     saida_prevista: Optional[datetime] = None
-    class Config:
-        from_attributes = True
+
+    model_config = ConfigDict(from_attributes=True)
+
 
 class RotaCreate(BaseModel):
     data_execucao: date
-    motorista_id: int
+    usuario_id: int
     nome: Optional[str] = None
+
     status: StatusRotaEnum = StatusRotaEnum.CALCULADA
     criada_por_id: Optional[int] = None
+
     distancia_total_metros: Optional[float] = None
     tempo_estimado_segundos: Optional[int] = None
-    geometria: Optional[str] = None
+    geometria: Optional[dict[str, Any]] = None
     provedor_calculo: Optional[str] = None
     calculada_em: Optional[datetime] = None
-    ordem_pedidos: List[int]
+
+    ordem_enderecos: List[int] = Field(min_length=1)
+
 
 class RotaResponse(BaseModel):
     id: int
     data_execucao: date
     status: StatusRotaEnum
     nome: Optional[str] = None
+
     distancia_total_metros: Optional[float] = None
     tempo_estimado_segundos: Optional[int] = None
-    geometria: Optional[str] = None
+    geometria: Optional[dict[str, Any]] = None
+
     criada_em: datetime
     atualizada_em: datetime
-    pedidos: Optional[List[RotaPedidoResponse]] = None
-    class Config:
-        from_attributes = True
+
+    enderecos: List[RotaEnderecoResponse] = Field(
+        default_factory=list
+    )
+
+    model_config = ConfigDict(from_attributes=True)

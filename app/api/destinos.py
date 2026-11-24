@@ -1,30 +1,92 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-from typing import List
-from app.db.session import get_db
-from app.schemas.destino import DestinoCreate, DestinoResponse, DestinoUpdate
+
+from flask import Blueprint, jsonify, abort
+
+from app.api.validacao import LerCorpo
+from app.api.autenticacao import ExigirUsuarioOperacional
+from app.db.session import GetDb
+from app.schemas.destino import (
+    DestinoCreate,
+    DestinoUpdate,
+    DestinoResponse,
+)
 from app.repositories import destino_repo
 
-router = APIRouter(prefix="/destinos", tags=["Destinos"])
 
-@router.post("/", response_model=DestinoResponse, status_code=201)
-def cadastrar_destino(destino: DestinoCreate, db: Session = Depends(get_db)):
-    return destino_repo.criar_destino(db, destino)
+destinos_bp = Blueprint(
+    "destinos",
+    __name__,
+    url_prefix="/destinos"
+)
 
-@router.get("/", response_model=List[DestinoResponse])
-def listar_destinos(db: Session = Depends(get_db)):
-    return destino_repo.listar_destinos(db)
 
-@router.put("/{destino_id}", response_model=DestinoResponse)
-def atualizar_destino(destino_id: int, destino: DestinoUpdate, db: Session = Depends(get_db)):
-    destino_atualizado = destino_repo.atualizar_destino(db, destino_id, destino)
-    if not destino_atualizado:
-        raise HTTPException(status_code=404, detail="Destino não encontrado")
-    return destino_atualizado
+def _Serializar(destino):
+    return DestinoResponse.model_validate(destino).model_dump(
+        mode="json"
+    )
 
-@router.delete("/{destino_id}", status_code=204)
-def deletar_destino(destino_id: int, db: Session = Depends(get_db)):
-    sucesso = destino_repo.deletar_destino(db, destino_id)
-    if not sucesso:
-        raise HTTPException(status_code=404, detail="Destino não encontrado")
-    return None
+
+@destinos_bp.post("/", strict_slashes=False)
+def CadastrarDestino():
+    usuario = ExigirUsuarioOperacional()
+    dados = LerCorpo(DestinoCreate)
+
+    criado = destino_repo.CriarDestino(
+        GetDb(),
+        dados,
+        usuario.id
+    )
+
+    return jsonify(_Serializar(criado)), 201
+
+
+@destinos_bp.get("/", strict_slashes=False)
+def ListarDestinos():
+    usuario = ExigirUsuarioOperacional()
+
+    destinos = destino_repo.ListarDestinos(
+        GetDb(),
+        usuario.id
+    )
+
+    return jsonify([
+        _Serializar(destino)
+        for destino in destinos
+    ])
+
+
+@destinos_bp.put("/<int:destinoId>")
+def AtualizarDestino(destinoId):
+    usuario = ExigirUsuarioOperacional()
+    dados = LerCorpo(DestinoUpdate)
+
+    try:
+        atualizado = destino_repo.AtualizarDestino(
+            GetDb(),
+            destinoId,
+            usuario.id,
+            dados
+        )
+
+    except ValueError as erro:
+        abort(400, description=str(erro))
+
+    if atualizado is None:
+        abort(404, description="Endereço não encontrado.")
+
+    return jsonify(_Serializar(atualizado))
+
+
+@destinos_bp.delete("/<int:destinoId>")
+def DeletarDestino(destinoId):
+    usuario = ExigirUsuarioOperacional()
+
+    removido = destino_repo.DeletarDestino(
+        GetDb(),
+        destinoId,
+        usuario.id
+    )
+
+    if not removido:
+        abort(404, description="Endereço não encontrado.")
+
+    return "", 204

@@ -1,0 +1,329 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<app-navbar
+  [abas]="abas"
+  [abaAtiva]="abaDestaque"
+  rotaLogo="/home"
+  (abaSelecionada)="selecionarAba($event, null)"
+>
+    <div *ngIf="isAdm">
+        <button class="botao botao-primario" (click)="deslogar()" [disabled]="deslogando">Logout</button>
+    </div>
+</app-navbar>
+
+<main class="conteudo">
+
+    <div
+        *ngIf="mensagem"
+        class="aviso"
+        [ngClass]="mensagem.tipo === 'erro' ? 'aviso-erro' : 'aviso-sucesso'"
+        [attr.role]="mensagem.tipo === 'erro' ? 'alert' : 'status'"
+    >
+        {{ mensagem.texto }}
+    </div>
+
+    <section *ngIf="abaAtiva === 'listar-usuario'">
+
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Usuários</h1>
+                <p class="descricao">Usuários cadastrados no sistema</p>
+            </div>
+            <div>
+                <button type="button" class="botao botao-secundario botao-atualizar" (click)="atualizarListaUsuarios()" [disabled]="carregando || !isAdm">
+                    {{ carregando ? 'Carregando' : 'Atualizar lista'}}
+                </button>
+                <button type="button" class="botao botao-primario" (click)="selecionarAba('cadastrar-usuario', null)" [disabled]="carregando || !isAdm">
+                    Cadastrar usuário
+                </button>
+            </div>
+        </div>
+        <div class="cartao">
+            <div class="tabela-wrap">
+                <table *ngIf="this.usuarios.length > 0 && !erroLista" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th scope="col">Nome</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Telefone</th>
+                            <th scope="col"><span class="sr-somente">Ações</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let usu of this.usuarios">
+                            <th>{{usu.nome}}</th>
+                            <th>
+                                <p *ngIf="usu.ativo" class="fa fa-check-circle"></p>
+                                <p *ngIf="!usu.ativo" class="fa fa-times-circle"></p>
+                            </th>
+                            <th>{{usu.email}}</th>
+                            <th>{{usu.telefone || '----'}}</th>
+                            <th>
+                                <div class="coluna-acao">
+                                    <p class="fa fa-eye" (click)="abrirDetalhes(usu)"></p>
+                                    <p class="fa fa-pencil" (click)="abrirEdicao(usu)"></p>
+                                </div>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+                <p *ngIf="carregando && !this.usuarios.length" class="carregando">
+                    Carregando Usuários
+                </p>
+                <div *ngIf="this.usuarios.length === 0 && !erroLista">
+                    <p>Nenhum usuário cadastrado</p>
+                </div>
+                <div *ngIf="erroLista" class="aviso aviso-erro" role="alert">
+                    {{ erroLista }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section *ngIf="abaAtiva === 'cadastrar-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Cadastro</h1>
+                <p class="descricao">Cadastre um usuário novo</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="selecionarAba('listar-usuario', null)">
+                Voltar
+            </button>
+        </div>
+        <form class="cartao" (ngSubmit)="cadastrarUsuario()">
+            <div class="grade-campos">
+                <div class="campo" [class.campo-erro]="errosFormCadastro.nome">
+                    <label for="nomeCadastroUsuario">Nome</label>
+                    <input
+                        name="nomeCadastro"
+                        id="nomeCadastroUsuario"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Ex.: Fulano De Tal"
+                        [(ngModel)]="formCadastro.nome"
+                        (ngModelChange)="formCadastro.nome = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.nome"
+                        [attr.aria-describedby]="errosFormCadastro.nome ? 'erro-nomeCadastroUsuario' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.nome" id="erro-nomeCadastroUsuario" class="erro-campo">{{ errosFormCadastro.nome }}</span>
+                </div>
+                <div class="campo" [class.campo-erro]="errosFormCadastro.email">
+                    <label for="emailCadastroUsuario">Email</label>
+                    <input
+                        name="emailCadastro"
+                        id="emailCadastroUsuario"
+                        type="email"
+                        autocomplete="off"
+                        placeholder="Ex.: fulano@gmail.com"
+                        [(ngModel)]="formCadastro.email"
+                        (ngModelChange)="formCadastro.email = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.email"
+                        [attr.aria-describedby]="errosFormCadastro.email ? 'erro-emailCadastroUsuario' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.email" id="erro-emailCadastroUsuario" class="erro-campo">{{ errosFormCadastro.email }}</span>
+                </div>
+                <div class="campo" [class.campo-erro]="errosFormCadastro.senha">
+                    <label for="senhaCadastroUsuario">Senha</label>
+                    <input
+                        name="senhaCadastro"
+                        id="senhaCadastroUsuario"
+                        type="password"
+                        autocomplete="off"
+                        placeholder="Insira uma senha com ao menos 8 caracteres"
+                        [(ngModel)]="formCadastro.senha"
+                        (ngModelChange)="formCadastro.senha = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.senha"
+                        [attr.aria-describedby]="errosFormCadastro.senha ? 'erro-senhaCadastroUsuario' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.senha" id="erro-senhaCadastroUsuario" class="erro-campo">{{ errosFormCadastro.senha }}</span>
+                </div>
+                <div class="campo" [class.campo-erro]="errosFormCadastro.telefone">
+                    <label for="telefoneCadastroUsuario">Telefone</label>
+                    <input
+                        name="telefoneCadastro"
+                        id="telefoneCadastroUsuario"
+                        type="text"
+                        placeholder="Ex.: 61 99876-5432"
+                        [(ngModel)]="formCadastro.telefone"
+                        (ngModelChange)="formCadastro.telefone = $event; revalidarCadastro()"
+                        [attr.aria-invalid]="!!errosFormCadastro.telefone"
+                        [attr.aria-describedby]="errosFormCadastro.telefone ? 'erro-telefoneCadastroUsuario' : null"
+                    >
+                    <span *ngIf="errosFormCadastro.telefone" id="erro-telefoneCadastroUsuario" class="erro-campo">{{ errosFormCadastro.telefone }}</span>
+                </div>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="botao botao-primario" [disabled]="cadastrando">Cadastrar Usuário</button>
+            </div>
+        </form>
+    </section>
+
+    <section *ngIf="abaAtiva === 'detalhar-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Detalhes</h1>
+                <p class="descricao">Detalhes do usuario de id {{usuarioDetalhado.id}}</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="selecionarAba('listar-usuario', null)">
+                Voltar
+            </button>
+        </div>
+        <div class="cartao">
+            <dl class="detalhes">
+                <div>
+                    <dt>Nome:</dt>
+                    <dd>{{usuarioDetalhado.nome}}</dd>
+                </div>
+                <div>
+                    <dt>Criado em:</dt>
+                    <dd>{{usuarioDetalhado.criado_em}}</dd>
+                </div>
+                <div>
+                    <dt>Email:</dt>
+                    <dd>{{usuarioDetalhado.email}}</dd>
+                </div>
+                <div>
+                    <dt>Telefone:</dt>
+                    <dd>{{(usuarioDetalhado.telefone != undefined ? (usuarioDetalhado.telefone) : '----')}}</dd>
+                </div>
+                <div>
+                    <dt>Perfil:</dt>
+                    <dd>{{usuarioDetalhado.perfil}}</dd>
+                </div>
+                <div>
+                    <dt>Status</dt>
+                    <dd>
+                        <p *ngIf="usuarioDetalhado.ativo" class="fa fa-check-circle"></p>
+                        <p *ngIf="!usuarioDetalhado.ativo" class="fa fa-times-circle"></p>
+                        {{usuarioDetalhado.ativo ? 'Conta ativa' : 'Conta desativada'}}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+    </section>
+
+    <section *ngIf="abaAtiva === 'editar-usuario'">
+        <div class="cabecalho-pagina">
+            <div>
+                <h1>Editar</h1>
+                <p class="descricao">Edite os dados do usuario {{usuarioEditado.nome}}</p>
+            </div>
+            <button type="button" class="botao botao-secundario" (click)="selecionarAba('listar-usuario', null)">
+                Voltar
+            </button>
+        </div>
+        <form class="cartao" (ngSubmit)="atualizarUsuario()">
+            <div class="grade-campos">
+                <div class="campo" [class.campo-erro]="errosFormEdicao.nome">
+                    <label for="nomeEdicaoUsuario">Nome</label>
+                    <input
+                        name="nomeEdicao"
+                        id="nomeEdicaoUsuario"
+                        type="text"
+                        autocomplete="off"
+                        placeholder="Ex.: Fulano De Tal"
+                        [(ngModel)]="formEdicao.nome"
+                        (ngModelChange)="formEdicao.nome = $event; revalidarEdicao()"
+                        [attr.aria-invalid]="!!errosFormEdicao.nome"
+                        [attr.aria-describedby]="errosFormEdicao.nome ? 'erro-nomeEdicaoUsuario' : null"
+                    >
+                    <span *ngIf="errosFormEdicao.nome" id="erro-nomeEdicaoUsuario" class="erro-campo">{{ errosFormEdicao.nome }}</span>
+                </div>
+                <div class="campo" [class.campo-erro]="errosFormEdicao.email">
+                    <label for="emailEdicaoUsuario">Email</label>
+                    <input
+                        name="emailEdicao"
+                        id="emailEdicaoUsuario"
+                        type="email"
+                        autocomplete="off"
+                        placeholder="Ex.: fulano@gmail.com"
+                        [(ngModel)]="formEdicao.email"
+                        (ngModelChange)="formEdicao.email = $event; revalidarEdicao()"
+                        [attr.aria-invalid]="!!errosFormEdicao.email"
+                        [attr.aria-describedby]="errosFormEdicao.email ? 'erro-emailEdicaoUsuario' : null"
+                    >
+                    <span *ngIf="errosFormEdicao.email" id="erro-emailEdicaoUsuario" class="erro-campo">{{ errosFormEdicao.email }}</span>
+                </div>
+                <div class="campo" [class.campo-erro]="errosFormEdicao.telefone">
+                    <label for="telefoneEdicaoUsuario">Telefone</label>
+                    <input
+                        name="TelefoneEdicao"
+                        id="telefoneEdicaoUsuario"
+                        type="tel"
+                        autocomplete="off"
+                        placeholder="Ex.: (61) 99876-5432"
+                        [(ngModel)]="formEdicao.telefone"
+                        (ngModelChange)="formEdicao.telefone = $event; revalidarEdicao()"
+                        [attr.aria-invalid]="!!errosFormEdicao.telefone"
+                        [attr.aria-describedby]="errosFormEdicao.telefone ? 'erro-telefoneEdicaoUsuario' : null"
+                    >
+                    <span *ngIf="errosFormEdicao.telefone" id="erro-telefoneEdicaoUsuario" class="erro-campo">{{ errosFormEdicao.telefone }}</span>
+                </div>
+                <div class="campo">
+                    <label>Perfil</label>
+                    <div class="formEdicaoPerfil">
+                        <input
+                            name="PerfilEdicao"
+                            id="perfilEdicaoADM"
+                            type="radio"
+                            value="ADM"
+                            [(ngModel)]="formEdicao.perfil"
+                        >
+                        <label for="perfilEdicaoADM">ADM</label>
+                    </div>
+                    <div class="formEdicaoPerfil">
+                        <input
+                            name="PerfilEdicao"
+                            id="perfilEdicaoUsuario"
+                            type="radio"
+                            value="USUARIO"
+                            [(ngModel)]="formEdicao.perfil"
+                        >
+                        <label for="perfilEdicaoUsuario">Usuario</label>
+                    </div>
+                </div>
+                <div class="campo">
+                    <label>Senha</label>
+                    <button class="botao botao-secundario" type="button" [disabled]="this.editando" (click)="abrirEdicaoSenha()">Alterar Senha</button>
+                </div>
+            </div>
+            <div class="acoes-form">
+                <button *ngIf="!formEdicao.ativo" class="botao botao-secundario" type="button" [disabled]="this.editando" (click)="reativarUsuario()">Reativar conta</button>
+                <button *ngIf="formEdicao.ativo" class="botao botao-cancelar" type="button" [disabled]="this.editando" (click)="desativarUsuario()">Desativar conta</button>
+                <button class="botao botao-primario" type="submit" [disabled]="this.editando">Confirmar edição</button>
+            </div>
+        </form>
+    </section>
+
+    <div *ngIf="alterarSenha" class="modalAlterarSenha">
+        <div class="conteudo">
+            <section>
+                <form class="cartao" (ngSubmit)="atualizarSenhaUsuario()">
+                    <div class="grade-campos">
+                        <div class="campo ocupa-tudo" [class.campo-erro]="errosFormEdicao.senha">
+                            <label for="senhaEdicaoUsuario">Senha nova</label>
+                            <input
+                                name="senhaEdicao"
+                                id="senhaEdicaoUsuario"
+                                type="password"
+                                autocomplete="off"
+                                placeholder="Insira uma senha nova com ao menos 8 caracteres"
+                                [(ngModel)]="formEdicao.senha"
+                                (ngModelChange)="formEdicao.senha = $event; revalidarEdicaoSenha()"
+                                [attr.aria-invalid]="!!errosFormEdicao.senha"
+                                [attr.aria-describedby]="errosFormEdicao.senha ? 'erro-senhaEdicaoUsuario' : null"
+                            >
+                            <span *ngIf="errosFormEdicao.senha" id="erro-senhaEdicaoUsuario" class="erro-campo">{{ errosFormEdicao.senha }}</span>
+                        </div>
+                    </div>
+                    <div class="acoes-form">
+                        <button type="button" class="botao botao-secundario" (click)="fecharEdicaoSenha(null)" [disabled]="editando">Voltar</button>
+                        <button class="botao botao-primario" type="submit" [disabled]="editando">Confirmar senha</button>
+                    </div>
+                </form>
+            </section>
+        </div>
+    </div>
+</main>
