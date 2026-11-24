@@ -1,7 +1,7 @@
 # Open Route — Backend Flask
 
 ## Escopo de perfis
-O sistema possui somente dois perfis: `ADM` e `USUARIO`. O antigo perfil Motorista foi incorporado a `USUARIO`; não existe perfil Cliente. O ADM pode cadastrar, listar, consultar perfil e remover contas USUARIO. Não existe endpoint de edição de usuário.
+O sistema possui somente dois perfis: `ADM` e `USUARIO`. O antigo perfil Motorista foi incorporado a `USUARIO`; não existe perfil Cliente. O ADM pode cadastrar, listar, consultar, editar e remover contas USUARIO.
 
 ## Configuração
 1. Para banco novo, execute `database.sql` no MySQL. Se o banco antigo já existir, faça backup e execute `MIGRACAO_ADM_USUARIO.sql` uma única vez.
@@ -10,11 +10,12 @@ O sistema possui somente dois perfis: `ADM` e `USUARIO`. O antigo perfil Motoris
 4. Execute `python -m flask --app app.main run --debug`.
 
 ## API de autenticação e administração
-- `POST /auth/login` — `{ "email": "...", "senha": "..." }`; retorna token Bearer.
+- `POST /auth/login` — `{ "email": "...", "senha": "..." }`; retorna token Bearer. Sessões expiram por inatividade (`SESSAO_IDLE_MINUTOS`) e por duração máxima (`SESSAO_DURACAO_HORAS`).
 - `POST /auth/logout` — revoga a sessão.
 - `GET /usuarios` — lista usuários (ADM).
 - `POST /usuarios` — cria usuário com perfil USUARIO (ADM). Campos: `nome`, `email`, `senha` (mínimo 8 caracteres), `telefone` opcional.
 - `GET /usuarios/{id}` — consulta perfil (ADM).
+- `PUT /usuarios/{id}` — edita usuário (ADM). Campos opcionais: `nome`, `email`, `telefone`, `senha` (mínimo 8), `ativo`. O ADM não pode desativar a própria conta.
 - `DELETE /usuarios/{id}` — desativa conta USUARIO e revoga suas sessões (ADM). A operação é lógica para preservar histórico operacional.
 - `GET /pedidos` — lista entregas para o painel operacional, exigindo sessão válida.
 - `POST /restricoes` — cadastra restrição de janela de horário vinculada a uma rota (USUARIO). Campos: `rota_id`, `janela_inicio` e `janela_fim` (`HH:MM[:SS]`), `observacoes` opcional.

@@ -55,38 +55,122 @@ def _AvaliarJanelas(ordem, matrizTempos, janelas):
         agenda.append(atual)
     return agenda
 
+
 def _RotaComJanelas(matrizCusto, matrizTempos, janelas):
     n = len(matrizCusto)
+
     ordem = [0]
-    faltam = set(range(1, n))
-    while faltam:
+    visitados = {0}
+
+    tentativas = 0
+    limiteTentativas = 50000
+    limiteAtingido = False
+
+    def Buscar(atual, minutoAtual):
+        nonlocal tentativas, limiteAtingido
+
+        if tentativas >= limiteTentativas:
+            limiteAtingido = True
+            return False
+
+        tentativas += 1
+
+        # Todos os endereços foram visitados.
+        if len(ordem) == n:
+            return True
+
         candidatos = []
-        for destino in faltam:
-            agendaAtual = _AvaliarJanelas(ordem, matrizTempos, janelas)
-            chegada = agendaAtual[-1] + float(matrizTempos[ordem[-1]][destino])
+
+        for destino in range(1, n):
+            if destino in visitados:
+                continue
+
             inicio, fim = janelas[destino]
-            chegada = max(chegada, float(inicio))
+
+            # Calcula a chegada considerando o deslocamento
+            # e a espera, caso o motorista chegue cedo.
+            chegada = max(
+                minutoAtual + float(matrizTempos[atual][destino]),
+                float(inicio)
+            )
+
             if chegada <= float(fim):
-                candidatos.append((float(fim), float(matrizCusto[ordem[-1]][destino]), destino))
-        if not candidatos:
-            raise ValueError("Não existe sequência viável que respeite todas as janelas de tempo.")
-        _, _, proximo = min(candidatos)
-        ordem.append(proximo); faltam.remove(proximo)
+                candidatos.append((
+                    float(fim),
+                    float(matrizCusto[atual][destino]),
+                    destino,
+                    chegada
+                ))
+
+        # Prioriza prazos próximos, mas permite tentar
+        # outras escolhas quando a primeira não funciona.
+        candidatos.sort()
+
+        for _, _, destino, chegada in candidatos:
+            ordem.append(destino)
+            visitados.add(destino)
+
+            if Buscar(destino, chegada):
+                return True
+
+            # Desfaz a escolha e tenta outra possibilidade.
+            ordem.pop()
+            visitados.remove(destino)
+
+            if limiteAtingido:
+                return False
+
+        return False
+
+    encontrou = Buscar(0, 0.0)
+
+    if not encontrou:
+        if limiteAtingido:
+            raise ValueError(
+                "Não foi encontrada uma rota viável dentro "
+                "do limite de busca. Isso não significa "
+                "que a rota seja impossível."
+            )
+
+        raise ValueError(
+            "Não existe sequência viável que respeite "
+            "todas as janelas de tempo."
+        )
+
+    # Retorna ao endereço inicial.
     ordem.append(0)
-    if _AvaliarJanelas(ordem, matrizTempos, janelas) is None:
-        raise ValueError("A rota calculada viola uma janela de tempo.")
-    melhor = list(ordem); melhorCusto = _Custo(matrizCusto, melhor); mudou = True
+
+    # Mantém a melhoria 2-opt já utilizada pelo projeto.
+    melhor = list(ordem)
+    melhorCusto = _Custo(matrizCusto, melhor)
+    mudou = True
+
     while mudou:
         mudou = False
-        for i in range(1, len(melhor)-2):
-            for j in range(i+1, len(melhor)-1):
-                candidata = melhor[:i] + list(reversed(melhor[i:j+1])) + melhor[j+1:]
-                if _AvaliarJanelas(candidata, matrizTempos, janelas) is None:
+
+        for i in range(1, len(melhor) - 2):
+            for j in range(i + 1, len(melhor) - 1):
+                candidata = (
+                    melhor[:i]
+                    + list(reversed(melhor[i:j + 1]))
+                    + melhor[j + 1:]
+                )
+
+                # Não aceita uma melhoria que viole horários.
+                if _AvaliarJanelas(
+                    candidata, matrizTempos, janelas
+                ) is None:
                     continue
+
                 custo = _Custo(matrizCusto, candidata)
+
                 if custo + 1e-9 < melhorCusto:
-                    melhor, melhorCusto, mudou = candidata, custo, True
+                    melhor = candidata
+                    melhorCusto = custo
+                    mudou = True
+
     return melhor
+
 
 def CalcularRotaOtimizada(matriz, velocidadeMediaKmh=40, matrizTempos=None, demandas=None, capacidades=None, janelasTempo=None):
     _ValidarMatriz(matriz)
