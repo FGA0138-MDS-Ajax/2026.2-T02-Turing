@@ -32,18 +32,18 @@
 | Numeração | Nome | O que foi feito | Desenvolvimento | Testes |
 |---|---|---|---|---|
 | C01.1 | Login de Usuários | Correção na tela para aderir a um novo endpoint para cadastro público de usuários, que não requer token de autenticação, alteração na home para ter o botão de logout | 100% | 0% |
-| C01.2 | Controle de sessão | Criação de uma função de remoção de sessão no front para deixar mais limpo | 100% | 0% |
-| C02.1 | Cadastro de usuários | Adição de verificação de campos nos formulários de atualização e cadastro de usuários,adição de opção para alteração de senha dos usuários no painel ADM e alteração no modo de desativar e ativar contas | 100% | 0% |
-| C02.2 | Gestão de perfis | Adição do perfil no modelo de atualização de usuarios no backend, removendo a sessão do usuário alterado para evitar utilização de funcionalidades indevidas e adição da opção de alterar perfis no front | 100% | 0% |
-| C03.1 | Cadastro de destinos | Refatoração do painel de usuários para adequar ao escopo novo, com o cadastro de endereços para criação de destinos para uso na formação da rota | 80% | 0% |
-| C03.2 | Validação de endereços | Acoplamento da validação de endereços com o front do painel de usuários. | 80% | 0% |
+| C01.2 | Controle de sessão | Criação de uma função de remoção de sessão no front para deixar mais limpo, implementação de testes do backend para remoção de sessão ao mudar dados da conta | 100% | 50% |
+| C02.1 | Cadastro de usuários | Adição de verificação de campos nos formulários de atualização e cadastro de usuários, adição de opção para alteração de senha dos usuários no painel ADM e alteração no modo de desativar e ativar contas, ampliação dos testes para contemplar o novo endpoint de cadastro público e as novas atualizações sobre o endpoint de atualização de usuário | 100% | 60% |
+| C02.2 | Gestão de perfis | Adição do perfil no modelo de atualização de usuarios no backend, removendo a sessão do usuário alterado para evitar utilização de funcionalidades indevidas e adição da opção de alterar perfis no front, implementação de testes sobre as funcionalidades de alteração de perfil e a revogação de sessões relacionada | 100% | 50% |
+| C03.1 | Cadastro de destinos | Refatoração do painel de usuários para adequar ao escopo novo, com o cadastro de endereços para criação de destinos para uso na formação da rota, implementação de testes para cadastro e atualização dos endereços com janelas de tempo | 80% | 35% |
+| C03.2 | Validação de endereços | Acoplamento da validação de endereços com o front do painel de usuários. | 80% | 20% |
 | C03.3 | Listagem e revisão de destinos | Adição da listagem e das opções de edição e deleção de destinos cadastrados pelo usuário ao painel de usuários. | 100% | 0% |
-| C04.1 | Converter endereços textuais em coordenadas (latitude/longitude). | Melhorias e refinamentos na entrada de dados dos endereços e da geocodificação | 60% | 0% |
-| C04.2 | Integração com API de geocodificação | Melhorias na entrada de dados dos endereços e da geocodificação | 60% | 0% |
-| C05.1 | Cálculo de rota otimizada | Atualização do front para chamar o cálculo das rotas com período de tempo e lista de destinos para otimização | 100% | 0% |
+| C04.1 | Converter endereços textuais em coordenadas (latitude/longitude). | Melhorias e refinamentos na entrada de dados dos endereços e da geocodificação | 60% | 30% |
+| C04.2 | Integração com API de geocodificação | Melhorias na entrada de dados dos endereços e da geocodificação | 60% | 20% |
+| C05.1 | Cálculo de rota otimizada | Atualização do front para chamar o cálculo das rotas com período de tempo e lista de destinos para otimização | 100% | 60% |
 | C05.2 | Exibição da rota no mapa | Adição do componente de mapeamento da rota, com listagem de destinos, paradas, distância e outros dados ao painel do usuário. | 100% | 0% |
-| C05.3 | Desempenho do cálculo | Nada | 0% | 0% |
-| C06.1 | Integração com API de mapas/rotas | Integração da API de mapas, para utilização no painel do usuário | 100% | 0% |
+| C05.3 | Desempenho do cálculo | Nada | 100% | 100% |
+| C06.1 | Integração com API de mapas/rotas | Integração da API de mapas, para utilização no painel do usuário | 100% | 30% |
 | C06.2 | Fallback entre provedores | Definição de mais de uma API nas funções relacionadas a geocodificação de endereços | 100% | 0% |
 | C07.1 | Segurança e LGPD | Apenas o usuário que cria os destinos pode vê-los e alterá-los. Sendo o acesso a esses dados liberados de acordo com a sessão do usuário. | 50% | 0% |
 

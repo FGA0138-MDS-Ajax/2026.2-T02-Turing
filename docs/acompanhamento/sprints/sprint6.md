@@ -32,18 +32,18 @@
 | Numeração | Nome | O que foi feito | Desenvolvimento | Testes |
 |---|---|---|---|---|
 | C01.1 | Login de Usuários | Nada | 100% | 0% |
-| C01.2 | Controle de sessão | Nada | 100% | 0% |
-| C02.1 | Cadastro de usuários | Nada | 100% | 0% |
-| C02.2 | Gestão de perfis | Nada | 100% | 0% |
-| C03.1 | Cadastro de destinos | Nada | 80% | 0% |
-| C03.2 | Validação de endereços | Nada | 80% | 0% |
+| C01.2 | Controle de sessão | Nada | 100% | 50% |
+| C02.1 | Cadastro de usuários | Nada | 100% | 60% |
+| C02.2 | Gestão de perfis | Nada | 100% | 50% |
+| C03.1 | Cadastro de destinos | Nada | 80% | 35% |
+| C03.2 | Validação de endereços | Nada | 80% | 20% |
 | C03.3 | Listagem e revisão de destinos | Nada | 100% | 0% |
-| C04.1 | Converter endereços textuais em coordenadas (latitude/longitude). | Nada | 60% | 0% |
-| C04.2 | Integração com API de geocodificação | Nada | 60% | 0% |
-| C05.1 | Cálculo de rota otimizada | Nada | 100% | 0% |
+| C04.1 | Converter endereços textuais em coordenadas (latitude/longitude). | Nada | 60% | 30% |
+| C04.2 | Integração com API de geocodificação | Nada | 60% | 20% |
+| C05.1 | Cálculo de rota otimizada | Nada | 100% | 60% |
 | C05.2 | Exibição da rota no mapa | Nada | 100% | 0% |
-| C05.3 | Desempenho do cálculo | Nada | 0% | 0% |
-| C06.1 | Integração com API de mapas/rotas | Nada | 100% | 0% |
+| C05.3 | Desempenho do cálculo | Nada | 100% | 100% |
+| C06.1 | Integração com API de mapas/rotas | Nada | 100% | 30% |
 | C06.2 | Fallback entre provedores | Nada | 100% | 0% |
 | C07.1 | Segurança e LGPD | Nada | 50% | 0% |
 

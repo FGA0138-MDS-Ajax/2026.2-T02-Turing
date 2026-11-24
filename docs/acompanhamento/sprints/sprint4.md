@@ -30,18 +30,18 @@
 | Numeração | Nome | O que foi feito | Desenvolvimento | Testes |
 |---|---|---|---|---|
 | C01.1 | Login de Usuários | Implementação dos endpoints no backend para login e logout de usuários, com criação de token para controle de sessão e criação da tela de autenticação no frontend, com cadastro e login de usuários, atualização da tela de usuário para permitir entrada na tela de autenticação | 100% | 0% |
-| C01.2 | Controle de sessão | Implementação no backend da criação de token de sessão para controlar acesso às funcionalidades do programa, implementação da utilização do token pelo frontend | 100% | 0% |
-| C02.1 | Cadastro de usuários | Implementação dos endpoints no backend para o CRUD de usuários, correção do painel de ADM para trabalhar com o escopo novo, tendo agora o CRUD de usuários. Faltando alguns dados e verificações na atualização dos usuários | 78% | 0% |
+| C01.2 | Controle de sessão | Implementação no backend da criação de token de sessão para controlar acesso às funcionalidades do programa, implementação da utilização do token pelo frontend com alguns testes sobre a expiração da sessão no backend | 100% | 15% |
+| C02.1 | Cadastro de usuários | Implementação dos endpoints no backend para o CRUD de usuários, correção do painel de ADM para trabalhar com o escopo novo, tendo agora o CRUD de usuários. Faltando alguns dados e verificações na atualização dos usuários. Alguns testes no backend | 78% | 15% |
 | C02.2 | Gestão de perfis | Nada | 0% | 0% |
 | C03.1 | Cadastro de destinos | Atualização dos endpoints de destinos, para interagir com a verificação de endereços e geocodificação | 40% | 0% |
-| C03.2 | Validação de endereços | Atualização dos endpoints para conter interação com a API de verificação e geolocalização de endereços  | 65% | 0% |
+| C03.2 | Validação de endereços | Atualização dos endpoints para conter interação com a API de verificação e geolocalização de endereços, com alguns testes no backend sobre a funcionalidade da api de verificação | 65% | 20% |
 | C03.3 | Listagem e revisão de destinos | Atualização dos endpoints de destino, corrigindo a API utilizada, com endpoint para listagem de destinos | 30% | 0% |
-| C04.1 | Converter endereços textuais em coordenadas (latitude/longitude). | Atualização dos endpoints de criação de destinos para interagir com a API de geocodificação. | 45% | 0% |
-| C04.2 | Integração com API de geocodificação | Adição e correção da API utilizada para a geocodificação de endereços no backend, com verificação de condição de falha da geocodificação. | 45% | 0% |
-| C05.1 | Cálculo de rota otimizada | Implementação no backend do cálculo de rotas otimizadas | 45% | 0% |
+| C04.1 | Converter endereços textuais em coordenadas (latitude/longitude). | Atualização dos endpoints de criação de destinos para interagir com a API de geocodificação, com alguns testes no backend | 45% | 30% |
+| C04.2 | Integração com API de geocodificação | Adição e correção da API utilizada para a geocodificação de endereços no backend, com verificação de condição de falha da geocodificação. Alguns testes no backend | 45% | 20% |
+| C05.1 | Cálculo de rota otimizada | Implementação no backend do cálculo de rotas otimizadas, com testes relacionados | 45% | 60% |
 | C05.2 | Exibição da rota no mapa | Nada | 0% | 0% |
-| C05.3 | Desempenho do cálculo | Nada | 0% | 0% |
-| C06.1 | Integração com API de mapas/rotas | Nada | 0% | 0% |
+| C05.3 | Desempenho do cálculo | Implementação de testes no backend relacionados ao tempo de cálculo com um número definido de destinos | 100% | 100% |
+| C06.1 | Integração com API de mapas/rotas | Implementação no backend do cálculo de rotas otimizadas, com alguns testes sobre o funcionamento da API | 40% | 30% |
 
 ### Geral
 
