@@ -1,3 +1,4 @@
+
 import {
   AfterViewInit,
   Component,
@@ -8,11 +9,12 @@ import {
   ViewChild
 } from '@angular/core';
 import * as L from 'leaflet';
-import { ParadaRota } from '../../models/pedido.model';
 
-// mostra a rota otimizada no mapa: paradas numeradas na ordem de visita
-// e uma linha ligando os pontos (a volta ao ponto de partida fica tracejada)
-// o back ainda não devolve o traçado pelas ruas, então a linha é reta entre as paradas 
+import {
+  GeometriaRota,
+  ParadaRota
+} from '../../models/rota.model';
+
 @Component({
   selector: 'app-mapa-rota',
   standalone: true,
@@ -21,7 +23,7 @@ import { ParadaRota } from '../../models/pedido.model';
       #mapa
       class="mapa"
       role="img"
-      aria-label="Mapa com a rota otimizada e as paradas numeradas"
+      aria-label="Mapa com o trajeto e as paradas numeradas"
     ></div>
   `,
   styles: [`
@@ -44,27 +46,38 @@ import { ParadaRota } from '../../models/pedido.model';
     }
   `]
 })
-export class MapaRotaComponent implements AfterViewInit, OnChanges, OnDestroy {
-  @Input() paradas: ParadaRota[] = [];
+export class MapaRotaComponent
+  implements AfterViewInit, OnChanges, OnDestroy {
 
-  @ViewChild('mapa', { static: true }) private mapaEl!: ElementRef<HTMLDivElement>;
+  @Input() paradas: ParadaRota[] = [];
+  @Input() geometria: GeometriaRota | null = null;
+  @Input() geometriaAproximada = false;
+
+  @ViewChild('mapa', { static: true })
+  private mapaEl!: ElementRef<HTMLDivElement>;
 
   private mapa?: L.Map;
   private readonly camada = L.layerGroup();
 
   ngAfterViewInit(): void {
-    this.mapa = L.map(this.mapaEl.nativeElement, { scrollWheelZoom: false });
+    this.mapa = L.map(this.mapaEl.nativeElement, {
+      scrollWheelZoom: false
+    });
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution:
-        '&copy; colaboradores do <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(this.mapa);
+    L.tileLayer(
+      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        maxZoom: 19,
+        attribution:
+          '&copy; colaboradores do ' +
+          '<a href="https://www.openstreetmap.org/copyright">' +
+          'OpenStreetMap</a>'
+      }
+    ).addTo(this.mapa);
 
     this.camada.addTo(this.mapa);
     this.desenhar();
 
-    // garante o tamanho certo caso o container tenha acabado de aparecer
     setTimeout(() => this.mapa?.invalidateSize());
   }
 
@@ -84,46 +97,103 @@ export class MapaRotaComponent implements AfterViewInit, OnChanges, OnDestroy {
     this.camada.clearLayers();
 
     const paradas = this.paradas.filter(
-      (p) => p.latitude != null && p.longitude != null
+      p =>
+        Number.isFinite(p.latitude) &&
+        Number.isFinite(p.longitude)
     );
+
     if (!paradas.length) {
       return;
     }
 
-    const pontos = paradas.map((p) => L.latLng(p.latitude, p.longitude));
+    const pontos = paradas.map(
+      p => L.latLng(p.latitude, p.longitude)
+    );
 
-    // trajeto na ordem de visita
-    L.polyline(pontos, { color: '#0f766e', weight: 4, opacity: 0.85 }).addTo(this.camada);
+    // GeoJSON usa [longitude, latitude].
+    // Leaflet utiliza [latitude, longitude].
+    const trajeto = (
+      this.geometria?.type === 'LineString'
+        ? this.geometria.coordinates
+        : []
+    )
+      .filter(
+        coordenada =>
+          coordenada.length >= 2 &&
+          Number.isFinite(coordenada[0]) &&
+          Number.isFinite(coordenada[1])
+      )
+      .map(
+        ([longitude, latitude]) =>
+          L.latLng(latitude, longitude)
+      );
 
-    // volta ao ponto de partida (tracejada)
-    if (pontos.length > 1) {
-      L.polyline([pontos[pontos.length - 1], pontos[0]], {
+    if (trajeto.length >= 2) {
+      // Desenha a geometria devolvida pelo backend.
+      L.polyline(trajeto, {
         color: '#0f766e',
-        weight: 3,
-        opacity: 0.6,
+        weight: 4,
+        opacity: 0.85,
+        dashArray: this.geometriaAproximada
+          ? '6 8'
+          : undefined
+      }).addTo(this.camada);
+    } else {
+      // Alternativa visual quando nao houver geometria.
+      L.polyline(pontos, {
+        color: '#0f766e',
+        weight: 4,
+        opacity: 0.65,
         dashArray: '6 8'
       }).addTo(this.camada);
+
+      if (pontos.length > 1) {
+        L.polyline(
+          [pontos[pontos.length - 1], pontos[0]],
+          {
+            color: '#0f766e',
+            weight: 3,
+            opacity: 0.6,
+            dashArray: '6 8'
+          }
+        ).addTo(this.camada);
+      }
     }
 
-    paradas.forEach((p, i) => {
-      // popup montado com textContent: o endereço vem do banco e não deve virar html
+    paradas.forEach((parada, indice) => {
       const popup = document.createElement('div');
-      popup.textContent = `${p.ordem}. ${p.endereco}`;
+      popup.textContent =
+        `${parada.ordem}. ${parada.endereco}`;
 
-      L.marker(pontos[i], {
-        icon: this.icone(p.ordem, i === 0),
-        title: `${p.ordem}. ${p.endereco}`
+      L.marker(pontos[indice], {
+        icon: this.icone(
+          parada.ordem,
+          indice === 0
+        ),
+        title: `${parada.ordem}. ${parada.endereco}`
       })
         .bindPopup(popup)
         .addTo(this.camada);
     });
 
-    this.mapa.fitBounds(L.latLngBounds(pontos), { padding: [40, 40], maxZoom: 16 });
+    const limites = L.latLngBounds(
+      trajeto.length >= 2
+        ? [...trajeto, ...pontos]
+        : pontos
+    );
+
+    this.mapa.fitBounds(limites, {
+      padding: [40, 40],
+      maxZoom: 16
+    });
   }
 
-  // marcador numerado (a parada 1, que é a partida, fica mais escura)
-  private icone(ordem: number, partida: boolean): L.DivIcon {
+  private icone(
+    ordem: number,
+    partida: boolean
+  ): L.DivIcon {
     const cor = partida ? '#0f172a' : '#0f766e';
+
     const estilo = [
       'width:28px',
       'height:28px',

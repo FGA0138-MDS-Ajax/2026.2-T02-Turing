@@ -1,8 +1,14 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 import { API_URL } from '../config/api.config';
-import { DestinoRota, NovoPedido, Pedido, RespostaRota } from '../models/pedido.model';
+import {
+  Rota,
+  RotaCreateRequest,
+  RotaCreateResponse
+} from '../models/rota.model';
 
 @Injectable({
   providedIn: 'root'
@@ -12,18 +18,27 @@ export class RotaService {
 
   constructor(private http: HttpClient) {}
 
-  // calcula a rota: o primeiro destino da lista vira o ponto de partida e de volta (regra do otimizador)
-  calcularRota(destinos: DestinoRota[]): Observable<RespostaRota> {
-    return this.http.post<RespostaRota>(`${this.apiUrl}/calcular-rota`, { destinos });
+  // Calcula e armazena a rota no backend.
+  calcularRota(
+    dadosRota: RotaCreateRequest
+  ): Observable<RotaCreateResponse> {
+    return this.http.post<RotaCreateResponse>(
+      `${this.apiUrl}/calcular-rota`,
+      dadosRota
+    );
   }
 
-  // busca os pedidos salvos no banco
-  obterPedidos(): Observable<Pedido[]> {
-    return this.http.get<Pedido[]>(`${this.apiUrl}/pedidos`);
+  // Lista as rotas do motorista autenticado.
+  listarRotas(): Observable<Rota[]> {
+    return this.http.get<Rota[]>(
+      `${this.apiUrl}/rotas`
+    );
   }
 
-  // registra um novo pedido
-  criarPedido(dadosPedido: NovoPedido): Observable<Pedido> {
-    return this.http.post<Pedido>(`${this.apiUrl}/pedidos`, dadosPedido);
+  // Consulta uma rota armazenada.
+  obterRota(rotaId: number): Observable<Rota> {
+    return this.http.get<Rota>(
+      `${this.apiUrl}/rotas/${rotaId}`
+    );
   }
 }

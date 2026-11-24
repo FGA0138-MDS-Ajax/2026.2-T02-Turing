@@ -109,7 +109,7 @@
                         id="senhaCadastroUsuario"
                         type="password"
                         autocomplete="off"
-                        placeholder="Insira uma senha entre 8 e 20 caracteres"
+                        placeholder="Insira uma senha com ao menos 8 caracteres"
                         [(ngModel)]="formCadastro.senha"
                         (ngModelChange)="formCadastro.senha = $event; revalidarCadastro()"
                         [attr.aria-invalid]="!!errosFormCadastro.senha"

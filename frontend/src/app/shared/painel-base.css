@@ -155,7 +155,7 @@ select:focus-visible {
   color: var(--texto);
 }
 
-input:not([type='checkbox']),
+input:not([type='checkbox']):not([type='radio']),
 select {
   width: 100%;
   box-sizing: border-box;

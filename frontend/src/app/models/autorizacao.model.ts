@@ -1,13 +1,13 @@
 import { Usuario } from "./usuario.model";
 
 export interface LoginResponse {
-  token: String;
-  tipo: String;
-  expira_em: String;
-  usuario: Usuario;
+    token: string;
+    tipo: string;
+    expira_em: string;
+    usuario: Usuario;
 }
 
 export interface LoginInput{
-    email: String
-    senha: String
+    email: string
+    senha: string
 }

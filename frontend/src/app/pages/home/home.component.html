@@ -1,20 +1,26 @@
 <app-navbar rotaLogo="/home">
-    <div *ngIf="tipoUsuario != ''">
-        <button class="botao botao-secundario" routerLink="/home" disabled>Perfil</button>
+    <div *ngIf="bearer">
+        <button class="botao botao-primario" (click)="deslogar()" [disabled]="deslogando">Logout</button>
+    </div>
+    <div *ngIf="!bearer">
+        <button class="botao botao-primario" routerLink="/autenticacao">Login</button>
     </div>
 </app-navbar>
 <main class="conteudo">
     <section>
         <div class="vazio">
-            <h2>Bem vindo ao OpenRoute</h2>
-            <div *ngIf="tipoUsuario === ''">
-                <button class="botao botao-primario" routerLink="/autenticacao">Fazer Login</button>
+            <h1>Bem vindo ao OpenRoute</h1>
+            <div *ngIf="!bearer">
+                <h3>Faça login/cadastre-se para começar a utilizar a aplicação.</h3>
             </div>
-            <div *ngIf="tipoUsuario === 'ADM'">
-                <button class="botao botao-primario" routerLink="/painel-adm">Painel do ADM</button>
-            </div>
-            <div *ngIf="tipoUsuario === 'USUARIO'">
-                <button class="botao botao-primario" routerLink="/painel-motorista">Painel do Usuario</button>
+            <div *ngIf="bearer">
+                <h3>Siga para o painel para continuar.</h3>
+                <div *ngIf="tipoUsuario === 'ADM'">
+                    <button class="botao botao-primario" routerLink="/painel-adm" [disabled]="deslogando">Painel do ADM</button>
+                </div>
+                <div *ngIf="tipoUsuario === 'USUARIO'">
+                    <button class="botao botao-primario" routerLink="/painel-motorista" [disabled]="deslogando">Painel do Usuario</button>
+                </div>
             </div>
         </div>
     </section>
