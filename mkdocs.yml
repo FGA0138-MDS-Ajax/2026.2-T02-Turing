@@ -34,8 +34,16 @@ nav:
 
   - Testes: testes/testes.md
 
-  - Atas de reunião:
-      - Ata 1: atas-reuniao/ata-reuniao-1.md
+  - Acompanhamento:
+      - Sprints:
+          - Sprint 1: acompanhamento/sprints/sprint1.md
+          - Sprint 2: acompanhamento/sprints/sprint2.md
+          - Sprint 3: acompanhamento/sprints/sprint3.md
+          - Sprint 4: acompanhamento/sprints/sprint4.md
+          - Sprint 5: acompanhamento/sprints/sprint5.md
+          - Sprint 6: acompanhamento/sprints/sprint6.md
+      - Atas de Reunião:
+          - Ata da reunião 1: acompanhamento/atas-de-reuniao/ata-reuniao-1.md
 
 theme:
   name: material
