@@ -8,7 +8,7 @@ O OpenRoute é uma plataforma de otimização de rotas de entrega, desenvolvida 
 
 
 
-O sistema busca facilitar a definição da sequência de atendimento e dos trajetos a serem percorridos, considerando as informações dos destinos e as restrições operacionais cadastradas. Dessa forma, pretende contribuir para um melhor planejamento das entregas, reduzindo deslocamentos desnecessários e o tempo gasto nas operações.
+O sistema busca facilitar a definição da sequência de atendimento e dos trajetos a serem percorridos, considerando as informações dos destinos. Dessa forma, pretende contribuir para um melhor planejamento das entregas, reduzindo deslocamentos desnecessários e o tempo gasto nas operações.
 
 
 

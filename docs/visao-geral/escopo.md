@@ -22,7 +22,7 @@ O sistema contempla as seguintes áreas funcionais:
 
 - **Gerenciamento de destinos e informações de entrega:** organização dos dados necessários ao planejamento das operações.
 
-- **Otimização de rotas:** cálculo de trajetos e definição de uma sequência de atendimento considerando os dados e as restrições operacionais disponíveis.
+- **Otimização de rotas:** cálculo de trajetos e definição de uma sequência de atendimento considerando os dados disponíveis.
 
 - **Visualização de rotas:** apresentação dos trajetos em mapas para apoiar a execução das entregas.
 
@@ -46,11 +46,7 @@ O sistema possui dois perfis:
 
 
 
-O OpenRoute não substitui a execução física das entregas. Sua finalidade é apoiar o planejamento e a organização dos trajetos.
-
-
-
-A plataforma também depende de serviços externos para determinadas operações, como geocodificação de endereços e obtenção de informações de rotas.
+A plataforma depende de serviços externos para determinadas operações, como geocodificação de endereços e obtenção de informações de rotas.
 
 
 

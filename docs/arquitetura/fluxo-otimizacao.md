@@ -60,7 +60,7 @@ Ao final do processo, o sistema apresenta uma rota organizada, permitindo que o 
 
 
 
-A qualidade do resultado depende das informações fornecidas, das restrições consideradas e da disponibilidade dos serviços externos utilizados.
+A qualidade do resultado depende das informações fornecidas e da disponibilidade dos serviços externos utilizados.
 
 
 

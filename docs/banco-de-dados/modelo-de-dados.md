@@ -342,7 +342,7 @@ Os relacionamentos são estabelecidos por meio de chaves estrangeiras:
 
 - **usuarios e rotas:** um usuário pode estar associado a várias rotas, tanto como usuário responsável pela rota quanto como responsável por sua criação.
 
-- **rotas e restricoes\_operacionais:** uma rota pode possuir várias restrições operacionais.
+- **rotas e restricoes\_operacionais:** uma rota pode possuir restrição operacional (tempo).
 
 - **rotas e pedidos:** o relacionamento é realizado pela tabela intermediária `rota\_pedidos`, que registra os pedidos associados a cada rota e a ordem de atendimento.
 
