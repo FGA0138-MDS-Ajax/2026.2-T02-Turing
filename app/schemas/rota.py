@@ -1,4 +1,3 @@
-
 from datetime import datetime, date, time
 from typing import List, Optional, Any
 
@@ -47,6 +46,12 @@ class RotaCreate(BaseModel):
     provedor_calculo: Optional[str] = None
     calculada_em: Optional[datetime] = None
 
+    # A origem será armazenada separada das entregas.
+    # Temporariamente opcional para manter o código atual funcionando
+    # até atualizarmos a API e o repositório nos próximos passos.
+    origem_id: Optional[int] = Field(default=None, gt=0)
+
+    # Aqui ficam apenas os IDs das entregas, na ordem otimizada.
     ordem_enderecos: List[int] = Field(min_length=1)
 
 
@@ -63,6 +68,10 @@ class RotaResponse(BaseModel):
     criada_em: datetime
     atualizada_em: datetime
 
+    # Rotas anteriores não possuem uma origem separada registrada.
+    origem: Optional[RotaEnderecoResponse] = None
+
+    # Quando adaptarmos a serialização, esta lista terá só as entregas.
     enderecos: List[RotaEnderecoResponse] = Field(
         default_factory=list
     )

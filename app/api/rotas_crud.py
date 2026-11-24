@@ -17,9 +17,35 @@ rotas_crud_bp = Blueprint(
 
 
 def _Serializar(rota):
-    return RotaResponse.model_validate(rota).model_dump(
+    """Separa a origem das entregas na resposta da API."""
+
+    dados = RotaResponse.model_validate(rota).model_dump(
         mode="json"
     )
+
+    pontos = dados["enderecos"]
+
+    # A origem é armazenada na posição zero.
+    origem = next(
+        (
+            ponto
+            for ponto in pontos
+            if ponto["ordem_parada"] == 0
+        ),
+        None
+    )
+
+    # Somente os demais pontos são entregas.
+    entregas = [
+        ponto
+        for ponto in pontos
+        if ponto["ordem_parada"] != 0
+    ]
+
+    dados["origem"] = origem
+    dados["enderecos"] = entregas
+
+    return dados
 
 
 @rotas_crud_bp.get("/", strict_slashes=False)
@@ -30,9 +56,16 @@ def ListarRotas():
 
     rotas = (
         db.query(RotaModel)
-        .options(selectinload(RotaModel.enderecos))
-        .filter(RotaModel.usuario_id == usuario.id)
-        .order_by(RotaModel.criada_em.desc(), RotaModel.id.desc())
+        .options(
+            selectinload(RotaModel.enderecos)
+        )
+        .filter(
+            RotaModel.usuario_id == usuario.id
+        )
+        .order_by(
+            RotaModel.criada_em.desc(),
+            RotaModel.id.desc()
+        )
         .all()
     )
 
