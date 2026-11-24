@@ -8,24 +8,29 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core';
+
 import * as L from 'leaflet';
 
 import {
   GeometriaRota,
+  OrigemRota,
   ParadaRota
 } from '../../models/rota.model';
+
 
 @Component({
   selector: 'app-mapa-rota',
   standalone: true,
+
   template: `
     <div
       #mapa
       class="mapa"
       role="img"
-      aria-label="Mapa com o trajeto e as paradas numeradas"
+      aria-label="Mapa com a origem, as entregas e o trajeto da rota"
     ></div>
   `,
+
   styles: [`
     :host {
       display: block;
@@ -49,15 +54,24 @@ import {
 export class MapaRotaComponent
   implements AfterViewInit, OnChanges, OnDestroy {
 
+  // Origem independente das entregas.
+  @Input() origem: OrigemRota | null = null;
+
+  // Somente as entregas, na ordem otimizada.
   @Input() paradas: ParadaRota[] = [];
+
+  // Geometria calculada pelo backend.
   @Input() geometria: GeometriaRota | null = null;
+
   @Input() geometriaAproximada = false;
 
   @ViewChild('mapa', { static: true })
   private mapaEl!: ElementRef<HTMLDivElement>;
 
   private mapa?: L.Map;
+
   private readonly camada = L.layerGroup();
+
 
   ngAfterViewInit(): void {
     this.mapa = L.map(this.mapaEl.nativeElement, {
@@ -76,18 +90,24 @@ export class MapaRotaComponent
     ).addTo(this.mapa);
 
     this.camada.addTo(this.mapa);
+
     this.desenhar();
 
-    setTimeout(() => this.mapa?.invalidateSize());
+    setTimeout(() => {
+      this.mapa?.invalidateSize();
+    });
   }
+
 
   ngOnChanges(): void {
     this.desenhar();
   }
 
+
   ngOnDestroy(): void {
     this.mapa?.remove();
   }
+
 
   private desenhar(): void {
     if (!this.mapa) {
@@ -96,19 +116,37 @@ export class MapaRotaComponent
 
     this.camada.clearLayers();
 
-    const paradas = this.paradas.filter(
-      p =>
-        Number.isFinite(p.latitude) &&
-        Number.isFinite(p.longitude)
+    // Valida as coordenadas da origem.
+    const origemValida =
+      this.origem !== null &&
+      Number.isFinite(this.origem.latitude) &&
+      Number.isFinite(this.origem.longitude);
+
+    const pontoOrigem = origemValida && this.origem
+      ? L.latLng(
+          this.origem.latitude,
+          this.origem.longitude
+        )
+      : null;
+
+    // Mantém somente entregas com coordenadas válidas.
+    const paradasValidas = this.paradas.filter(
+      parada =>
+        Number.isFinite(parada.latitude) &&
+        Number.isFinite(parada.longitude)
     );
 
-    if (!paradas.length) {
-      return;
-    }
-
-    const pontos = paradas.map(
-      p => L.latLng(p.latitude, p.longitude)
+    const pontosEntregas = paradasValidas.map(
+      parada => L.latLng(
+        parada.latitude,
+        parada.longitude
+      )
     );
+
+    const pontosMarcadores: L.LatLng[] = [
+      ...(pontoOrigem ? [pontoOrigem] : []),
+      ...pontosEntregas
+    ];
 
     // GeoJSON usa [longitude, latitude].
     // Leaflet utiliza [latitude, longitude].
@@ -128,8 +166,13 @@ export class MapaRotaComponent
           L.latLng(latitude, longitude)
       );
 
+    // ---------------------------------------
+    // DESENHO DO TRAJETO
+    // ---------------------------------------
+
     if (trajeto.length >= 2) {
-      // Desenha a geometria devolvida pelo backend.
+
+      // Usa a geometria viária retornada pelo backend.
       L.polyline(trajeto, {
         color: '#0f766e',
         weight: 4,
@@ -138,49 +181,98 @@ export class MapaRotaComponent
           ? '6 8'
           : undefined
       }).addTo(this.camada);
-    } else {
-      // Alternativa visual quando nao houver geometria.
-      L.polyline(pontos, {
-        color: '#0f766e',
-        weight: 4,
-        opacity: 0.65,
-        dashArray: '6 8'
-      }).addTo(this.camada);
 
-      if (pontos.length > 1) {
-        L.polyline(
-          [pontos[pontos.length - 1], pontos[0]],
-          {
-            color: '#0f766e',
-            weight: 3,
-            opacity: 0.6,
-            dashArray: '6 8'
-          }
-        ).addTo(this.camada);
+    } else {
+
+      // Caso não haja geometria, utiliza linhas
+      // aproximadas ligando origem e entregas.
+      const percurso: L.LatLng[] = [
+        ...(pontoOrigem ? [pontoOrigem] : []),
+        ...pontosEntregas
+      ];
+
+      // Retorna à origem, quando ela estiver disponível.
+      if (pontoOrigem && pontosEntregas.length > 0) {
+        percurso.push(pontoOrigem);
+      }
+
+      if (percurso.length >= 2) {
+        L.polyline(percurso, {
+          color: '#0f766e',
+          weight: 4,
+          opacity: 0.65,
+          dashArray: '6 8'
+        }).addTo(this.camada);
       }
     }
 
-    paradas.forEach((parada, indice) => {
-      const popup = document.createElement('div');
-      popup.textContent =
-        `${parada.ordem}. ${parada.endereco}`;
+    // ---------------------------------------
+    // MARCADOR DA ORIGEM
+    // ---------------------------------------
 
-      L.marker(pontos[indice], {
+    if (pontoOrigem && this.origem) {
+
+      const popupOrigem = document.createElement('div');
+
+      popupOrigem.textContent =
+        'Ponto de partida e retorno: ' +
+        this.origem.endereco;
+
+      L.marker(pontoOrigem, {
+        icon: this.icone('O', true),
+        title: 'Origem: ' + this.origem.endereco
+      })
+        .bindPopup(popupOrigem)
+        .addTo(this.camada);
+    }
+
+    // ---------------------------------------
+    // MARCADORES DAS ENTREGAS
+    // ---------------------------------------
+
+    paradasValidas.forEach(parada => {
+
+      const ponto = L.latLng(
+        parada.latitude,
+        parada.longitude
+      );
+
+      const popup = document.createElement('div');
+
+      popup.textContent =
+        `Entrega ${parada.ordem}: ${parada.endereco}`;
+
+      L.marker(ponto, {
         icon: this.icone(
-          parada.ordem,
-          indice === 0
+          String(parada.ordem),
+          false
         ),
-        title: `${parada.ordem}. ${parada.endereco}`
+        title:
+          `Entrega ${parada.ordem}: ${parada.endereco}`
       })
         .bindPopup(popup)
         .addTo(this.camada);
     });
 
-    const limites = L.latLngBounds(
-      trajeto.length >= 2
-        ? [...trajeto, ...pontos]
-        : pontos
-    );
+    // ---------------------------------------
+    // ENQUADRAMENTO DO MAPA
+    // ---------------------------------------
+
+    const pontosVisiveis = [
+      ...pontosMarcadores,
+      ...trajeto
+    ];
+
+    if (pontosVisiveis.length === 0) {
+      return;
+    }
+
+    if (pontosVisiveis.length === 1) {
+      this.mapa.setView(pontosVisiveis[0], 15);
+      return;
+    }
+
+    const limites = L.latLngBounds(pontosVisiveis);
 
     this.mapa.fitBounds(limites, {
       padding: [40, 40],
@@ -188,11 +280,17 @@ export class MapaRotaComponent
     });
   }
 
+
   private icone(
-    ordem: number,
-    partida: boolean
+    rotulo: string,
+    ehOrigem: boolean
   ): L.DivIcon {
-    const cor = partida ? '#0f172a' : '#0f766e';
+
+    // Azul-escuro para a origem.
+    // Verde para as entregas.
+    const cor = ehOrigem
+      ? '#0f172a'
+      : '#0f766e';
 
     const estilo = [
       'width:28px',
@@ -210,7 +308,7 @@ export class MapaRotaComponent
 
     return L.divIcon({
       className: '',
-      html: `<div style="${estilo}">${ordem}</div>`,
+      html: `<div style="${estilo}">${rotulo}</div>`,
       iconSize: [28, 28],
       iconAnchor: [14, 14],
       popupAnchor: [0, -14]

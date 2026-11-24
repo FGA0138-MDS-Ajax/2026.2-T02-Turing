@@ -8,14 +8,14 @@
 
 <main class="conteudo">
 
-  <!-- CABECALHO -->
+  <!-- CABEÇALHO -->
 
   <div class="cabecalho-pagina">
     <div>
       <h1>Planejamento de rotas</h1>
       <p class="descricao">
-        Cadastre seus endereços, selecione as paradas
-        e calcule a melhor rota para suas entregas.
+        Cadastre seus endereços, escolha a origem,
+        selecione as entregas e calcule a melhor rota.
       </p>
     </div>
 
@@ -38,7 +38,7 @@
     {{ mensagemSucesso }}
   </div>
 
-  <!-- CADASTRO E EDICAO DE ENDERECOS -->
+  <!-- CADASTRO E EDIÇÃO -->
 
   <section
     *ngIf="exibirFormulario"
@@ -46,9 +46,11 @@
     aria-labelledby="titulo-formulario"
   >
     <h2 id="titulo-formulario">
-      {{ enderecoEmEdicaoId === null
+      {{
+        enderecoEmEdicaoId === null
           ? 'Cadastrar endereço'
-          : 'Editar endereço' }}
+          : 'Editar endereço'
+      }}
     </h2>
 
     <p class="descricao">
@@ -63,7 +65,10 @@
       <div class="grade-campos">
 
         <div class="campo">
-          <label for="logradouro">Quadra ou logradouro *</label>
+          <label for="logradouro">
+            Quadra ou logradouro *
+          </label>
+
           <input
             id="logradouro"
             name="logradouro"
@@ -75,7 +80,10 @@
         </div>
 
         <div class="campo">
-          <label for="numero">Número ou lote *</label>
+          <label for="numero">
+            Número ou lote *
+          </label>
+
           <input
             id="numero"
             name="numero"
@@ -87,7 +95,10 @@
         </div>
 
         <div class="campo">
-          <label for="complemento">Conjunto / Complemento</label>
+          <label for="complemento">
+            Conjunto / Complemento
+          </label>
+
           <input
             id="complemento"
             name="complemento"
@@ -99,6 +110,7 @@
 
         <div class="campo">
           <label for="bairro">Bairro</label>
+
           <input
             id="bairro"
             name="bairro"
@@ -110,6 +122,7 @@
 
         <div class="campo">
           <label for="cidade">Cidade *</label>
+
           <input
             id="cidade"
             name="cidade"
@@ -121,6 +134,7 @@
 
         <div class="campo">
           <label for="estado">Estado (UF) *</label>
+
           <input
             id="estado"
             name="estado"
@@ -135,6 +149,7 @@
 
         <div class="campo ocupa-tudo">
           <label for="cep">CEP *</label>
+
           <input
             id="cep"
             name="cep"
@@ -146,9 +161,11 @@
           >
         </div>
 
+        <!-- JANELAS DE HORÁRIO -->
+
         <div class="campo">
           <label for="janela-inicio">
-            Início da janela de horário *
+            Início da janela de horário
           </label>
 
           <input
@@ -156,13 +173,12 @@
             name="janela_inicio"
             type="time"
             [(ngModel)]="formEndereco.janela_inicio"
-            required
           >
         </div>
 
         <div class="campo">
           <label for="janela-fim">
-            Fim da janela de horário *
+            Fim da janela de horário
           </label>
 
           <input
@@ -170,13 +186,20 @@
             name="janela_fim"
             type="time"
             [(ngModel)]="formEndereco.janela_fim"
-            required
           >
         </div>
 
         <p class="ajuda ocupa-tudo">
-          A janela de horário indica o período em que
-          a entrega pode acontecer nesse endereço.
+          <strong>Para endereços de entrega:</strong>
+          informe obrigatoriamente o início e o fim
+          da janela de horário.
+
+          <br>
+
+          <strong>Para endereços usados apenas como origem:</strong>
+          você pode deixar os dois horários vazios.
+
+          <br>
 
           Não é necessário informar latitude ou longitude.
         </p>
@@ -226,11 +249,10 @@
           }}
         </button>
       </div>
-
     </form>
   </section>
 
-  <!-- LISTAGEM DOS ENDERECOS -->
+  <!-- LISTA DE ENDEREÇOS -->
 
   <section
     class="cartao"
@@ -238,9 +260,13 @@
   >
     <div class="cabecalho-pagina">
       <div>
-        <h2 id="titulo-enderecos">Meus endereços</h2>
+        <h2 id="titulo-enderecos">
+          Meus endereços
+        </h2>
+
         <p class="descricao">
-          Selecione os endereços que deseja incluir na rota.
+          Marque as entregas que deseja incluir na rota.
+          O ponto de partida será escolhido separadamente.
         </p>
       </div>
 
@@ -284,14 +310,13 @@
     <ng-container
       *ngIf="!carregandoEnderecos && !erroEnderecos"
     >
-
       <div
         *ngIf="enderecos.length > 0; else semEnderecos"
         class="tabela-wrap"
       >
         <table>
           <caption class="sr-somente">
-            Lista dos endereços cadastrados pelo motorista
+            Endereços cadastrados pelo motorista
           </caption>
 
           <thead>
@@ -301,7 +326,7 @@
                   type="checkbox"
                   [checked]="todosSelecionados"
                   (change)="alternarTodos()"
-                  aria-label="Selecionar todos os endereços validados"
+                  aria-label="Selecionar todas as entregas disponíveis"
                 >
               </th>
 
@@ -315,16 +340,19 @@
           <tbody>
             <tr
               *ngFor="let endereco of enderecos"
-              [class.linha-bloqueada]="!podeSelecionar(endereco)"
+              [class.linha-bloqueada]="
+                !podeSerOrigem(endereco)
+              "
             >
               <td class="coluna-check">
                 <input
                   type="checkbox"
                   [checked]="selecionados.has(endereco.id)"
-                  [disabled]="!podeSelecionar(endereco)"
+                  [disabled]="!podeSelecionarEntrega(endereco)"
                   (change)="alternarSelecao(endereco)"
                   [attr.aria-label]="
-                    'Selecionar endereço ' + endereco.id
+                    'Selecionar entrega no endereço ' +
+                    endereco.id
                   "
                 >
               </td>
@@ -353,6 +381,15 @@
                 <small class="obs">
                   CEP: {{ endereco.cep }}
                 </small>
+
+                <small
+                  class="obs"
+                  *ngIf="endereco.id === pontoPartidaId"
+                >
+                  <strong>
+                    Ponto de partida e retorno
+                  </strong>
+                </small>
               </td>
 
               <td>
@@ -369,7 +406,7 @@
                 </ng-container>
 
                 <ng-template #janelaNaoInformada>
-                  Não informada
+                  Sem janela de entrega
                 </ng-template>
               </td>
 
@@ -390,9 +427,20 @@
 
                 <small
                   class="obs"
-                  *ngIf="!podeSelecionar(endereco)"
+                  *ngIf="!podeSerOrigem(endereco)"
                 >
-                  Endereço ainda não disponível para cálculo.
+                  Endereço ainda não validado para cálculo.
+                </small>
+
+                <small
+                  class="obs"
+                  *ngIf="
+                    podeSerOrigem(endereco) &&
+                    !endereco.janela_inicio &&
+                    endereco.id !== pontoPartidaId
+                  "
+                >
+                  Disponível como origem.
                 </small>
               </td>
 
@@ -435,33 +483,36 @@
           </button>
         </div>
       </ng-template>
-
     </ng-container>
   </section>
 
-  <!-- CALCULO DA ROTA -->
+  <!-- CÁLCULO DA ROTA -->
 
   <section
     class="cartao"
     aria-labelledby="titulo-calculo"
   >
-    <h2 id="titulo-calculo">Calcular rota otimizada</h2>
+    <h2 id="titulo-calculo">
+      Calcular rota otimizada
+    </h2>
 
     <p class="descricao">
-      Escolha pelo menos dois endereços validados
-      e configure sua saída.
+      Escolha um ponto de partida e selecione
+      as entregas que deseja realizar.
     </p>
 
     <p class="ajuda">
       {{ enderecosSelecionados.length }}
       {{
         enderecosSelecionados.length === 1
-          ? 'endereço selecionado'
-          : 'endereços selecionados'
+          ? 'entrega selecionada'
+          : 'entregas selecionadas'
       }}
     </p>
 
     <div class="grade-campos">
+
+      <!-- ORIGEM INDEPENDENTE -->
 
       <div class="campo ocupa-tudo">
         <label for="ponto-partida">
@@ -472,14 +523,17 @@
           id="ponto-partida"
           name="ponto_partida"
           [(ngModel)]="pontoPartidaId"
-          [disabled]="enderecosSelecionados.length < 2"
+          (ngModelChange)="aoAlterarPontoPartida()"
+          [disabled]="carregandoEnderecos"
         >
           <option [ngValue]="null">
-            Selecione os endereços na tabela
+            Selecione o endereço de origem
           </option>
 
           <option
-            *ngFor="let endereco of enderecosSelecionados"
+            *ngFor="
+              let endereco of enderecosDisponiveisOrigem
+            "
             [ngValue]="endereco.id"
           >
             {{ formatarEndereco(endereco) }}
@@ -487,12 +541,15 @@
         </select>
 
         <span class="ajuda">
-          A rota começa e termina nesse endereço.
+          A rota começa e termina nesse local.
+          Ele não será contabilizado como entrega.
         </span>
       </div>
 
       <div class="campo">
-        <label for="data-execucao">Data da rota *</label>
+        <label for="data-execucao">
+          Data da rota *
+        </label>
 
         <input
           id="data-execucao"
@@ -504,7 +561,9 @@
       </div>
 
       <div class="campo">
-        <label for="hora-saida">Horário de saída *</label>
+        <label for="hora-saida">
+          Horário de saída *
+        </label>
 
         <input
           id="hora-saida"
@@ -513,6 +572,11 @@
           [(ngModel)]="horaSaida"
           required
         >
+
+        <span class="ajuda">
+          A saída pode ocorrer antes das janelas
+          das entregas.
+        </span>
       </div>
 
       <div class="campo ocupa-tudo">
@@ -546,7 +610,8 @@
         (click)="calcularRota()"
         [disabled]="
           calculando ||
-          enderecosSelecionados.length < 2
+          pontoPartidaId === null ||
+          enderecosSelecionados.length < 1
         "
       >
         {{
@@ -556,9 +621,10 @@
         }}
       </button>
     </div>
+
   </section>
 
-  <!-- RESULTADO E MAPA -->
+  <!-- RESULTADO DA ROTA -->
 
   <section
     #blocoResultado
@@ -587,15 +653,34 @@
         </dd>
       </div>
 
+
+    <!-- Tempo gasto efetivamente percorrendo o trajeto -->
       <div>
-        <dt>Tempo estimado</dt>
+        <dt>Tempo de deslocamento</dt>
+        <dd>
+         {{ formatarDuracao(resultado.tempo_deslocamento_min) }}
+        </dd>
+      </div>
+
+    <!-- Tempo aguardando as janelas de entrega -->
+    <div>
+      <dt>Tempo de espera</dt>
+      <dd>
+        {{ formatarDuracao(resultado.tempo_espera_min) }}
+      </dd>
+    </div>
+
+      <!-- Duração completa: deslocamento + espera -->
+      <div>
+        <dt>Duração total da rota</dt>
         <dd>
           {{ formatarDuracao(resultado.tempo_estimado_min) }}
         </dd>
       </div>
 
+
       <div>
-        <dt>Paradas</dt>
+        <dt>Entregas</dt>
         <dd>
           {{ resultado.rota_otimizada.length }}
         </dd>
@@ -612,42 +697,116 @@
 
       <div>
         <h3>Ordem das paradas</h3>
+  <ol class="paradas">
 
-        <ol class="paradas">
-          <li
-            *ngFor="let parada of resultado.rota_otimizada"
-          >
-            <span
-              class="numero"
-              aria-hidden="true"
-            >
-              {{ parada.ordem }}
-            </span>
+  <!-- SAÍDA DA ORIGEM -->
 
-            <span class="parada-texto">
-              <span class="sr-somente">
-                Parada {{ parada.ordem }}:
-              </span>
+  <li>
+    <span class="numero" aria-hidden="true">
+      O
+    </span>
 
-              {{ parada.endereco }}
+    <span class="parada-texto">
+      <strong>{{ resultado.origem.endereco }}</strong>
 
-              <small *ngIf="parada.ordem === 1">
-                Partida e retorno
-              </small>
-            </span>
-          </li>
-        </ol>
+      <small>
+        Ponto de partida
+      </small>
+
+      <small>
+        Saída prevista:
+        {{ resultado.saida_origem_prevista | date:'dd/MM/yyyy HH:mm' }}
+      </small>
+    </span>
+  </li>
+
+  <!-- ENTREGAS NA ORDEM OTIMIZADA -->
+
+  <li *ngFor="let parada of resultado.rota_otimizada">
+
+    <span class="numero" aria-hidden="true">
+      {{ parada.ordem }}
+    </span>
+
+    <span class="parada-texto">
+
+      <strong>{{ parada.endereco }}</strong>
+
+      <small>
+        Entrega {{ parada.ordem }}
+      </small>
+
+      <small>
+        Janela de horário:
+        {{ parada.janela_inicio.slice(0, 5) }}
+        às
+        {{ parada.janela_fim.slice(0, 5) }}
+      </small>
+
+      <small>
+        <strong>Chegada prevista:</strong>
+        {{ parada.chegada_prevista | date:'dd/MM/yyyy HH:mm' }}
+      </small>
+
+      <small>
+        <strong>Atendimento previsto:</strong>
+        {{ parada.atendimento_previsto | date:'dd/MM/yyyy HH:mm' }}
+      </small>
+
+      <small *ngIf="parada.espera_min > 0">
+        <strong>Tempo de espera:</strong>
+        {{ formatarDuracao(parada.espera_min) }}
+      </small>
+
+      <small>
+        Saída prevista:
+        {{ parada.saida_prevista | date:'dd/MM/yyyy HH:mm' }}
+      </small>
+
+    </span>
+  </li>
+
+  <!-- RETORNO À ORIGEM -->
+
+  <li>
+    <span
+      class="numero"
+      style="background: #0f172a;"
+      aria-hidden="true"
+    >
+      O
+    </span>
+
+    <span class="parada-texto">
+
+      <strong>{{ resultado.origem.endereco }}</strong>
+
+      <small>
+        Retorno à origem
+      </small>
+
+      <small>
+        <strong>Retorno previsto:</strong>
+        {{ resultado.retorno_previsto | date:'dd/MM/yyyy HH:mm' }}
+      </small>
+
+    </span>
+  </li>
+
+  </ol>
+
       </div>
 
       <div>
         <h3>Mapa da rota</h3>
 
         <app-mapa-rota
-          [paradas]="resultado.rota_otimizada"
-          [geometria]="resultado.geometria"
-          [geometriaAproximada]="
-            resultado.geometria_aproximada
-          "
+        [origem]="resultado.origem"
+        [paradas]="resultado.rota_otimizada"
+        [geometria]="resultado.geometria"
+        [geometriaAproximada]="
+        resultado.geometria_aproximada
+        "
         ></app-mapa-rota>
       </div>
 

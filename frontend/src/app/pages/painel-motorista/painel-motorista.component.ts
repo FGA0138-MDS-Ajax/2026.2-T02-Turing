@@ -69,36 +69,37 @@ function dataLocalHoje(): string {
 })
 export class PainelMotoristaComponent implements OnInit {
 
-  // Mantemos o ID antigo para nao quebrar o HTML atual.
   readonly abas = [
     { id: 'entregas', rotulo: 'Planejar rota' }
   ];
 
   abaAtiva = 'entregas';
 
-  // Enderecos cadastrados pelo motorista.
+  // Endereços cadastrados pelo motorista.
   enderecos: Destino[] = [];
   carregandoEnderecos = false;
   erroEnderecos = '';
   mensagemSucesso = '';
 
-  // Formulario de cadastro e edicao.
+  // Formulário de cadastro e edição.
   exibirFormulario = false;
   salvandoEndereco = false;
   enderecoEmEdicaoId: number | null = null;
   formEndereco: DestinoCreateRequest = formularioVazio();
   erroFormulario = '';
 
-  // Enderecos selecionados para a rota.
+  // Apenas os IDs das entregas.
   selecionados = new Set<number>();
+
+  // A origem é independente das entregas.
   pontoPartidaId: number | null = null;
 
-  // Configuracoes da rota.
+  // Configurações da rota.
   dataExecucao = dataLocalHoje();
   horaSaida = '12:00';
   nomeRota = '';
 
-  // Resultado do calculo.
+  // Resultado do cálculo.
   calculando = false;
   erroRota = '';
   resultado: RotaCreateResponse | null = null;
@@ -116,7 +117,7 @@ export class PainelMotoristaComponent implements OnInit {
   }
 
   // -----------------------------------------------
-  // Listagem de enderecos
+  // Listagem de endereços
   // -----------------------------------------------
 
   carregarEnderecos(): void {
@@ -128,22 +129,24 @@ export class PainelMotoristaComponent implements OnInit {
         this.enderecos = dados;
         this.carregandoEnderecos = false;
 
-        // Remove da selecao enderecos que deixaram
-        // de existir ou que nao estao validados.
+        // Verifica se a origem escolhida ainda existe
+        // e possui coordenadas validadas.
+        this.ajustarPontoPartida();
+
+        // Mantém somente entregas válidas, diferentes da origem.
         this.selecionados = new Set(
           [...this.selecionados].filter(id =>
-            dados.some(
-              endereco =>
-                endereco.id === id &&
-                this.podeSelecionar(endereco)
+            id !== this.pontoPartidaId &&
+            dados.some(endereco =>
+              endereco.id === id &&
+              this.podeSelecionarEntrega(endereco)
             )
           )
         );
-
-        this.ajustarPontoPartida();
       },
       error: (erro) => {
         this.carregandoEnderecos = false;
+
         this.erroEnderecos = mensagemDeErro(
           erro,
           'Não foi possível carregar seus endereços.'
@@ -164,7 +167,7 @@ export class PainelMotoristaComponent implements OnInit {
   }
 
   // -----------------------------------------------
-  // Cadastro e edicao de enderecos
+  // Cadastro e edição de endereços
   // -----------------------------------------------
 
   abrirCadastro(): void {
@@ -210,8 +213,18 @@ export class PainelMotoristaComponent implements OnInit {
     this.erroFormulario = '';
     this.mensagemSucesso = '';
 
+    const inicioJanela =
+      this.formEndereco.janela_inicio?.trim() || null;
+
+    const fimJanela =
+      this.formEndereco.janela_fim?.trim() || null;
+
     const dados: DestinoCreateRequest = {
       ...this.formEndereco,
+
+      janela_inicio: inicioJanela,
+      janela_fim: fimJanela,
+
       logradouro: this.formEndereco.logradouro.trim(),
       numero: this.formEndereco.numero.trim(),
       complemento: this.formEndereco.complemento?.trim(),
@@ -228,27 +241,36 @@ export class PainelMotoristaComponent implements OnInit {
       !dados.estado ||
       !dados.cep
     ) {
-      this.erroFormulario = 'Preencha os campos obrigatórios.';
+      this.erroFormulario =
+        'Preencha os campos obrigatórios.';
       return;
     }
 
     if (dados.estado.length !== 2) {
-      this.erroFormulario = 'Informe a UF com duas letras.';
+      this.erroFormulario =
+        'Informe a UF com duas letras.';
       return;
     }
 
     if (!/^\d{8}$/.test(dados.cep)) {
-      this.erroFormulario = 'Informe um CEP com oito dígitos.';
-      return;
-    }
-
-    if (!dados.janela_inicio || !dados.janela_fim) {
       this.erroFormulario =
-        'Informe o início e o fim da janela de horário.';
+        'Informe um CEP com oito dígitos.';
       return;
     }
 
-    if (dados.janela_fim < dados.janela_inicio) {
+    // A origem pode ficar sem janela.
+    // Entretanto, uma janela parcial não é válida.
+    if (Boolean(inicioJanela) !== Boolean(fimJanela)) {
+      this.erroFormulario =
+        'Informe os dois horários da janela ou deixe ambos vazios.';
+      return;
+    }
+
+    if (
+      inicioJanela &&
+      fimJanela &&
+      fimJanela < inicioJanela
+    ) {
       this.erroFormulario =
         'O fim da janela não pode ser anterior ao início.';
       return;
@@ -300,9 +322,12 @@ export class PainelMotoristaComponent implements OnInit {
     this.destinoService.deletarDestino(endereco.id).subscribe({
       next: () => {
         this.selecionados.delete(endereco.id);
-        this.ajustarPontoPartida();
-        this.resultado = null;
 
+        if (this.pontoPartidaId === endereco.id) {
+          this.pontoPartidaId = null;
+        }
+
+        this.resultado = null;
         this.mensagemSucesso = 'Endereço excluído com sucesso.';
         this.carregarEnderecos();
       },
@@ -316,10 +341,12 @@ export class PainelMotoristaComponent implements OnInit {
   }
 
   // -----------------------------------------------
-  // Selecao de paradas
+  // Origem e seleção das entregas
   // -----------------------------------------------
 
-  podeSelecionar(endereco: Destino): boolean {
+  // A origem precisa estar geocodificada.
+  // Não precisa possuir janela de entrega.
+  podeSerOrigem(endereco: Destino): boolean {
     return (
       endereco.validacao_status === StatusValidacao.VALIDADO &&
       endereco.latitude != null &&
@@ -327,27 +354,52 @@ export class PainelMotoristaComponent implements OnInit {
     );
   }
 
+  // Toda entrega precisa ter uma janela completa.
+  podeSelecionarEntrega(endereco: Destino): boolean {
+    return (
+      this.podeSerOrigem(endereco) &&
+      !!endereco.janela_inicio &&
+      !!endereco.janela_fim &&
+      endereco.janela_inicio <= endereco.janela_fim &&
+      endereco.id !== this.pontoPartidaId
+    );
+  }
+
+  // Mantém compatibilidade com o HTML atual.
+  podeSelecionar(endereco: Destino): boolean {
+    return this.podeSelecionarEntrega(endereco);
+  }
+
+  // Endereços disponíveis para saída e retorno.
+  get enderecosDisponiveisOrigem(): Destino[] {
+    return this.enderecos.filter(endereco =>
+      this.podeSerOrigem(endereco)
+    );
+  }
+
+  // Somente as entregas selecionadas.
   get enderecosSelecionados(): Destino[] {
-    return this.enderecos.filter(
-      endereco => this.selecionados.has(endereco.id)
+    return this.enderecos.filter(endereco =>
+      this.selecionados.has(endereco.id) &&
+      this.podeSelecionarEntrega(endereco)
     );
   }
 
   get todosSelecionados(): boolean {
-    const disponiveis = this.enderecos.filter(
-      endereco => this.podeSelecionar(endereco)
+    const disponiveis = this.enderecos.filter(endereco =>
+      this.podeSelecionarEntrega(endereco)
     );
 
     return (
       disponiveis.length > 0 &&
-      disponiveis.every(
-        endereco => this.selecionados.has(endereco.id)
+      disponiveis.every(endereco =>
+        this.selecionados.has(endereco.id)
       )
     );
   }
 
   alternarSelecao(endereco: Destino): void {
-    if (!this.podeSelecionar(endereco)) {
+    if (!this.podeSelecionarEntrega(endereco)) {
       return;
     }
 
@@ -357,7 +409,7 @@ export class PainelMotoristaComponent implements OnInit {
       this.selecionados.add(endereco.id);
     }
 
-    this.ajustarPontoPartida();
+    this.resultado = null;
   }
 
   alternarTodos(): void {
@@ -365,41 +417,74 @@ export class PainelMotoristaComponent implements OnInit {
       this.selecionados.clear();
     } else {
       this.enderecos
-        .filter(endereco => this.podeSelecionar(endereco))
+        .filter(endereco => this.podeSelecionarEntrega(endereco))
         .forEach(endereco =>
           this.selecionados.add(endereco.id)
         );
     }
 
+    this.resultado = null;
+  }
+
+  // Executado ao escolher uma origem no formulário.
+  aoAlterarPontoPartida(): void {
+    if (this.pontoPartidaId !== null) {
+      this.selecionados.delete(this.pontoPartidaId);
+    }
+
     this.ajustarPontoPartida();
+
+    this.erroRota = '';
+    this.resultado = null;
   }
 
   private ajustarPontoPartida(): void {
-    const selecionados = this.enderecosSelecionados;
+    const origem = this.enderecos.find(endereco =>
+      endereco.id === this.pontoPartidaId
+    );
 
-    if (
-      !selecionados.some(
-        endereco => endereco.id === this.pontoPartidaId
-      )
-    ) {
-      this.pontoPartidaId = selecionados[0]?.id ?? null;
+    if (!origem || !this.podeSerOrigem(origem)) {
+      this.pontoPartidaId = null;
+    }
+
+    if (this.pontoPartidaId !== null) {
+      this.selecionados.delete(this.pontoPartidaId);
     }
   }
 
   // -----------------------------------------------
-  // Calculo da rota
+  // Cálculo da rota
   // -----------------------------------------------
 
   calcularRota(): void {
-    const enderecos = this.enderecosSelecionados;
-
     if (this.calculando) {
       return;
     }
 
-    if (enderecos.length < 2) {
+    this.erroRota = '';
+
+    const origem = this.enderecos.find(endereco =>
+      endereco.id === this.pontoPartidaId &&
+      this.podeSerOrigem(endereco)
+    );
+
+    if (!origem) {
       this.erroRota =
-        'Selecione pelo menos dois endereços validados.';
+        'Selecione um ponto de partida válido.';
+      return;
+    }
+
+    const entregas = this.enderecosSelecionados;
+
+    if (entregas.length < 1) {
+      this.erroRota =
+        'Selecione pelo menos uma entrega validada com janela de horário.';
+      return;
+    }
+
+    if (entregas.some(entrega => entrega.id === origem.id)) {
+      this.erroRota =
+        'O ponto de partida não pode ser também uma entrega.';
       return;
     }
 
@@ -409,28 +494,16 @@ export class PainelMotoristaComponent implements OnInit {
       return;
     }
 
-    const partida = enderecos.find(
-      endereco => endereco.id === this.pontoPartidaId
-    ) ?? enderecos[0];
-
-    // O primeiro endereco enviado ao backend
-    // e o ponto inicial e final da rota.
-    const ordenados = [
-      partida,
-      ...enderecos.filter(
-        endereco => endereco.id !== partida.id
-      )
-    ];
-
+    // A origem é enviada separadamente das entregas.
     const dados: RotaCreateRequest = {
-      ids_enderecos: ordenados.map(endereco => endereco.id),
+      id_origem: origem.id,
+      ids_enderecos: entregas.map(entrega => entrega.id),
       data_execucao: this.dataExecucao,
       hora_saida: this.horaSaida,
       nome: this.nomeRota.trim() || undefined
     };
 
     this.calculando = true;
-    this.erroRota = '';
     this.resultado = null;
 
     this.rotaService.calcularRota(dados).subscribe({
