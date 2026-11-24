@@ -18,33 +18,64 @@ class ErroGeoportal(Exception):
     """Falha ao consultar ou interpretar os dados do Geoportal DF."""
 
 
+def _ExtrairQuadra(logradouro, complemento):
+    """Identifica o número e, se explícito, o prefixo da quadra.
+
+    Exemplos: QR 111, Q 1, QNP 27, QNM 20, QNN 5 e Quadra 1.
+    Para 'Quadra 1' ou '1', o prefixo permanece indefinido.
+    """
+    texto = f"{logradouro or ''} {complemento or ''}"
+    correspondencia = re.search(
+        r"\b(quadra|qd|q[a-z]{0,3})\s*0*(\d+)\b", texto, re.I
+    )
+
+    if correspondencia:
+        prefixo = correspondencia.group(1).upper()
+        numero = int(correspondencia.group(2))
+        if prefixo in ("QUADRA", "QD"):
+            prefixo = None
+        return numero, prefixo
+
+    somente_numero = re.fullmatch(r"\s*0*(\d+)\s*", str(logradouro or ""))
+    if somente_numero:
+        return int(somente_numero.group(1)), None
+
+    return None
+
+
 def _IdentificarEndereco(logradouro, numero, complemento, cep):
-    """Extrai quadra, conjunto e lote de um endereço do DF."""
+    """Extrai quadra, conjunto e lote de um endereço padronizado do DF.
+
+    Aceita conjuntos numéricos ('Conjunto 2') e alfabéticos
+    ('Conjunto B', 'CJ B' ou somente 'B' no complemento).
+    Mantém o retorno de quatro elementos para compatibilidade.
+    """
+    quadra = _ExtrairQuadra(logradouro, complemento)
     texto = f"{logradouro or ''} {complemento or ''}"
 
-    # Aceita Quadra 111, Q 111, QD 111, QR 111 e QS 111.
-    quadra = re.search(r"\b(?:quadra|qd|qr|qs|q)\s*0*(\d+)\b", texto, re.I)
+    conjunto = re.search(
+        r"\b(?:conjunto|cj)\s*0*([a-z]|\d+)\b", texto, re.I
+    )
+    if conjunto is None:
+        conjunto = re.fullmatch(r"\s*([a-z])\s*", str(complemento or ""), re.I)
 
-    # Também aceita um número isolado no campo logradouro, ex.: 111.
-    if quadra is None:
-        quadra = re.fullmatch(r"\s*0*(\d+)\s*", str(logradouro or ""))
-
-    conjunto = re.search(r"\b(?:conjunto|cj)\s*0*(\d+)\b", texto, re.I)
     lote = re.fullmatch(
-        r"\s*(?:(?:casa|lote|lt)\s*)?0*(\d+)\s*",
-        str(numero or ""),
-        re.I,
+        r"\s*(?:(?:casa|lote|lt)\s*)?0*(\d+)\s*", str(numero or ""), re.I
     )
     cepLimpo = re.sub(r"\D", "", str(cep or ""))
 
     if not (quadra and conjunto and lote and len(cepLimpo) == 8):
         return None
 
-    q, cj, lt = (int(quadra.group(1)), int(conjunto.group(1)), int(lote.group(1)))
-    if min(q, cj, lt) <= 0:
+    numeroQuadra, _ = quadra
+    valorConjunto = conjunto.group(1)
+    cj = int(valorConjunto) if valorConjunto.isdigit() else valorConjunto.upper()
+    lt = int(lote.group(1))
+
+    if numeroQuadra <= 0 or lt <= 0 or (isinstance(cj, int) and cj <= 0):
         return None
 
-    return cepLimpo, q, cj, lt
+    return cepLimpo, numeroQuadra, cj, lt
 
 
 def _CentroDoPoligono(aneis):
@@ -79,9 +110,10 @@ def _CentroDoPoligono(aneis):
 
 
 def GeocodificarLoteDF(logradouro, numero, complemento, cep, estado):
-    """Retorna o centro do lote ou None se não houver correspondência única.
+    """Retorna o centro do lote ou None sem correspondência única.
 
-    Consulta endereços padronizados do DF usando quadra, conjunto, lote e CEP.
+    Consulta quadra, conjunto, lote e CEP de endereços padronizados do DF.
+    Preserva prefixos explícitos, como QNP, QNM e QNN.
     """
     if (estado or "").strip().upper() != "DF":
         return None
@@ -91,12 +123,18 @@ def GeocodificarLoteDF(logradouro, numero, complemento, cep, estado):
         return None
 
     cepLimpo, quadra, conjunto, lote = identificacao
+    dadosQuadra = _ExtrairQuadra(logradouro, complemento)
+    prefixo = dadosQuadra[1]
 
-    # O Geoportal usa prefixos variados para quadras e pode gravar
-    # lotes com zero à esquerda (LT 08) ou sem ele (LT 8).
+    # Compatibilidade com a busca anterior: quando a quadra é genérica
+    # (ou Q/QR/QS), pesquisar as três variantes usuais.
+    # Prefixos específicos, como QNP, QNM e QNN, não devem virar 'Q'.
+    prefixos = ("Q", "QR", "QS") if prefixo in (None, "Q", "QR", "QS") else (prefixo,)
+    quadrasSQL = ", ".join(f"'{p} {quadra}'" for p in prefixos)
+
     filtro = (
         f"cod_qdui_cep = '{cepLimpo}' "
-        f"AND txt_qdui_quadra IN ('Q {quadra}', 'QR {quadra}', 'QS {quadra}') "
+        f"AND txt_qdui_quadra IN ({quadrasSQL}) "
         f"AND txt_qdui_conjunto = 'CJ {conjunto}' "
         f"AND txt_qdui_lote IN ('LT {lote}', 'LT {lote:02d}')"
     )
@@ -118,6 +156,8 @@ def GeocodificarLoteDF(logradouro, numero, complemento, cep, estado):
     except (requests.RequestException, ValueError) as erro:
         raise ErroGeoportal("Serviço do Geoportal DF indisponível.") from erro
 
+    if not isinstance(dados, dict):
+        raise ErroGeoportal("Resposta inesperada do Geoportal DF.")
     if dados.get("error"):
         raise ErroGeoportal("Geoportal DF retornou erro na consulta.")
 
@@ -125,7 +165,7 @@ def GeocodificarLoteDF(logradouro, numero, complemento, cep, estado):
     if not isinstance(resultados, list):
         raise ErroGeoportal("Resposta inesperada do Geoportal DF.")
     if len(resultados) != 1:
-        return None  # Nenhum resultado ou correspondência ambígua.
+        return None  # Nenhum lote ou correspondência ambígua.
 
     geometria = resultados[0].get("geometry") or {}
     return _CentroDoPoligono(geometria.get("rings"))
