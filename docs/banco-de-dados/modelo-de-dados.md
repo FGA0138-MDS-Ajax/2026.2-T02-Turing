@@ -10,7 +10,7 @@ O banco de dados do OpenRoute utiliza MySQL para armazenar as informações nece
 
 
 
-A estrutura é organizada em tabelas relacionadas entre si por meio de chaves primárias e estrangeiras, permitindo manter a integridade dos dados e estabelecer associações entre usuários, pedidos, endereços e rotas.
+A estrutura é organizada em tabelas relacionadas entre si por meio de chaves primárias e estrangeiras, permitindo manter a integridade dos dados e estabelecer associações entre usuários, endereços e rotas.
 
 
 
@@ -158,61 +158,8 @@ As coordenadas são obtidas pelo processo de geocodificação do backend a parti
 
 
 
-### 5. pedidos
 
-
-
-Armazena os pedidos que representam as entregas a serem organizadas pelo sistema.
-
-
-
-Principais campos:
-
-
-
-- `id`: identificador do pedido.
-
-- `endereco\_id`: identificador do endereço associado.
-
-- `criado\_por\_id`: identificador do usuário responsável pela criação, quando informado.
-
-- `descricao`: descrição adicional do pedido.
-
-- `data\_entrega`: data prevista para a entrega.
-
-- `janela\_entrega\_inicio`: horário inicial permitido para a entrega.
-
-- `janela\_entrega\_fim`: horário final permitido para a entrega.
-
-- `status`: situação atual do pedido.
-
-- `criado\_em`: data de criação do registro.
-
-- `atualizado\_em`: data da última atualização.
-
-
-
-O status do pedido pode assumir os seguintes valores:
-
-
-
-- `PENDENTE`
-
-- `PLANEJADO`
-
-- `SAIU\_PARA\_ENTREGA`
-
-- `EM\_ANDAMENTO`
-
-- `ENTREGUE`
-
-- `FALHOU`
-
-- `CANCELADO`
-
-
-
-### 6. rotas
+### 5. rotas
 
 
 
@@ -268,7 +215,7 @@ O status da rota pode assumir os valores:
 
 
 
-### 7. restricoes\_operacionais
+### 6. restricoes\_operacionais
 
 
 
@@ -296,33 +243,6 @@ Principais campos:
 
 
 
-### 8. rota\_pedidos
-
-
-
-É a tabela responsável por relacionar rotas e pedidos, permitindo registrar quais pedidos fazem parte de cada rota e em qual ordem devem ser atendidos.
-
-
-
-Principais campos:
-
-
-
-- `id`: identificador do registro.
-
-- `rota\_id`: identificador da rota.
-
-- `pedido\_id`: identificador do pedido.
-
-- `ordem\_parada`: posição do pedido na sequência de atendimento.
-
-- `chegada\_prevista`: horário previsto de chegada ao destino.
-
-- `saida\_prevista`: horário previsto de saída do destino.
-
-- `adicionada\_em`: data de inclusão do pedido na rota.
-
-
 
 ## Relacionamentos entre as tabelas
 
@@ -336,16 +256,9 @@ Os relacionamentos são estabelecidos por meio de chaves estrangeiras:
 
 - **usuarios e sessoes:** um usuário pode possuir várias sessões de acesso.
 
-- **enderecos e pedidos:** um endereço pode estar associado a vários pedidos, enquanto cada pedido possui um endereço.
-
-- **usuarios e pedidos:** um usuário pode ser associado à criação de vários pedidos.
-
 - **usuarios e rotas:** um usuário pode estar associado a várias rotas, tanto como usuário responsável pela rota quanto como responsável por sua criação.
 
 - **rotas e restricoes\_operacionais:** uma rota pode possuir restrição operacional (tempo).
-
-- **rotas e pedidos:** o relacionamento é realizado pela tabela intermediária `rota\_pedidos`, que registra os pedidos associados a cada rota e a ordem de atendimento.
-
 
 
 ## Integridade dos dados
