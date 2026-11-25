@@ -1,0 +1,2390 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../instalacao/banco-de-dados/">
+      
+      
+        <link rel="next" href="../../acompanhamento/sprints/sprint1/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.2">
+    
+    
+      
+        <title>Testes - OpenRoute - Documentação</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#testes-do-sistema" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenRoute - Documentação" class="md-header__button md-logo" aria-label="OpenRoute - Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenRoute - Documentação
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Testes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenRoute - Documentação" class="md-nav__button md-logo" aria-label="OpenRoute - Documentação" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenRoute - Documentação
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Início
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visão geral
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Visão geral
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../visao-geral/apresentacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Apresentação
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../visao-geral/escopo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Escopo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Arquitetura
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arquitetura/arquitetura-geral/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Visão geral
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arquitetura/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arquitetura/frontend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arquitetura/fluxo-otimizacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fluxo de otimização
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../arquitetura/integracoes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Integrações
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/autenticacao/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Autenticação
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/usuarios/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Usuários
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/destinos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Destinos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/rotas/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rotas
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../api/restricoes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Restrições
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Banco de dados
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Banco de dados
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../banco-de-dados/modelo-de-dados/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modelo de dados
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Instalação
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Instalação
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../instalacao/ambiente/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ambiente
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../instalacao/backend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../instalacao/frontend/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Frontend
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../instalacao/banco-de-dados/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Banco de dados
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testes
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Testes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objetivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objetivo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ambiente-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ambiente de testes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-testes-automatizados-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Testes automatizados do backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Testes automatizados do backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-acessar-o-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1. Acessar o projeto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-verificar-a-sintaxe-dos-arquivos-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2. Verificar a sintaxe dos arquivos Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-executar-os-testes-automatizados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3. Executar os testes automatizados
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-interpretar-os-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4. Interpretar os resultados
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-resultados-de-testes-registrados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Resultados de testes registrados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-verificacoes-funcionais-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Verificações funcionais do backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Verificações funcionais do backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-verificar-a-disponibilidade-da-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1. Verificar a disponibilidade da API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-verificar-a-geocodificacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2. Verificar a geocodificação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-verificar-o-calculo-de-rotas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3. Verificar o cálculo de rotas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-verificacoes-do-banco-de-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Verificações do banco de dados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-verificacoes-manuais-do-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Verificações manuais do frontend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-verificacoes-de-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Verificações de integração
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Verificações de integração">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-frontend-e-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1. Frontend e backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-backend-e-banco-de-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2. Backend e banco de dados
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-backend-e-servicos-externos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3. Backend e serviços externos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-funcionalidades-que-exigem-testes-adicionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Funcionalidades que exigem testes adicionais
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-registro-dos-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Registro dos resultados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-consideracoes-finais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Considerações finais
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Acompanhamento
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Acompanhamento
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_1" id="__nav_8_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprints
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sprints
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/sprints/sprint1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/sprints/sprint2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint 2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/sprints/sprint3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint 3
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/sprints/sprint4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint 4
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/sprints/sprint5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint 5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/sprints/sprint6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint 6
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_8_2" id="__nav_8_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Atas de Reunião
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_8_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Atas de Reunião
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../acompanhamento/atas-de-reuniao/ata-reuniao-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Ata da reunião 1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-objetivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Objetivo
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-ambiente-de-testes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Ambiente de testes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-testes-automatizados-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Testes automatizados do backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Testes automatizados do backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-acessar-o-projeto" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1. Acessar o projeto
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-verificar-a-sintaxe-dos-arquivos-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2. Verificar a sintaxe dos arquivos Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-executar-os-testes-automatizados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3. Executar os testes automatizados
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#34-interpretar-os-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.4. Interpretar os resultados
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-resultados-de-testes-registrados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Resultados de testes registrados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-verificacoes-funcionais-do-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Verificações funcionais do backend
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Verificações funcionais do backend">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-verificar-a-disponibilidade-da-api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1. Verificar a disponibilidade da API
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-verificar-a-geocodificacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2. Verificar a geocodificação
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-verificar-o-calculo-de-rotas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3. Verificar o cálculo de rotas
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-verificacoes-do-banco-de-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Verificações do banco de dados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-verificacoes-manuais-do-frontend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Verificações manuais do frontend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-verificacoes-de-integracao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Verificações de integração
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Verificações de integração">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-frontend-e-backend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1. Frontend e backend
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-backend-e-banco-de-dados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2. Backend e banco de dados
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-backend-e-servicos-externos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3. Backend e serviços externos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-funcionalidades-que-exigem-testes-adicionais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Funcionalidades que exigem testes adicionais
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-registro-dos-resultados" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Registro dos resultados
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-consideracoes-finais" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Considerações finais
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="testes-do-sistema">Testes do sistema</h1>
+<h2 id="1-objetivo">1. Objetivo</h2>
+<p>Este documento apresenta os procedimentos utilizados para verificar o funcionamento do OpenRoute, identificar falhas e avaliar se os componentes do sistema executam suas responsabilidades conforme esperado.</p>
+<p>Os testes abrangem o backend, a comunicação com o banco de dados, as integrações externas e a interface do frontend.</p>
+<p>É importante diferenciar os testes automatizados, executados por ferramentas de teste, das verificações manuais, realizadas por meio da utilização da aplicação.</p>
+<h2 id="2-ambiente-de-testes">2. Ambiente de testes</h2>
+<p>Para executar os testes do backend, são utilizadas as seguintes ferramentas:</p>
+<table>
+<thead>
+<tr>
+<th>Ferramenta</th>
+<th>Finalidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python</td>
+<td>Executar o código do backend.</td>
+</tr>
+<tr>
+<td>pytest</td>
+<td>Executar os testes automatizados.</td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td>Disponibilizar o banco de dados utilizado pelo sistema.</td>
+</tr>
+<tr>
+<td>Flask</td>
+<td>Executar a API durante as verificações funcionais.</td>
+</tr>
+</tbody>
+</table>
+<p>Para as verificações do frontend, são utilizados:</p>
+<table>
+<thead>
+<tr>
+<th>Ferramenta</th>
+<th>Finalidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Node.js</td>
+<td>Ambiente de execução do frontend.</td>
+</tr>
+<tr>
+<td>npm</td>
+<td>Gerenciar as dependências do projeto.</td>
+</tr>
+<tr>
+<td>Angular</td>
+<td>Executar a aplicação web.</td>
+</tr>
+<tr>
+<td>Navegador</td>
+<td>Verificar a interface e o comportamento da aplicação.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-testes-automatizados-do-backend">3. Testes automatizados do backend</h2>
+<p>O backend utiliza o <code>pytest</code> como ferramenta para execução dos testes automatizados.</p>
+<p>Os testes devem ser executados na raiz do projeto backend, com o ambiente virtual ativado e as dependências instaladas.</p>
+<h3 id="31-acessar-o-projeto">3.1. Acessar o projeto</h3>
+<p>Abra o PowerShell e entre na pasta do backend:</p>
+<pre><code class="language-powershell">
+cd C:\\Users\\Pessoal\\Documents\\OpenRoute-backend
+
+</code></pre>
+<p>Ative o ambiente virtual:</p>
+<pre><code class="language-powershell">
+.\\venv\\Scripts\\Activate.ps1
+
+</code></pre>
+<p>Confira se o ambiente virtual está ativo. O terminal deverá apresentar <code>(venv)</code> no início da linha.</p>
+<h3 id="32-verificar-a-sintaxe-dos-arquivos-python">3.2. Verificar a sintaxe dos arquivos Python</h3>
+<p>Para verificar se os arquivos Python podem ser compilados sem apresentar erros de sintaxe, execute:</p>
+<pre><code class="language-powershell">
+python -m compileall -q app tests
+
+</code></pre>
+<p>Esse comando verifica os arquivos dos diretórios <code>app</code> e <code>tests</code>.</p>
+<p>Se não houver erros de compilação, o comando será concluído sem apresentar mensagens de erro.</p>
+<p>Essa verificação não substitui os testes funcionais: ela verifica a compilação dos arquivos, não se todas as funcionalidades produzem os resultados esperados.</p>
+<h3 id="33-executar-os-testes-automatizados">3.3. Executar os testes automatizados</h3>
+<p>Na raiz do backend, execute:</p>
+<pre><code class="language-powershell">
+pytest -q
+
+</code></pre>
+<p>O pytest localizará e executará os testes reconhecidos no projeto.</p>
+<p>A opção <code>-q</code> apresenta um resumo dos resultados, facilitando a identificação de testes aprovados e reprovados.</p>
+<p>Quando todos os testes forem aprovados, o resultado deverá indicar a quantidade de testes executados e a ausência de falhas.</p>
+<h3 id="34-interpretar-os-resultados">3.4. Interpretar os resultados</h3>
+<p>Durante a execução, podem ocorrer diferentes resultados:</p>
+<table>
+<thead>
+<tr>
+<th>Resultado</th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Passed</td>
+<td>O teste foi executado e aprovado.</td>
+</tr>
+<tr>
+<td>Failed</td>
+<td>O teste foi executado, mas o resultado não correspondeu ao esperado.</td>
+</tr>
+<tr>
+<td>Error</td>
+<td>Ocorreu um erro durante a execução do teste.</td>
+</tr>
+<tr>
+<td>Skipped</td>
+<td>O teste foi ignorado por alguma condição definida.</td>
+</tr>
+</tbody>
+</table>
+<p>Caso algum teste apresente falha, consulte a mensagem apresentada pelo pytest para identificar o arquivo, a função e a condição que causaram o problema.</p>
+<h2 id="4-resultados-de-testes-registrados">4. Resultados de testes registrados</h2>
+<p>O relatório de correções do OpenRoute registra a execução dos seguintes procedimentos:</p>
+<p>| Procedimento | Resultado registrado |</p>
+<p>|---|---|
+| <code>python -m compileall -q app tests</code> | Concluído sem erros. |
+| <code>pytest -q</code> | 16 testes aprovados. |</p>
+<p>Esses resultados correspondem à execução registrada no relatório de correções disponibilizado para o projeto.</p>
+<p>A quantidade de testes aprovados pode mudar conforme alterações no código e nos testes. Por isso, é necessário executar novamente os comandos no código atual para verificar seu estado.</p>
+<h2 id="5-verificacoes-funcionais-do-backend">5. Verificações funcionais do backend</h2>
+<p>Além dos testes automatizados, o backend pode ser verificado por meio de requisições HTTP à API.</p>
+<h3 id="51-verificar-a-disponibilidade-da-api">5.1. Verificar a disponibilidade da API</h3>
+<p>Inicie o backend:</p>
+<pre><code class="language-powershell">
+python -m flask --app app.main run --debug
+
+</code></pre>
+<p>Com o servidor em execução, abra outro terminal e execute:</p>
+<pre><code class="language-powershell">
+Invoke-RestMethod http://127.0.0.1:5000/health
+
+</code></pre>
+<p>A rota <code>/health</code> permite verificar se a API está acessível.</p>
+<h3 id="52-verificar-a-geocodificacao">5.2. Verificar a geocodificação</h3>
+<p>A geocodificação é responsável por converter informações textuais de endereço em coordenadas geográficas.</p>
+<p>Durante a verificação, devem ser observados os seguintes aspectos:</p>
+<ul>
+<li>
+<p>O endereço informado é enviado corretamente ao backend.</p>
+</li>
+<li>
+<p>O backend realiza a consulta ao serviço de geocodificação.</p>
+</li>
+<li>
+<p>Quando a consulta é bem-sucedida, são obtidas latitude e longitude.</p>
+</li>
+<li>
+<p>Quando ocorre uma falha, o sistema deve tratar a resposta sem assumir que o endereço foi validado.</p>
+</li>
+</ul>
+<p>O usuário informa os dados do endereço, não sendo necessário preencher manualmente latitude e longitude.</p>
+<h3 id="53-verificar-o-calculo-de-rotas">5.3. Verificar o cálculo de rotas</h3>
+<p>O cálculo de rotas deve ser verificado utilizando destinos que possuam coordenadas geográficas válidas.</p>
+<p>Devem ser observados os seguintes aspectos:</p>
+<ul>
+<li>
+<p>A API recebe os pontos necessários ao cálculo.</p>
+</li>
+<li>
+<p>O sistema verifica se existe a quantidade mínima de destinos exigida.</p>
+</li>
+<li>
+<p>O backend consulta o OSRM para obter informações de deslocamento.</p>
+</li>
+<li>
+<p>O resultado apresenta a sequência de atendimento calculada.</p>
+</li>
+<li>
+<p>As informações de distância e tempo são retornadas quando disponíveis.</p>
+</li>
+<li>
+<p>O tratamento alternativo utilizado quando o OSRM falha deve ser verificado.</p>
+</li>
+</ul>
+<p>O backend possui um mecanismo de aproximação baseado em Haversine para situações em que a consulta de matriz ao OSRM falha. Essa aproximação não equivale a um trajeto real calculado por uma segunda API de roteamento.</p>
+<h2 id="6-verificacoes-do-banco-de-dados">6. Verificações do banco de dados</h2>
+<p>As verificações do banco de dados devem confirmar se as informações são armazenadas e consultadas corretamente.</p>
+<p>Com o MySQL em execução, conecte-se ao banco:</p>
+<pre><code class="language-powershell">
+mysql -u root -p -P 3307
+
+</code></pre>
+<p>Selecione o banco:</p>
+<pre><code class="language-sql">
+USE open\_route;
+
+</code></pre>
+<p>Consulte as tabelas disponíveis:</p>
+<pre><code class="language-sql">
+SHOW TABLES;
+
+</code></pre>
+<p>Também podem ser realizadas consultas para verificar a existência dos registros.</p>
+<p>Por exemplo:</p>
+<pre><code class="language-sql">
+SELECT * FROM usuarios;
+
+</code></pre>
+<pre><code class="language-sql">
+SELECT * FROM enderecos;
+
+</code></pre>
+<pre><code class="language-sql">
+SELECT * FROM rotas;
+
+</code></pre>
+<p>As consultas devem ser realizadas considerando os dados existentes no ambiente de testes.</p>
+<p><strong>Atenção:</strong> não utilize comandos de exclusão ou alteração de registros em um banco com dados importantes durante a execução de verificações.</p>
+<h2 id="7-verificacoes-manuais-do-frontend">7. Verificações manuais do frontend</h2>
+<p>As verificações manuais permitem avaliar se a interface apresenta os dados corretamente e se as ações realizadas pelo usuário produzem os resultados esperados.</p>
+<p>Para executá-las, o backend e o frontend devem estar configurados e disponíveis.</p>
+<p>Inicie o frontend na pasta <code>frontend</code>:</p>
+<pre><code class="language-powershell">
+npm start
+
+</code></pre>
+<p>Acesse:</p>
+<pre><code class="language-text">
+http://localhost:4200
+
+</code></pre>
+<p>Durante a utilização da aplicação, podem ser verificadas as seguintes situações:</p>
+<table>
+<thead>
+<tr>
+<th>Verificação</th>
+<th>Resultado esperado</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abertura da aplicação</td>
+<td>A interface deve ser carregada no navegador.</td>
+</tr>
+<tr>
+<td>Acesso às funcionalidades disponíveis</td>
+<td>As telas devem apresentar os recursos correspondentes ao perfil de acesso.</td>
+</tr>
+<tr>
+<td>Gerenciamento de destinos</td>
+<td>As operações disponíveis devem permitir trabalhar com os dados dos endereços.</td>
+</tr>
+<tr>
+<td>Visualização de mapas</td>
+<td>Os recursos de mapa devem apresentar as informações geográficas recebidas pela aplicação.</td>
+</tr>
+<tr>
+<td>Comunicação com a API</td>
+<td>As requisições devem alcançar o backend e receber respostas compatíveis com as operações solicitadas.</td>
+</tr>
+<tr>
+<td>Exibição de erros</td>
+<td>Problemas nas operações devem ser apresentados ou tratados sem interromper indevidamente a aplicação.</td>
+</tr>
+</tbody>
+</table>
+<p>Essas verificações são procedimentos manuais. Sua descrição não significa que todas as funcionalidades listadas estejam implementadas ou tenham sido aprovadas em uma execução de testes.</p>
+<h2 id="8-verificacoes-de-integracao">8. Verificações de integração</h2>
+<p>Os testes de integração verificam a comunicação entre diferentes partes do sistema.</p>
+<p>No OpenRoute, devem ser observadas principalmente as seguintes integrações:</p>
+<h3 id="81-frontend-e-backend">8.1. Frontend e backend</h3>
+<p>Verificar se:</p>
+<ul>
+<li>
+<p>O frontend utiliza o endereço correto da API.</p>
+</li>
+<li>
+<p>As requisições são enviadas aos endpoints correspondentes.</p>
+</li>
+<li>
+<p>As respostas do backend são interpretadas corretamente.</p>
+</li>
+<li>
+<p>Os erros retornados pela API são tratados pela interface.</p>
+</li>
+</ul>
+<h3 id="82-backend-e-banco-de-dados">8.2. Backend e banco de dados</h3>
+<p>Verificar se:</p>
+<ul>
+<li>
+<p>A aplicação consegue estabelecer conexão com o MySQL.</p>
+</li>
+<li>
+<p>As consultas retornam os dados esperados.</p>
+</li>
+<li>
+<p>As operações de persistência funcionam corretamente.</p>
+</li>
+<li>
+<p>Os relacionamentos entre as tabelas são respeitados.</p>
+</li>
+</ul>
+<h3 id="83-backend-e-servicos-externos">8.3. Backend e serviços externos</h3>
+<p>Verificar se:</p>
+<ul>
+<li>
+<p>O backend consegue consultar o Nominatim para geocodificação.</p>
+</li>
+<li>
+<p>O backend consegue consultar o OSRM para obter informações de roteamento.</p>
+</li>
+<li>
+<p>As respostas recebidas são tratadas corretamente.</p>
+</li>
+<li>
+<p>As falhas de comunicação são tratadas sem interromper indevidamente a aplicação.</p>
+</li>
+</ul>
+<h2 id="9-funcionalidades-que-exigem-testes-adicionais">9. Funcionalidades que exigem testes adicionais</h2>
+<p>A existência de uma estrutura no banco de dados ou de uma funcionalidade prevista no planejamento não significa que ela esteja completamente implementada.</p>
+<p>O relatório de correções do projeto identifica funcionalidades que ainda exigem implementação ou validação adicional, entre elas:</p>
+<ul>
+<li>
+<p>Autenticação e gerenciamento de sessões.</p>
+</li>
+<li>
+<p>Cadastro, edição e exclusão de usuários.</p>
+</li>
+<li>
+<p>Associação e gerenciamento de perfis.</p>
+</li>
+<li>
+<p>Operações completas de cadastro, listagem e edição de entregas.</p>
+</li>
+<li>
+<p>Endpoints de gerenciamento de restrições operacionais.</p>
+</li>
+<li>
+<p>Integração completa da visualização de mapas com o contrato do backend.</p>
+</li>
+<li>
+<p>Melhorias de desempenho da visualização de mapas.</p>
+</li>
+<li>
+<p>Implementação de um segundo provedor de roteamento como alternativa ao OSRM.</p>
+</li>
+<li>
+<p>Verificação das medidas de segurança e proteção de dados conforme a LGPD.</p>
+</li>
+</ul>
+<p>Esses itens não devem ser considerados aprovados apenas pela execução dos testes automatizados já registrados.</p>
+<h2 id="10-registro-dos-resultados">10. Registro dos resultados</h2>
+<p>Para acompanhar a qualidade do sistema, recomenda-se registrar os resultados das execuções de testes.</p>
+<p>O registro pode conter:</p>
+<table>
+<thead>
+<tr>
+<th>Informação</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data da execução</td>
+<td>Dia em que os testes foram realizados.</td>
+</tr>
+<tr>
+<td>Versão do código</td>
+<td>Branch e identificação da versão testada.</td>
+</tr>
+<tr>
+<td>Procedimento</td>
+<td>Comando ou funcionalidade verificada.</td>
+</tr>
+<tr>
+<td>Resultado</td>
+<td>Aprovado, reprovado ou não executado.</td>
+</tr>
+<tr>
+<td>Problemas encontrados</td>
+<td>Descrição das falhas identificadas.</td>
+</tr>
+<tr>
+<td>Responsável</td>
+<td>Integrante responsável pela execução.</td>
+</tr>
+</tbody>
+</table>
+<p>Esse registro facilita a comparação dos resultados entre diferentes versões do sistema e permite acompanhar a correção de problemas.</p>
+<h2 id="11-consideracoes-finais">11. Considerações finais</h2>
+<p>Os testes são importantes para verificar se os componentes do OpenRoute funcionam de maneira adequada e se a comunicação entre frontend, backend, banco de dados e serviços externos ocorre conforme esperado.</p>
+<p>A execução dos testes automatizados auxilia na identificação de erros no código, enquanto as verificações manuais e de integração permitem avaliar o comportamento da aplicação em situações próximas à utilização real.</p>
+<p>Os resultados devem sempre corresponder à versão efetivamente testada.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": [], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+    
+  </body>
+</html>
