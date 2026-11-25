@@ -19,7 +19,6 @@ nav:
       - Autenticação: api/autenticacao.md
       - Usuários: api/usuarios.md
       - Destinos: api/destinos.md
-      - Pedidos: api/pedidos.md
       - Rotas: api/rotas.md
       - Restrições: api/restricoes.md
 
