@@ -1,43 +1,132 @@
-/* You can add global styles to this file, and also import other style files */
-   @import 'leaflet/dist/leaflet.css';
-body{
-    margin: 0;
-    padding: 0;
-    background-color: aliceblue;
+
+@import 'leaflet/dist/leaflet.css';
+
+/* Paleta padrão: modo claro */
+
+:root {
+  --or-fundo: #f7efe2;
+  --or-superficie: #fffaf3;
+  --or-texto: #133f33;
+  --or-texto-suave: #4d665c;
+  --or-linha: #e1d6c7;
+
+  --or-dourado: #d8ab5c;
+  --or-terracota: #b94e39;
+  --or-terracota-hover: #9f3d2b;
+  --or-hover: #efe6d8;
+
+  --or-decoracao: #eee0cb;
+  --or-mapa: #e4d1b3;
+  --or-rua: #fffaf2;
+
+  color-scheme: light;
 }
 
-.headerButton{
-    user-select: none;
-    height: 5vh;
-    width: 9vw;
-    min-height: 50px;
-    min-width: 70px;
-    border-radius: 50px;
-    margin-left: max(0.5vh, 5px);
-    margin-right: max(0.5vh, 5px);
-    border: none;
-    font-size: medium;
-    color: white;
-    background: rgb(0, 128, 255);
+/* Paleta para modo escuro */
+
+html[data-openroute-tema='escuro'] {
+  --or-fundo: #102b23;
+  --or-superficie: #1a3b31;
+  --or-texto: #f8f1e6;
+  --or-texto-suave: #ccd8ce;
+  --or-linha: #456257;
+
+  --or-dourado: #e8bd70;
+  --or-terracota: #b94e39;
+  --or-terracota-hover: #a4402e;
+  --or-hover: #294c40;
+
+  --or-decoracao: #193a30;
+  --or-mapa: #35564a;
+  --or-rua: #698175;
+
+  color-scheme: dark;
 }
 
-.headerButton:hover{
-    transition: 0.2s;
-    cursor: pointer;
-    background-color: rgb(0, 64, 255);
+/* Configurações gerais */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-.headerButton:active{
-    background-color: rgb(0, 0, 64);
+html {
+  scroll-behavior: smooth;
 }
 
-.headerButton:disabled{
-    color: black;
-    background-color: rgb(214, 214, 214);
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: var(--or-fundo);
+  color: var(--or-texto);
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
-.headerButton:disabled:hover{
-    cursor: default;
-    color: black;
-    background-color: rgb(214, 214, 214);
+/* Cores básicas dos painéis existentes no modo escuro */
+
+html[data-openroute-tema='escuro'] app-autenticacao,
+html[data-openroute-tema='escuro'] app-painel-adm,
+html[data-openroute-tema='escuro'] app-painel-motorista {
+  --fundo: #102b23;
+  --superficie: #1a3b31;
+  --tinta: #f8f1e6;
+  --texto: #edf2e9;
+  --texto-suave: #c5d4ca;
+  --linha: #456257;
+  --acao: #e8bd70;
+  --acao-escura: #f2d08d;
+  --rota: #84c5a2;
+}
+
+/* Estilos antigos preservados para compatibilidade */
+
+.headerButton {
+  user-select: none;
+  height: 5vh;
+  width: 9vw;
+  min-height: 50px;
+  min-width: 70px;
+  border-radius: 50px;
+  margin-left: max(0.5vh, 5px);
+  margin-right: max(0.5vh, 5px);
+  border: none;
+  font-size: medium;
+  color: white;
+  background: rgb(0, 128, 255);
+}
+
+.headerButton:hover {
+  transition: 0.2s;
+  cursor: pointer;
+  background-color: rgb(0, 64, 255);
+}
+
+.headerButton:active {
+  background-color: rgb(0, 0, 64);
+}
+
+.headerButton:disabled {
+  color: black;
+  background-color: rgb(214, 214, 214);
+}
+
+.headerButton:disabled:hover {
+  cursor: default;
+  color: black;
+  background-color: rgb(214, 214, 214);
+}
+
+/* Acessibilidade */
+
+:focus-visible {
+  outline: 3px solid var(--or-dourado);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

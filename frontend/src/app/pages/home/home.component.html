@@ -1,27 +1,143 @@
+
 <app-navbar rotaLogo="/home">
-    <div *ngIf="bearer">
-        <button class="botao botao-primario" (click)="deslogar()" [disabled]="deslogando">Logout</button>
-    </div>
-    <div *ngIf="!bearer">
-        <button class="botao botao-primario" routerLink="/autenticacao">Login</button>
-    </div>
+
+  <ng-container *ngIf="!bearer">
+    <a routerLink="/autenticacao" class="home-link-topo">
+      Entrar
+    </a>
+
+    <a routerLink="/autenticacao" class="home-cadastro-topo">
+      Cadastrar-se
+    </a>
+  </ng-container>
+
+  <ng-container *ngIf="bearer">
+    <a
+      *ngIf="tipoUsuario === 'ADM'"
+      routerLink="/painel-adm"
+      class="home-link-topo"
+    >
+      Meu painel
+    </a>
+
+    <a
+      *ngIf="tipoUsuario === 'USUARIO'"
+      routerLink="/painel-motorista"
+      class="home-link-topo"
+    >
+      Meu painel
+    </a>
+
+    <button
+      type="button"
+      class="home-cadastro-topo"
+      (click)="deslogar()"
+      [disabled]="deslogando"
+    >
+      {{ deslogando ? 'Saindo...' : 'Sair' }}
+    </button>
+  </ng-container>
+
 </app-navbar>
-<main class="conteudo">
-    <section>
-        <div class="vazio">
-            <h1>Bem vindo ao OpenRoute</h1>
-            <div *ngIf="!bearer">
-                <h3>Faça login/cadastre-se para começar a utilizar a aplicação.</h3>
-            </div>
-            <div *ngIf="bearer">
-                <h3>Siga para o painel para continuar.</h3>
-                <div *ngIf="tipoUsuario === 'ADM'">
-                    <button class="botao botao-primario" routerLink="/painel-adm" [disabled]="deslogando">Painel do ADM</button>
-                </div>
-                <div *ngIf="tipoUsuario === 'USUARIO'">
-                    <button class="botao botao-primario" routerLink="/painel-motorista" [disabled]="deslogando">Painel do Usuario</button>
-                </div>
-            </div>
-        </div>
-    </section>
+
+<main class="home-pagina">
+
+  <section class="home-conteudo" aria-labelledby="home-titulo">
+
+    <h1 id="home-titulo" class="home-titulo">
+      Bem-vindo ao
+      <span>OpenRoute</span>
+    </h1>
+
+    <p class="home-subtitulo" *ngIf="!bearer">
+      Faça login ou cadastre-se para começar
+      a utilizar a aplicação.
+    </p>
+
+    <p class="home-subtitulo" *ngIf="bearer">
+      Organize seus endereços e planeje suas entregas
+      de maneira mais eficiente.
+    </p>
+
+    <div class="home-cards">
+
+      <article class="home-card">
+        <span class="home-detalhe-card" aria-hidden="true"></span>
+        <p>
+          Um sistema pensado para facilitar seu trabalho
+        </p>
+      </article>
+
+      <article class="home-card">
+        <span class="home-detalhe-card" aria-hidden="true"></span>
+        <p>
+          Rotas otimizadas e um cálculo de toda sua jornada
+        </p>
+      </article>
+
+      <article class="home-card">
+        <span class="home-detalhe-card" aria-hidden="true"></span>
+        <p>
+          Cadastre múltiplos destinos e economize seu tempo
+        </p>
+      </article>
+
+    </div>
+
+    <div class="home-acoes" *ngIf="!bearer">
+
+      <a
+        routerLink="/autenticacao"
+        class="home-botao home-botao-principal"
+      >
+        Entrar no sistema
+      </a>
+
+      <a
+        routerLink="/autenticacao"
+        class="home-botao home-botao-secundario"
+      >
+        Criar conta gratuita
+      </a>
+
+    </div>
+
+    <div class="home-acoes" *ngIf="bearer">
+
+      <a
+        *ngIf="tipoUsuario === 'ADM'"
+        routerLink="/painel-adm"
+        class="home-botao home-botao-principal"
+      >
+        Acessar painel ADM
+      </a>
+
+      <a
+        *ngIf="tipoUsuario === 'USUARIO'"
+        routerLink="/painel-motorista"
+        class="home-botao home-botao-principal"
+      >
+        Acessar painel do motorista
+      </a>
+
+    </div>
+
+    <div
+      *ngIf="mensagem"
+      class="home-mensagem"
+      [class.home-mensagem-erro]="mensagem.tipo === 'erro'"
+      [attr.role]="mensagem.tipo === 'erro' ? 'alert' : 'status'"
+    >
+      {{ mensagem.texto }}
+    </div>
+
+  </section>
+
+  <!-- Ilustração decorativa, sem função no sistema -->
+  <div class="home-decoracao" aria-hidden="true">
+    <div class="home-mapa-decorativo">
+      <span class="home-marcador"></span>
+    </div>
+  </div>
+
 </main>
