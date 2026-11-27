@@ -1,14 +1,20 @@
--- OpenRoute: script para criar o banco do zero (MariaDB 10.4 / MySQL compatível).
--- ATENÇÃO: NÃO execute este arquivo sobre um banco que já contém tabelas.
--- Ele é um script de criação inicial, não uma migração; há CREATE TABLE sem IF NOT EXISTS.
--- Não use DROP DATABASE para atualizar o ambiente existente.
--- Estruturas legadas de pedidos/restrições/logs foram mantidas temporariamente
--- até as dependências do backend serem revisadas e removidas.
+
+-- OpenRoute: script de criacao inicial do banco de dados.
+-- Compatibilidade prevista: MariaDB 10.4+ / MySQL 8.0.16+.
+--
+-- ATENCAO: execute somente em um banco novo e vazio.
+-- Este script NAO atualiza a estrutura de um banco existente.
+-- Nao use DROP DATABASE nem execute este script no seu banco atual
+-- para aplicar mudancas. Migracoes devem ser feitas separadamente.
+--
+-- Escopo: perfis ADM e USUARIO, sessoes, enderecos,
+-- rotas calculadas e paradas das rotas.
 
 CREATE DATABASE IF NOT EXISTS open_route;
 
 USE open_route;
 
+-- Perfis
 CREATE TABLE perfis (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     codigo VARCHAR(40) NOT NULL,
@@ -19,6 +25,7 @@ CREATE TABLE perfis (
     UNIQUE KEY uq_perfis_codigo (codigo)
 );
 
+-- Usuarios
 CREATE TABLE usuarios (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     perfil_id BIGINT UNSIGNED NOT NULL,
@@ -37,6 +44,7 @@ CREATE TABLE usuarios (
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
+-- Sessoes autenticadas
 CREATE TABLE sessoes (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     usuario_id BIGINT UNSIGNED NOT NULL,
@@ -54,6 +62,7 @@ CREATE TABLE sessoes (
         ON UPDATE CASCADE ON DELETE CASCADE
 );
 
+-- Enderecos cadastrados pelos motoristas
 CREATE TABLE enderecos (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     usuario_id BIGINT UNSIGNED NOT NULL,
@@ -70,11 +79,13 @@ CREATE TABLE enderecos (
     janela_fim TIME NULL,
     latitude DECIMAL(10,7) NULL,
     longitude DECIMAL(10,7) NULL,
-    validacao_status ENUM('PENDENTE', 'VALIDADO', 'FALHOU') NOT NULL DEFAULT 'PENDENTE',
+    validacao_status ENUM('PENDENTE', 'VALIDADO', 'FALHOU')
+        NOT NULL DEFAULT 'PENDENTE',
     provedor_geocodificacao VARCHAR(50) NULL,
     geocodificado_em DATETIME NULL,
     criado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    atualizado_em DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     KEY ix_enderecos_usuario_id (usuario_id),
     CONSTRAINT fk_enderecos_usuarios
@@ -84,8 +95,11 @@ CREATE TABLE enderecos (
         CHECK (
             (janela_inicio IS NULL AND janela_fim IS NULL)
             OR
-            (janela_inicio IS NOT NULL AND janela_fim IS NOT NULL
-             AND janela_fim >= janela_inicio)
+            (
+                janela_inicio IS NOT NULL
+                AND janela_fim IS NOT NULL
+                AND janela_fim >= janela_inicio
+            )
         ),
     CONSTRAINT chk_enderecos_latitude
         CHECK (latitude IS NULL OR latitude BETWEEN -90 AND 90),
@@ -93,45 +107,28 @@ CREATE TABLE enderecos (
         CHECK (longitude IS NULL OR longitude BETWEEN -180 AND 180)
 );
 
-CREATE TABLE pedidos (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    endereco_id BIGINT UNSIGNED NOT NULL,
-    criado_por_id BIGINT UNSIGNED NULL,
-    descricao TEXT NULL,
-    data_entrega DATE NOT NULL,
-    janela_entrega_inicio TIME NULL,
-    janela_entrega_fim TIME NULL,
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_pedidos_enderecos
-        FOREIGN KEY (endereco_id) REFERENCES enderecos (id)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT fk_pedidos_criado_por
-        FOREIGN KEY (criado_por_id) REFERENCES usuarios (id)
-        ON UPDATE CASCADE ON DELETE SET NULL,
-    CONSTRAINT chk_pedidos_janela_entrega
-        CHECK (
-            janela_entrega_inicio IS NULL
-            OR janela_entrega_fim IS NULL
-            OR janela_entrega_fim >= janela_entrega_inicio
-        )
-);
-
+-- Rotas calculadas
 CREATE TABLE rotas (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     usuario_id BIGINT UNSIGNED NOT NULL,
     criada_por_id BIGINT UNSIGNED NULL,
     nome VARCHAR(120) NULL,
     data_execucao DATE NOT NULL,
-    status ENUM('RASCUNHO', 'CALCULADA', 'EM_ANDAMENTO', 'CONCLUIDA', 'CANCELADA') NOT NULL DEFAULT 'RASCUNHO',
+    status ENUM(
+        'RASCUNHO',
+        'CALCULADA',
+        'EM_ANDAMENTO',
+        'CONCLUIDA',
+        'CANCELADA'
+    ) NOT NULL DEFAULT 'RASCUNHO',
     distancia_total_metros DECIMAL(13,2) NULL,
     tempo_estimado_segundos INT UNSIGNED NULL,
     geometria JSON NULL,
     provedor_calculo VARCHAR(50) NULL,
     calculada_em TIMESTAMP NULL DEFAULT NULL,
     criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    atualizada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     CONSTRAINT fk_rotas_usuarios
         FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
@@ -141,41 +138,10 @@ CREATE TABLE rotas (
         ON UPDATE CASCADE ON DELETE SET NULL
 );
 
-CREATE TABLE restricoes_operacionais (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    rota_id BIGINT UNSIGNED NOT NULL,
-    janela_inicio TIME NULL,
-    janela_fim TIME NULL,
-    observacoes VARCHAR(500) NULL,
-    criada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_restricoes_rotas
-        FOREIGN KEY (rota_id) REFERENCES rotas (id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT chk_restricoes_janela
-        CHECK (janela_inicio IS NULL OR janela_fim IS NULL OR janela_fim >= janela_inicio)
-);
-
-CREATE TABLE rota_pedidos (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    rota_id BIGINT UNSIGNED NOT NULL,
-    pedido_id BIGINT UNSIGNED NOT NULL,
-    ordem_parada SMALLINT UNSIGNED NOT NULL,
-    chegada_prevista DATETIME NULL,
-    saida_prevista DATETIME NULL,
-    adicionada_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_rota_pedidos_rotas
-        FOREIGN KEY (rota_id) REFERENCES rotas (id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT fk_rota_pedidos_pedidos
-        FOREIGN KEY (pedido_id) REFERENCES pedidos (id)
-        ON UPDATE CASCADE ON DELETE RESTRICT
-);
-
--- Paradas de uma rota: snapshot do endereço na data do cálculo.
--- O vínculo com o cadastro pode ficar NULL se o endereço original for excluído.
+-- Paradas de cada rota.
+-- A origem utiliza ordem_parada = 0.
+-- As entregas utilizam ordem_parada = 1, 2, 3...
+-- Os dados do endereco sao preservados no momento do calculo.
 CREATE TABLE rota_enderecos (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     rota_id BIGINT UNSIGNED NOT NULL,
@@ -210,117 +176,28 @@ CREATE TABLE rota_enderecos (
         CHECK (
             (janela_inicio IS NULL AND janela_fim IS NULL)
             OR
-            (janela_inicio IS NOT NULL AND janela_fim IS NOT NULL
-             AND janela_fim >= janela_inicio)
+            (
+                janela_inicio IS NOT NULL
+                AND janela_fim IS NOT NULL
+                AND janela_fim >= janela_inicio
+            )
         )
 );
 
-CREATE TABLE ocorrencias (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    usuario_id BIGINT UNSIGNED NOT NULL,
-    rota_id BIGINT UNSIGNED NULL,
-    pedido_id BIGINT UNSIGNED NULL,
-    descricao TEXT NOT NULL,
-    data_ocorrencia DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    resolvida BOOLEAN NOT NULL DEFAULT FALSE,
-    resolvida_em DATETIME NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_ocorrencias_usuarios
-        FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT fk_ocorrencias_rotas
-        FOREIGN KEY (rota_id) REFERENCES rotas (id)
-        ON UPDATE CASCADE ON DELETE SET NULL,
-    CONSTRAINT fk_ocorrencias_pedidos
-        FOREIGN KEY (pedido_id) REFERENCES pedidos (id)
-        ON UPDATE CASCADE ON DELETE SET NULL
-);
-
-CREATE TABLE alertas (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    administrador_id BIGINT UNSIGNED NOT NULL,
-    rota_id BIGINT UNSIGNED NOT NULL,
-    titulo VARCHAR(150) NOT NULL,
-    mensagem TEXT NOT NULL,
-    ativo BOOLEAN NOT NULL DEFAULT TRUE,
-    criado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    atualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_alertas_administradores
-        FOREIGN KEY (administrador_id) REFERENCES usuarios (id)
-        ON UPDATE CASCADE ON DELETE RESTRICT,
-    CONSTRAINT fk_alertas_rotas
-        FOREIGN KEY (rota_id) REFERENCES rotas (id)
-        ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-CREATE TABLE alertas_visualizacoes (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    alerta_id BIGINT UNSIGNED NOT NULL,
-    usuario_id BIGINT UNSIGNED NOT NULL,
-    visualizado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_visualizacoes_alertas
-        FOREIGN KEY (alerta_id) REFERENCES alertas (id)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-    CONSTRAINT fk_visualizacoes_usuarios
-        FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-        ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-CREATE TABLE auditoria_logs (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    usuario_id BIGINT UNSIGNED NULL,
-    acao VARCHAR(100) NOT NULL,
-    entidade VARCHAR(100) NOT NULL,
-    entidade_id VARCHAR(64) NULL,
-    detalhes JSON NULL,
-    ip_origem VARCHAR(45) NULL,
-    user_agent VARCHAR(500) NULL,
-    registrado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id),
-    CONSTRAINT fk_auditoria_usuarios
-        FOREIGN KEY (usuario_id) REFERENCES usuarios (id)
-        ON UPDATE CASCADE ON DELETE SET NULL
-);
-
-CREATE TABLE integracao_logs (
-    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    provedor VARCHAR(60) NOT NULL,
-    servico VARCHAR(80) NOT NULL,
-    endpoint VARCHAR(500) NULL,
-    metodo_http ENUM('GET', 'POST', 'PUT', 'PATCH', 'DELETE') NULL,
-    codigo_http SMALLINT UNSIGNED NULL,
-    duracao_ms INT UNSIGNED NULL,
-    sucesso BOOLEAN NOT NULL,
-    mensagem_erro TEXT NULL,
-    registrado_em TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (id)
-);
-DROP TRIGGER IF EXISTS trg_auditoria_logs_bloquear_update;
-DROP TRIGGER IF EXISTS trg_auditoria_logs_bloquear_delete;
-
-DELIMITER $$
-CREATE TRIGGER trg_auditoria_logs_bloquear_update
-BEFORE UPDATE ON auditoria_logs
-FOR EACH ROW
-BEGIN
-    SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Registros de auditoria sao imutaveis.';
-END$$
-
-CREATE TRIGGER trg_auditoria_logs_bloquear_delete
-BEFORE DELETE ON auditoria_logs
-FOR EACH ROW
-BEGIN
-    SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Registros de auditoria nao podem ser excluidos.';
-END$$
-DELIMITER ;
-
+-- Perfis iniciais do sistema
 INSERT INTO perfis (codigo, nome, descricao)
-SELECT 'ADM', 'Administrador', 'Gerencia as contas de usuarios do sistema.'
-WHERE NOT EXISTS (SELECT 1 FROM perfis WHERE codigo = 'ADM')
+SELECT
+    'ADM',
+    'Administrador',
+    'Gerencia as contas de usuarios do sistema.'
+WHERE NOT EXISTS (
+    SELECT 1 FROM perfis WHERE codigo = 'ADM'
+)
 UNION ALL
-SELECT 'USUARIO', 'Usuario', 'Utiliza as funcionalidades operacionais do Open Route.'
-WHERE NOT EXISTS (SELECT 1 FROM perfis WHERE codigo = 'USUARIO');
+SELECT
+    'USUARIO',
+    'Usuario',
+    'Utiliza as funcionalidades operacionais do Open Route.'
+WHERE NOT EXISTS (
+    SELECT 1 FROM perfis WHERE codigo = 'USUARIO'
+);
