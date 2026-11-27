@@ -25,6 +25,9 @@ def AplicarGeocodificacao(destino):
     destino.longitude = None
     destino.provedor_geocodificacao = None
     destino.geocodificado_em = None
+    destino.validacao_status = StatusValidacao.PENDENTE
+
+    geoportalIndisponivel = False
 
     # Primeiro tenta localizar lotes cadastrados no DF.
     try:
@@ -38,10 +41,12 @@ def AplicarGeocodificacao(destino):
 
     except ErroGeoportal as erro:
         logger.warning(
-            "Geoportal DF indisponível: %s", erro
+            "Geoportal DF indisponível: %s. "
+            "Tentando Nominatim.",
+            erro,
         )
-        destino.validacao_status = StatusValidacao.PENDENTE
-        return destino
+        geoportalIndisponivel = True
+        coordenadas = None
 
     if coordenadas is not None:
         destino.latitude = coordenadas["latitude"]
@@ -51,8 +56,8 @@ def AplicarGeocodificacao(destino):
         destino.geocodificado_em = datetime.utcnow()
         return destino
 
-    # Se o Geoportal não encontrou correspondência,
-    # utiliza o Nominatim.
+    # Se o Geoportal não encontrou correspondência
+    # ou apresentou erro, tenta o Nominatim.
     try:
         coordenadas = GeocodificarEndereco(
             logradouro=destino.logradouro,
@@ -66,19 +71,25 @@ def AplicarGeocodificacao(destino):
 
     except ErroNominatim as erro:
         logger.warning(
-            "Nominatim indisponível: %s", erro
+            "Nominatim indisponível: %s",
+            erro,
         )
         destino.validacao_status = StatusValidacao.PENDENTE
         return destino
 
-    destino.provedor_geocodificacao = "nominatim"
-    destino.geocodificado_em = datetime.utcnow()
-
-    if coordenadas is None:
-        destino.validacao_status = StatusValidacao.FALHOU
-    else:
+    if coordenadas is not None:
         destino.latitude = coordenadas["latitude"]
         destino.longitude = coordenadas["longitude"]
+        destino.provedor_geocodificacao = "nominatim"
         destino.validacao_status = StatusValidacao.VALIDADO
+        destino.geocodificado_em = datetime.utcnow()
+        return destino
+
+    # Se o Geoportal estava indisponível,
+    # não podemos concluir que o endereço é inválido.
+    if geoportalIndisponivel:
+        destino.validacao_status = StatusValidacao.PENDENTE
+    else:
+        destino.validacao_status = StatusValidacao.FALHOU
 
     return destino
