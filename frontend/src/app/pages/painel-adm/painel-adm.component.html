@@ -6,9 +6,6 @@
   rotaLogo="/home"
   (abaSelecionada)="selecionarAba($event, null)"
 >
-    <div *ngIf="isAdm">
-        <button class="botao botao-primario" (click)="deslogar()" [disabled]="deslogando">Logout</button>
-    </div>
 </app-navbar>
 
 <main class="conteudo">
@@ -30,10 +27,10 @@
                 <p class="descricao">Usuários cadastrados no sistema</p>
             </div>
             <div>
-                <button type="button" class="botao botao-secundario botao-atualizar" (click)="atualizarListaUsuarios()" [disabled]="carregando || !isAdm">
+                <button type="button" class="botao botao-secundario botao-atualizar" (click)="atualizarListaUsuarios()" [disabled]="carregando">
                     {{ carregando ? 'Carregando' : 'Atualizar lista'}}
                 </button>
-                <button type="button" class="botao botao-primario" (click)="selecionarAba('cadastrar-usuario', null)" [disabled]="carregando || !isAdm">
+                <button type="button" class="botao botao-primario" (click)="selecionarAba('cadastrar-usuario', null)" [disabled]="carregando">
                     Cadastrar usuário
                 </button>
             </div>

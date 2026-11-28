@@ -9,8 +9,6 @@ import { UsuarioService } from '../../services/usuario.service';
 import { HttpResponse } from '@angular/common/http';
 import { Mensagem, TipoMensagem } from '../../models/mensagem.model';
 import { limpaCampoTelefoneUsuario, telefonesUsuarioIguais, validarEmailUsuario, validarNomeUsuario, validarSenhaUsuario, validarTelefoneUsuario } from '../../shared/validacaoUsuario.util';
-import { AutenticacaoService } from '../../services/autenticacao.service';
-import { Router } from '@angular/router';
 
 type Aba = 'listar-usuario' | 'cadastrar-usuario' | 'editar-usuario' | 'detalhar-usuario';
 type erroEdicao = '' | 'validacao' | 'igual';
@@ -45,7 +43,6 @@ export class PainelAdmComponent implements OnInit{
 
     public abaAtiva: Aba = 'listar-usuario';
 
-    public isAdm: boolean = false;
     public deslogando: boolean = false;
 
     public mensagem: Mensagem | null = null;
@@ -71,44 +68,11 @@ export class PainelAdmComponent implements OnInit{
 
     constructor(
         private _cdr: ChangeDetectorRef,
-        private _router: Router,
-        private _usuarioService: UsuarioService,
-        private _autenticacaoService: AutenticacaoService
+        private _usuarioService: UsuarioService
     ){}
 
     ngOnInit(): void {
-        this.checkAdm();
         this.atualizarListaUsuarios();
-    }
-
-    public checkAdm(): void {
-        this.isAdm = Boolean(sessionStorage.getItem('TipoUsuario') === 'ADM') && Boolean(sessionStorage.getItem('BearerToken'));
-    }
-
-    public deslogar():void {
-        this.deslogando = true;
-
-        this._autenticacaoService.logout().pipe(
-            takeUntil(this._destroy$)
-        ).subscribe({
-            next: (response: HttpResponse<any>) => {
-                if(response.status === 204){
-                    this._autenticacaoService.removerSessionLogin();
-                    this.deslogando = false;
-                    this._router.navigate(['home']);
-                }
-            },
-            error: (erro) => {
-                this.mensagem = {
-                    tipo: TipoMensagem.ERRO,
-                    texto: mensagemDeErro(
-                        erro,
-                        'Não foi possível fazer logout, tente novamente.'
-                    )
-                } as Mensagem;
-                this.deslogando = false;
-            }
-        });
     }
 
     public atualizarListaUsuarios(): void {
@@ -117,10 +81,6 @@ export class PainelAdmComponent implements OnInit{
     };
 
     public selecionarAba(aba: string, mensagem: Mensagem | null): void {
-        if(!this.isAdm){
-            return
-        }
-
         this.mensagem = mensagem;
 
         this.formCadastro = {} as UsuarioCreateRequest;
@@ -200,7 +160,7 @@ export class PainelAdmComponent implements OnInit{
         if(!this._validarCadastro() || this.cadastrando){
             return;
         }
-            
+
         this.cadastrando = true;
         this._usuarioService.cadastrarUsuario(
             this._setUsuarioCadastroInput()
